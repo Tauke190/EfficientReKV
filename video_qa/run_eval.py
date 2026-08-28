@@ -403,10 +403,8 @@ def eval_ovobench(args, mode):
 def eval_ovobench_realtime(args):
     eval_ovobench(args, 'realtime')
 
-
 def eval_ovobench_backward(args):
     eval_ovobench(args, 'backward')
-
 
 def eval_fpsbench_stream(args):
     """FPS-Bench-Stream: the FPSBench clip hidden in a 600 s haystack, asked at the end.
@@ -479,110 +477,6 @@ def eval_fpsbench_stream(args):
     # short-clip arm runs -- both write the same no-lookahead columns.
     score(args, f"python video_qa/eval/eval_fpsbench_stream.py --save_dir {save_dir}")
     exec(f"python video_qa/eval/check_fpsbench_stream.py --save_dir {save_dir}")
-
-
-def eval_fpsbench_stream_small(args):
-    """FPSBench's own 2-25 s clips, streamed, questioned at certificate time.
-
-    "small" is the clip length, not the question count: this is the released FPSBench,
-    996 short clips, one question each. The long-video arm built on the same questions is
-    `fpsbench_stream` below, where each clip is spliced into a 600 s haystack and the
-    question is asked at the end -- that one tests retrieval over a long memory, this one
-    tests whether fast motion was resolved as it went past. They share the prompt, the
-    exact-fps grid and the audit columns, and nothing else.
-
-    Frames arrive one per forward pass and each question fires at the end of its temporal
-    certificate (video_qa/rekv_fpsbench_stream_small_vqa.py). The offline arm was removed:
-    ReKV is a streaming model, so answering after the whole clip has been ingested measures
-    its ingestion path rather than whether it resolved the motion in time.
-
-    `--sample_fps` is exact here by construction, so there is no `--exact_fps` flag and no
-    '-exactfps' directory suffix: the stride path cannot deliver a controlled frame rate on
-    clips recorded at 23.98/25/29.97/30 fps.
-    """
-    num_chunks = args.num_chunks
-    trigger_tag = "-fullclip" if args.full_clip else ""
-    # A separate directory rather than a column, because an MBA run and a multiple-choice
-    # run of the same arm have different row counts and different metrics; merging them
-    # into one path would make `results.csv` mean two things.
-    mba_tag = "-mba" if args.mba else ""
-    save_dir = (f"results/{args.model}/fpsbench_stream_small/{args.retrieve_size}-{args.sample_fps}"
-                f"{trigger_tag}{mba_tag}{reduction_tag(args)}")
-    solver = "rekv_fpsbench_stream_small_vqa"
-    # MBA needs the answer key; multiple choice does not and defaults to the question-only
-    # file, which is what keeps the key out of the ordinary path.
-    default_anno = ("data/fpsbench/test_mc_keyed.json" if args.mba
-                    else "data/fpsbench/test_mc.json")
-    anno_path = args.anno_path or default_anno
-    prompt_args = ["--max_new_tokens", str(args.max_new_tokens),
-                   "--choice_seed", str(args.choice_seed)]
-    if args.no_none_of_above:
-        prompt_args.append("--no_none_of_above")
-    if args.shuffle_choices:
-        prompt_args.append("--shuffle_choices")
-    # Latency flags. Recorded columns are unconditional; these two change what the number
-    # measures, so they have to reach the worker.
-    if args.force_answer_length:
-        prompt_args.append("--force_answer_length")
-    if args.retrieval_breakdown:
-        prompt_args.append("--retrieval_breakdown")
-    if args.full_clip:
-        prompt_args.append("--full_clip")
-    if args.mba:
-        prompt_args += ["--mba", "--mba_scoring", args.mba_scoring,
-                        "--mba_max_new_tokens", str(args.mba_max_new_tokens)]
-        if args.mba_include_none:
-            prompt_args.append("--mba_include_none")
-    if not args.only_eval:
-        # QA
-        processes = []
-        for idx in range(0, num_chunks):
-            cmd = ["python", f"video_qa/{solver}.py",
-                    "--model", args.model,
-                    "--sample_fps", str(args.sample_fps),
-                    "--n_local", str(args.n_local),
-                    "--retrieve_size", str(args.retrieve_size),
-                    "--save_dir", save_dir,
-                    "--anno_path", anno_path,
-                    "--debug", args.debug,
-                    "--num_chunks", str(num_chunks),
-                    "--chunk_idx", str(idx)] + reduction_args(args) + prompt_args
-            p = multiprocessing.Process(target=exec, args=(cmd, True, f'{4*idx},{4*idx+1},{4*idx+2},,{4*idx+3}' if args.model=='llava_ov_72b' else str(idx)))  # llava_ov_72b needs 4x 80GB GPUs
-            processes.append(p)
-            p.start()
-        for p in processes:
-            p.join()
-        # Every chunk must have produced its file before anything is merged. The merge is
-        # shell redirection with no error checking: a chunk that died leaves `head -n 1`
-        # with nothing to read, so `results.csv` ends up with no header row and only the
-        # surviving chunks' data -- a file that still loads, still has plausible row
-        # counts, and is silently missing a quarter of the benchmark. That is a worse
-        # outcome than a crash, so fail here and say which chunks are gone.
-        missing = [idx for idx in range(num_chunks)
-                   if not os.path.exists(f"{save_dir}/{num_chunks}_{idx}.csv")]
-        if missing:
-            raise RuntimeError(
-                f"{save_dir}: chunks {missing} produced no output -- refusing to merge a "
-                f"partial run into results.csv. Check the log above for their traceback; "
-                f"the usual cause is num_chunks ({num_chunks}) exceeding the number of "
-                f"GPUs the job actually got, which makes the surplus workers fail with "
-                f"'No CUDA GPUs are available'.")
-        # merge results
-        exec(f"> {save_dir}/results.csv")
-        for idx in range(num_chunks):
-            if idx == 0:
-                exec(f"head -n 1 {save_dir}/{num_chunks}_{idx}.csv > {save_dir}/results.csv")
-            exec(f"tail -n +2 {save_dir}/{num_chunks}_{idx}.csv >> {save_dir}/results.csv")
-            exec(f"rm {save_dir}/{num_chunks}_{idx}.csv")
-    # An MBA run carries the key, so it scores locally. A multiple-choice run against the
-    # question-only release does not: it ends at the submission JSONL, and the exporter
-    # would in any case make no sense of K binary rows per question.
-    if args.mba:
-        exec(f"python video_qa/eval/eval_fpsbench_mba.py --save_dir {save_dir}")
-    else:
-        exec(f"python video_qa/eval/export_fpsbench.py --save_dir {save_dir}")
-    exec(f"python video_qa/eval/check_fpsbench_stream.py --save_dir {save_dir}")
-
 
 def eval_cgbench(args):
     num_chunks = args.num_chunks
