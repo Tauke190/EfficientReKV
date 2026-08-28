@@ -1,0 +1,176 @@
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# =========================
+# Virtual environments
+# =========================
+.venv/
+venv/
+env/
+ENV/
+
+# =========================
+# Jupyter Notebook
+# =========================
+.ipynb_checkpoints/
+
+# =========================
+# Machine Learning Datasets
+# =========================
+/data/
+/datasets/
+/dataset/
+*.csv
+*.tsv
+*.jsonl
+*.parquet
+*.feather
+*.arrow
+
+# Compressed datasets
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.7z
+*.rar
+
+# =========================
+# Trained Models / Weights
+# =========================
+/models/
+model_zoo/
+checkpoints/
+weights/
+/artifacts/
+
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.bin
+*.onnx
+*.pb
+*.h5
+*.hdf5
+*.pkl
+*.pickle
+*.joblib
+*.tflite
+
+# =========================
+# ML Experiment Outputs
+# =========================
+/runs/
+/experiments/
+/outputs/
+/results/
+/logs/
+wandb/
+mlruns/
+tensorboard/
+lightning_logs/
+
+# =========================
+# Hugging Face
+# =========================
+.cache/
+huggingface/
+transformers_cache/
+
+# =========================
+# PyTorch
+# =========================
+torch_cache/
+
+# =========================
+# TensorFlow / Keras
+# =========================
+.keras/
+tensorflow_datasets/
+
+# =========================
+# Temporary / Cache Files
+# =========================
+cache/
+tmp/
+temp/
+*.tmp
+*.temp
+
+# =========================
+# IDEs / Editors
+# =========================
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# =========================
+# Environment / Secrets
+# =========================
+.env
+.env.*
+!.env.example
+
+# API keys / credentials (scripts/score_llmjudge_gpt.sh reads scripts/.openai_key)
+.openai_key
+*.key
+!*.pub.key
+*.pem
+credentials.json
+secrets.json
+
+# =========================
+# Python Packaging
+# =========================
+*.egg-info/
+/dist/
+/build/
+.eggs/
+
+# =========================
+# Profiling / Coverage
+# =========================
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# =========================
+# Large generated files
+# =========================
+*.log
+*.out
+*.err
+
+# =========================
+# Common ML image/video/audio data
+# =========================
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.wav
+*.mp3
+*.flac
+*.jpg
+*.jpeg
+*.png
+*.webp
+*.tif
+*.tiff
