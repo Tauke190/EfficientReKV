@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=rekv_eval
-#SBATCH --output=/home/av354855/EfficientVideoXLPro/slurmlogs/rekv_eval-%j.out
+#SBATCH --output=/home/av354855/EfficientReKV/slurmlogs/rekv_eval-%j.out
 #SBATCH --gres-flags=enforce-binding
 #SBATCH -p gpu
 #SBATCH -C gmem48
@@ -20,16 +20,8 @@ eval "$(conda shell.bash hook)"
 # Activate the ReKV conda environment
 conda activate Rekv
 
-LOGDIR=/home/av354855/EfficientVideoXLPro/slurmlogs
+LOGDIR=/home/av354855/EfficientReKV/slurmlogs
 
-# A full home quota kills the batch step in ~1s with ExitCode 0:53 and no .out file,
-# before this script ever runs. This guard only catches the quota filling later; a job
-# that vanishes leaving no log is a quota problem, not a code problem.
-if ! touch "${LOGDIR}/.writetest" 2>/dev/null; then
-    echo "FATAL: ${LOGDIR} not writable -- home quota is full. Free space and resubmit." >&2
-    exit 1
-fi
-rm -f "${LOGDIR}/.writetest"
 
 # Stop matplotlib dumping base64 PNGs into stdout and throttle tqdm; unset, these grew
 # past logs to 25MB each.
@@ -45,7 +37,15 @@ echo "Checking PyTorch CUDA version and availability:"
 python -c "import torch; print('torch.version.cuda:', torch.version.cuda); print('torch.cuda.is_available:', torch.cuda.is_available())"
 
 # Change directory
-cd /home/av354855/EfficientVideoXLPro/ReKV
+cd /home/av354855/EfficientReKV
+
+# The repo root has to be on sys.path, not just be the cwd: run_eval.py launches its
+# workers as `python video_qa/<solver>.py`, which puts video_qa/ on sys.path[0] and leaves
+# the root off entirely. The `video_qa`/`model` imports inside a worker would then resolve
+# through the Rekv env's editable rekv-1.0 install, which maps both packages to the
+# EfficientVideoXLPro/ReKV clone -- so the workers would run that tree's code while
+# run_eval itself ran this one. See the same note in scripts/eval.sh.
+export PYTHONPATH="$(pwd)${PYTHONPATH:+:${PYTHONPATH}}"
 
 # NUM_CHUNKS below must match #SBATCH --gres=gpu:N above -- run_eval.py
 # spawns one process per chunk, each pinned to its own GPU via CUDA_VISIBLE_DEVICES.
@@ -56,14 +56,31 @@ NUM_CHUNKS=4
 MODEL=llava_ov_7b
 
 # Supported dataset: qaego4d egoschema cgbench mlvu activitynet_qa rvs_ego rvs_movie
-# ovobench_realtime / ovobench_backward / fpsbench_stream are valid --dataset values too,
-# but each needs its annotation built first (video_qa/convert_ovobench.py,
-# video_qa/convert_fpsbench_stream.py) and a sample_fps of its own. Their extra flags
-# (--trigger, --anno_path) are not knobs here; add them to the run_eval call below if a
-# run needs them.
+# ovobench_realtime / ovobench_backward / fpsbench_stream / odvbench are valid --dataset
+# values too, but each needs its annotation built first (video_qa/convert_ovobench.py,
+# video_qa/convert_fpsbench_stream.py, scripts/setup_odvbench.py) and a sample_fps of its
+# own. --trigger is a knob below; --anno_path is not, so add it to the run_eval call if a
+# subset run needs it.
 # Space-separated: each dataset is evaluated in turn.
 DATASETS="rvs_ego rvs_movie"
+
+# odvbench is the outlier here: it is streaming (each question may only see frames up to
+# its own end_time, like ovobench), and its clips run 5-90 s -- median 33 s -- so 0.5 fps
+# gives an early question a single frame. Use 2 or more. Note also that no odvbench clip
+# comes close to n_local, so the retrieval path never fires: the run measures the
+# reduction stages' effect on perception, not on retrieval.
 SAMPLE_FPS=0.5
+
+# fpsbench_stream only -- when each question fires. 'query' asks at query_time_sec, while
+# the needle is still the newest thing in the cache: that measures realtime perception, the
+# model's ability to answer about what it just saw. 'end' asks only after all 600 s have
+# been ingested, so the needle has to be retrieved back out of a memory dominated by
+# unrelated footage -- a retrieval measurement, and the benchmark's own default protocol.
+# The two arms write to different results dirs ('query' adds a -query suffix), so neither
+# overwrites the other. Ignored by every other dataset. For a frame-rate sweep over
+# fpsbench_stream (1..32 fps, with the chunk count sized to host memory at each rate), use
+# scripts/eval_fpsbenchstream.slurm rather than this file.
+TRIGGER=query
 N_LOCAL=15000
 RETRIEVE_SIZE=64
 
@@ -113,6 +130,11 @@ for DATASET in ${DATASETS}; do
         --prune_method ${PRUNE_METHOD} --prune_threshold ${THR} \
         --prune_metric ${PRUNE_METRIC} --prune_refresh_every ${PRUNE_REFRESH_EVERY}"
 
+    # --trigger is fpsbench_stream's alone; forwarding it elsewhere would put an
+    # inapplicable flag on every other dataset's command line.
+    TRIGGER_ARGS=""
+    [ "${DATASET}" = "fpsbench_stream" ] && TRIGGER_ARGS="--trigger ${TRIGGER}"
+
     echo "=== ${MODEL} | ${DATASET} | s1=${VISION_METHOD} | s2=${PRUNE_METHOD}@${THR} ==="
     python -m video_qa.run_eval \
         --num_chunks ${NUM_CHUNKS} \
@@ -122,6 +144,7 @@ for DATASET in ${DATASETS}; do
         --n_local ${N_LOCAL} \
         --retrieve_size ${RETRIEVE_SIZE} \
         ${SKIP_SCORING} \
+        ${TRIGGER_ARGS} \
         ${REDUCE_ARGS}
   done
 done

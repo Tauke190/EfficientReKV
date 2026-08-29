@@ -110,6 +110,16 @@ def add_args(parser):
                              "bias; the presented order goes into the results CSV.")
     parser.add_argument("--choice_seed", type=int, default=2024,
                         help="--shuffle_choices only: RNG seed, per question.")
+    parser.add_argument("--decode_window", type=int, default=256,
+                        help="Slots decoded at a time (0 = the whole stream up front, "
+                             "which is what every solver here did before this flag). "
+                             "Frames are held at source resolution -- a median "
+                             "FPS-Bench-Stream frame is 4.6 MB -- so a whole-stream decode "
+                             "is 600 x sample_fps x 4.6 MB per worker: 2.7 GB at 1 fps but "
+                             "85 GB at 32 fps, times --num_chunks workers on one node. "
+                             "Frames arrive in order and are never re-read, so windowing "
+                             "decodes each block exactly once and only bounds residency; "
+                             "the frames themselves are identical either way.")
     parser.add_argument("--trigger", type=str, default='end', choices=['end', 'query'],
                         help="When each question fires. 'end' (default) is this "
                              "benchmark's protocol: the whole 600 s stream has been "
@@ -142,6 +152,7 @@ class ReKVFPSBenchStreamVQA(BaseVQA):
         self.choice_seed = args.choice_seed
         self.force_answer_length = args.force_answer_length
         self.retrieval_breakdown = args.retrieval_breakdown
+        self.decode_window = args.decode_window
 
     # --- ingestion ------------------------------------------------------------------
 
@@ -149,7 +160,8 @@ class ReKVFPSBenchStreamVQA(BaseVQA):
         # exact=True regardless of --exact_fps, for the reason in the module docstring:
         # the stride grid does not put slot k at t = k / sample_fps, and every conversion
         # in this file assumes it does.
-        return FrameStream(video_sample['video_path'], self.sample_fps, exact=True)
+        return FrameStream(video_sample['video_path'], self.sample_fps, exact=True,
+                           window=self.decode_window)
 
     def ingest(self, stream, start, end):
         """Encode slots [start, end) as they arrive, one forward pass each.

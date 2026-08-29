@@ -2,6 +2,16 @@
 # ReKV evaluation, run directly (no scheduler). scripts/eval.slurm is the sbatch twin --
 # same knobs, same loop; keep the two in step when changing either.
 
+# Import this checkout, not whatever `pip install -e` last registered. The Rekv env has an
+# editable install of rekv-1.0 whose finder hard-maps the `video_qa` and `model` packages to
+# a different clone (EfficientVideoXLPro/ReKV). run_eval launches its workers as
+# `python video_qa/<solver>.py`, so sys.path[0] is video_qa/ -- the repo root is not on the
+# path at all, PathFinder misses, and the editable finder answers with the other clone. Every
+# `from video_qa.base import ...` in a worker then loads code from outside this tree. Putting
+# the repo root on PYTHONPATH lets PathFinder win, since the editable finder is appended to
+# sys.meta_path rather than prepended.
+export PYTHONPATH="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)${PYTHONPATH:+:${PYTHONPATH}}"
+
 # The number of processes utilized for parallel evaluation.
 # Normally, set it to the number of GPUs on your machine.
 # Yet, llava_ov_72b needs 4x 80GB GPUs. So set num_chunks to num_gpus//4.
@@ -11,14 +21,29 @@ num_chunks=1
 model=llava_ov_0.5b
 
 # Supported dataset: qaego4d egoschema cgbench mlvu activitynet_qa rvs_ego rvs_movie
-# ovobench_realtime / ovobench_backward / fpsbench_stream are valid --dataset values too,
-# but each needs its annotation built first (video_qa/convert_ovobench.py,
-# video_qa/convert_fpsbench_stream.py) and a sample_fps of its own. Their extra flags
-# (--trigger, --anno_path) are not knobs here; add them to the run_eval call below if a
-# run needs them.
+# ovobench_realtime / ovobench_backward / fpsbench_stream / odvbench are valid --dataset
+# values too, but each needs its annotation built first (video_qa/convert_ovobench.py,
+# video_qa/convert_fpsbench_stream.py, scripts/setup_odvbench.py) and a sample_fps of its
+# own. --trigger is a knob below; --anno_path is not, so add it to the run_eval call if a
+# subset run needs it.
 # Space-separated: each dataset is evaluated in turn.
 datasets="rvs_ego rvs_movie"
+
+# odvbench is the outlier here: it is streaming (each question may only see frames up to
+# its own end_time, like ovobench), and its clips run 5-90 s -- median 33 s -- so 0.5 fps
+# gives an early question a single frame. Use 2 or more. Note also that no odvbench clip
+# comes close to n_local, so the retrieval path never fires: the run measures the
+# reduction stages' effect on perception, not on retrieval.
 sample_fps=0.5
+
+# fpsbench_stream only -- when each question fires. 'query' asks at query_time_sec, while
+# the needle is still the newest thing in the cache: that measures realtime perception, the
+# model's ability to answer about what it just saw. 'end' asks only after all 600 s have
+# been ingested, so the needle has to be retrieved back out of a memory dominated by
+# unrelated footage -- a retrieval measurement, and the benchmark's own default protocol.
+# The two arms write to different results dirs ('query' adds a -query suffix), so neither
+# overwrites the other. Ignored by every other dataset.
+trigger=query
 n_local=15000
 retrieve_size=64
 
@@ -68,6 +93,11 @@ for dataset in ${datasets}; do
         --prune_method ${prune_method} --prune_threshold ${thr} \
         --prune_metric ${prune_metric} --prune_refresh_every ${prune_refresh_every}"
 
+    # --trigger is fpsbench_stream's alone; forwarding it elsewhere would put an
+    # inapplicable flag on every other dataset's command line.
+    trigger_args=""
+    [ "${dataset}" = "fpsbench_stream" ] && trigger_args="--trigger ${trigger}"
+
     echo "=== ${model} | ${dataset} | s1=${vision_method} | s2=${prune_method}@${thr} ==="
     python -m video_qa.run_eval \
         --num_chunks ${num_chunks} \
@@ -77,6 +107,7 @@ for dataset in ${datasets}; do
         --n_local ${n_local} \
         --retrieve_size ${retrieve_size} \
         ${skip_scoring} \
+        ${trigger_args} \
         ${reduce_args}
   done
 done

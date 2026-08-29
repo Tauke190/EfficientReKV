@@ -23,19 +23,19 @@ exists below.
 
 
 import torch
-from decord import VideoReader, cpu
 from logzero import logger
 
-from video_qa.base import BaseVQA, work
+from video_qa.base import BaseVQA, open_video_reader, work
 
 
 class FrameStream:
-    """The sampled frames of a video, decoded up front and handed over one at a time.
+    """The sampled frames of a video, decoded ahead and handed over one at a time.
 
-    The decode is upstream ReKV's -- a single `vr.get_batch(frame_idx)` -- so the frames
-    and the decode cost are the reference implementation's. Only what happens afterwards
-    differs: frames leave this object one at a time, so the encode path still never batches
-    a frame with its neighbours and never encodes one past the question it is answering.
+    The decode is upstream ReKV's -- `vr.get_batch(frame_idx)`, over the whole video by
+    default -- so the frames and the decode cost are the reference implementation's. Only
+    what happens afterwards differs: frames leave this object one at a time, so the encode
+    path still never batches a frame with its neighbours and never encodes one past the
+    question it is answering.
 
     The arrival grid is BaseVQA.load_video's, so a streaming run and an offline run of the
     same file at the same --sample_fps see the same frames:
@@ -51,10 +51,20 @@ class FrameStream:
     which is what keeps a 2-hour source video affordable; `len()` reports the capped
     length, and `n_available` the length before the cap, so a caller can tell that it
     truncated something.
+
+    `window` decodes in blocks of that many slots instead of all of them up front, holding
+    one block at a time. The default (None) keeps the whole-video decode every previous run
+    used, and is right while the decoded video is small. It stops being right as
+    --sample_fps rises: the pixels are held at source resolution, so a 600 s
+    FPS-Bench-Stream video is ~4.6 MB/frame x 600 x fps -- 2.7 GB at 1 fps but 85 GB at
+    32 fps, per worker, on top of the KV-Cache. Frames arrive in order and are never read
+    again, so a block is decoded exactly once either way; windowing only bounds what is
+    resident. Random access still works, but a caller that jumps between blocks re-decodes
+    on every jump.
     """
 
-    def __init__(self, video_path, sample_fps, exact=False, num_frames=None):
-        vr = VideoReader(video_path, ctx=cpu(0))
+    def __init__(self, video_path, sample_fps, exact=False, num_frames=None, window=None):
+        vr = open_video_reader(video_path)
         self.sample_fps = sample_fps
         n_src = len(vr)
         src_fps = round(vr.get_avg_fps())
@@ -70,11 +80,33 @@ class FrameStream:
         self.n_available = len(self._index)
         if num_frames is not None:
             self._index = self._index[:max(1, num_frames)]
-        self._video = torch.from_numpy(vr.get_batch(self._index).asnumpy())
-        logger.debug(f'video shape: {tuple(self._video.shape)}')
+        self.window = int(window) if window else None
+        self._block = None        # the decoded block, windowed mode only
+        self._block_start = -1
+        if self.window:
+            # The reader has to outlive __init__ here, unlike the eager path where the
+            # pixels are all copied out before it goes.
+            self._vr = vr
+            logger.debug(f'video: {len(self._index)} slots, decoded '
+                         f'{self.window} at a time')
+        else:
+            self._video = torch.from_numpy(vr.get_batch(self._index).asnumpy())
+            logger.debug(f'video shape: {tuple(self._video.shape)}')
 
     def __len__(self):
         return len(self._index)
+
+    def _load_block(self, k):
+        """Decode the block holding slot k, dropping the one before it.
+
+        The old block is released before the new one is read so the two are never resident
+        together -- the peak is one block, which is the whole point of windowing.
+        """
+        start = (k // self.window) * self.window
+        self._block = None
+        idx = self._index[start:start + self.window]
+        self._block = torch.from_numpy(self._vr.get_batch(idx).asnumpy())
+        self._block_start = start
 
     def get(self, k):
         """Slot k on its own, as a (1, H, W, 3) uint8 tensor.
@@ -83,6 +115,11 @@ class FrameStream:
         (video_qa/measure_encoding_fps.py). The streaming solvers go through `frames`,
         which is the same read in arrival order.
         """
+        if self.window:
+            if self._block is None or not (
+                    self._block_start <= k < self._block_start + len(self._block)):
+                self._load_block(k)
+            return self._block[k - self._block_start:k - self._block_start + 1]
         return self._video[k:k + 1]
 
     def frames(self, start, end):

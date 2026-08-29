@@ -50,13 +50,13 @@ from collections import defaultdict
 
 import pandas as pd
 import torch
-from decord import VideoReader, cpu
 from tqdm import tqdm
 from transformers import logging as hf_logging
 
 import logzero
 from logzero import logger
 
+from video_qa.base import open_video_reader
 from model.token_pruning import StreamingTokenPruner
 from video_qa.base import MODELS
 
@@ -93,7 +93,7 @@ def sample_clips(anno, num_videos, seed):
 
 def load_video(video_path, sample_fps):
     """Frame sampling identical to `BaseVQA.load_video`, plus the rate it really used."""
-    vr = VideoReader(video_path, ctx=cpu(0))
+    vr = open_video_reader(video_path)
     native_fps = round(vr.get_avg_fps())
     stride = max(1, int(native_fps / sample_fps))
     frame_idx = list(range(0, len(vr), stride))

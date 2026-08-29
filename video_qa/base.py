@@ -5,10 +5,12 @@ import os
 import math
 import argparse
 
+import numpy as np
 import pandas as pd
 import torch
 from tqdm import tqdm
 from decord import VideoReader, cpu
+from decord._ffi.base import DECORDError
 from transformers import (
     logging,
     LlavaOnevisionForConditionalGeneration, LlavaOnevisionProcessor,
@@ -55,6 +57,138 @@ MODELS = {
 }
 
 
+
+class _FrameBatch:
+    """decord's batch handle, for the one method every caller here uses."""
+
+    def __init__(self, frames):
+        self._frames = frames
+
+    def asnumpy(self):
+        return self._frames
+
+
+class NpyFrameReader:
+    """A pre-extracted `(T, H, W, 3)` uint8 frame array behind decord's VideoReader API.
+
+    RVS-Movie (data/rvs/movie/*.npy) ships MovieNet already decoded rather than as a
+    container, so decord cannot open those paths at all -- it demuxes the numpy header and
+    reports the file as invalid data. Frame count equals the annotation's `duration` in
+    seconds, which is where the 1.0 below comes from: the frames are one per second and
+    there is no header to read a rate out of.
+
+    Memory-mapped, because these arrays run to ~1 GB and every caller subsamples to a
+    stride immediately -- materializing a whole movie to keep every other frame would cost
+    more RAM than the sampled frames themselves.
+    """
+
+    def __init__(self, video_path):
+        self._frames = np.load(video_path, mmap_mode='r')
+
+    def __len__(self):
+        return len(self._frames)
+
+    def get_avg_fps(self):
+        return 1.0
+
+    def get_batch(self, frame_idx):
+        # Fancy-indexing a memmap already returns an in-memory copy, so this is the point
+        # where the sampled frames -- and only those -- are read off disk.
+        return _FrameBatch(np.asarray(self._frames[list(frame_idx)]))
+
+
+def decord_num_threads():
+    """How many decode threads decord may use.
+
+    decord's default (`num_threads=0`) sizes its thread pool from the machine's hardware
+    concurrency, which ignores the CPU affinity mask a scheduler hands the process: 40
+    threads on the 8 CPUs `--cpus-per-gpu=8` actually granted. That oversubscription is
+    worth avoiding on its own -- under `--num_chunks 4` it is four full-size pools sharing
+    one allocation -- but note it is *not* what causes the DECORDError that
+    `_RetryingVideoReader` below exists to survive. See that class for the real fault.
+
+    Sizing the pool to the affinity mask costs little: measured on 40 ODV-Bench clips,
+    28.1 frames/s at 8 threads against 32.2 at the unbounded default, where forcing a
+    single thread would give 13.8.
+
+    `REKV_DECORD_THREADS` overrides. run_eval.py sets it when it fans out, since only the
+    parent knows how many workers will be sharing the allocation.
+    """
+    override = os.environ.get('REKV_DECORD_THREADS')
+    if override:
+        return max(1, int(override))
+    try:
+        return max(1, len(os.sched_getaffinity(0)))
+    except AttributeError:  # not Linux
+        return max(1, os.cpu_count() or 1)
+
+
+class _RetryingVideoReader:
+    """decord VideoReader that drops to single-threaded decode when threading faults.
+
+    decord 0.6.0's multi-threaded decoder is broken on some H.264 streams. Its worker
+    calls `avcodec_send_packet`, gets EAGAIN (-11), treats it as fatal and dies; the next
+    `Pop()` then fails the liveness check and the whole run aborts with
+
+        DECORDError: threaded_decoder.cc:104: Check failed: run_.load()
+
+    (the more informative "Thread worker: Error sending packet ... (-11 vs. 0)" only
+    surfaces on some attempts, which is what makes the bare CHECK so hard to read).
+
+    It is a property of the file, not of load or batch size: `data/rvs/ego/videos/
+    9198b9a4-*.mp4` fails at any thread count above one, for a batch of ten frames as
+    surely as for the default run's 1800, on an idle node. The same call at
+    `num_threads=1` succeeds. Meanwhile 400 ODV-Bench clips decode fine multi-threaded --
+    so pinning everything to one thread to satisfy the bad files would pay 2.3x on decode
+    for every good one.
+
+    Hence: attempt the threaded decode, and on a DECORDError reopen single-threaded and
+    retry once. The downgrade sticks for the life of the reader, so a windowed
+    FrameStream that decodes block after block pays the detection cost once rather than
+    per block.
+    """
+
+    def __init__(self, video_path, num_threads):
+        self._path = video_path
+        self._num_threads = max(1, num_threads)
+        self._vr = VideoReader(video_path, ctx=cpu(0), num_threads=self._num_threads)
+
+    def __len__(self):
+        return len(self._vr)
+
+    def get_avg_fps(self):
+        return self._vr.get_avg_fps()
+
+    def __getitem__(self, idx):
+        return self._vr[idx]
+
+    def get_batch(self, indices):
+        try:
+            return self._vr.get_batch(indices)
+        except DECORDError:
+            if self._num_threads == 1:
+                raise  # already serial: a real decode failure, not the threading fault
+            logger.warning(
+                f'{os.path.basename(self._path)}: decord failed at '
+                f'num_threads={self._num_threads}; reopening single-threaded. Decode will '
+                f'be slower for this video.')
+            self._num_threads = 1
+            self._vr = VideoReader(self._path, ctx=cpu(0), num_threads=1)
+            return self._vr.get_batch(indices)
+
+
+def open_video_reader(video_path):
+    """decord for containers, `NpyFrameReader` for pre-extracted `.npy` frame arrays.
+
+    Both honour the same small slice of the VideoReader API (`len`, `get_avg_fps`,
+    `get_batch(...).asnumpy()`), so the sampling grids below are written once and do not
+    care which kind of source they are on.
+    """
+    if video_path.endswith('.npy'):
+        return NpyFrameReader(video_path)
+    return _RetryingVideoReader(video_path, decord_num_threads())
+
+
 class BaseVQA:
     def __init__(self, anno, save_dir, sample_fps,
                  qa_model, qa_processor=None,
@@ -93,7 +227,7 @@ class BaseVQA:
         return chunks[k]
 
     def load_video(self, video_path):
-        vr = VideoReader(video_path, ctx=cpu(0))
+        vr = open_video_reader(video_path)
         fps = round(vr.get_avg_fps())
         if self.exact_fps:
             # Sample on the exact `sample_fps` timestamp grid, each slot taking the most

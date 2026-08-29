@@ -20,6 +20,13 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
+# cd alone does not put the repo root on sys.path: the benchmark is launched as
+# `python video_qa/measure_encoding_fps.py`, so sys.path[0] is video_qa/. Without this the
+# `video_qa`/`model` imports resolve through the Rekv env's editable rekv-1.0 install, which
+# maps both packages to a different clone -- the benchmark would time that tree's model code
+# instead of this one's. See the same note in scripts/eval.sh.
+export PYTHONPATH="$(pwd)${PYTHONPATH:+:${PYTHONPATH}}"
+
 # ---- measurement protocol -----------------------------------------------------------
 # ENCODE_CHUNK_SIZE=1 is the strict frame-by-frame number: the paper describes frames as
 # arriving one at a time, and batching 64 of them would add ~128 s of lag at 0.5 FPS input.

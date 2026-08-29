@@ -407,14 +407,17 @@ def eval_ovobench_backward(args):
     eval_ovobench(args, 'backward')
 
 def eval_fpsbench_stream(args):
-    """FPS-Bench-Stream: the FPSBench clip hidden in a 600 s haystack, asked at the end.
+    """FPS-Bench-Stream: the FPSBench clip hidden in a 600 s haystack.
 
-    The retrieval arm. Each of 990 built streams is one FPSBench question whose evidence
-    occupies a median 1.5% of the video and sits a median 294 s before the question, so
-    answering requires ReKV to retrieve it out of a memory dominated by unrelated footage
-    (video_qa/rekv_fpsbench_stream_vqa.py). `--trigger query` is the control: the same
-    frames, the same ingestion, but asked when the needle is still the newest thing in the
-    cache.
+    Each of 990 built streams is one FPSBench question whose evidence occupies a median
+    1.5% of the video (video_qa/rekv_fpsbench_stream_vqa.py). `--trigger` picks which
+    question the run asks:
+
+    * `query` (default) asks at query_time_sec, with the needle still the newest thing in
+      the cache -- realtime perception, measuring what the model makes of what it just saw;
+    * `end` asks after all 600 s are ingested, a median 294 s after the evidence, so
+      answering requires retrieving it out of a memory dominated by unrelated footage.
+      That is the benchmark's published protocol and the retrieval arm.
 
     This release ships an answer key, so the run ends at a
     scorer -- accuracy broken down by needle position and by whether retrieval reached the
@@ -422,8 +425,9 @@ def eval_fpsbench_stream(args):
     video_qa/convert_fpsbench_stream.py.
     """
     num_chunks = args.num_chunks
-    # Only the control arm is tagged: the end trigger is this benchmark's protocol, so it
-    # keeps the plain directory name.
+    # The tag names the arm, not the default: 'end' keeps the plain directory it has always
+    # written to and 'query' keeps its -query suffix, so making 'query' the default did not
+    # move anybody's existing results. It does mean the default arm is the tagged one.
     trigger_tag = "" if args.trigger == 'end' else f"-{args.trigger}"
     anno_path = args.anno_path or "data/fpsbench_stream/test_mc.json"
     # A subset run gets its own directory, named after its annotation file. Without this a
@@ -447,6 +451,7 @@ def eval_fpsbench_stream(args):
         prompt_args.append("--force_answer_length")
     if args.retrieval_breakdown:
         prompt_args.append("--retrieval_breakdown")
+    prompt_args += ["--decode_window", str(args.decode_window)]
     if not args.only_eval:
         # QA
         processes = []
@@ -512,11 +517,85 @@ def eval_cgbench(args):
     score(args, f"python video_qa/eval/eval_multiple_choice.py --save_dir {save_dir}")
 
 
+def eval_odvbench(args):
+    """ODV-Bench -- online driving VQA, questioned mid-stream.
+
+    Streaming, like ovobench and unlike every other multiple-choice dataset here: each
+    question carries an `end_time` and may only be answered from frames up to it, so the
+    video is ingested incrementally and questioned in between. It shares OVO-Bench's
+    solver outright (video_qa/rekv_ovobench_vqa.py) -- that file's contract is
+    end_time/gt_index/question_id and nothing OVO-specific.
+
+    The time limit is the benchmark. `end_time` sits at a median of ~0.45 of clip
+    duration, and 62% of the questions ask what happens after it ("What will the position
+    box of the pedestrian be", "Will there be significant traffic risks in the future"),
+    so an offline pass answers them from the very frames they are asking the model to
+    predict. eval_odvbench.py refuses to score a CSV that shows any sign of it.
+
+    Two call-site consequences. The clips are short -- 5-90 s, median 33 s -- so the
+    default sample_fps of 0.5 gives an early question one frame; run this at 2 or more.
+    And no clip comes near n_local, so retrieval never fires: this measures the reduction
+    stages' effect on perception, not on retrieval.
+
+    `--blind` swaps in video_qa/blind_vqa.py, which answers every question with no video
+    at all. Worth running once before trusting any number here: 3234 of the 6348 questions
+    sit in subtasks whose majority answer is far above their own chance line (all 123
+    Hallucination-detection answers are "Unable to say."), so the language-prior floor is
+    high and uneven across subtasks.
+
+    Run scripts/setup_odvbench.py first to produce the annotation file.
+    """
+    num_chunks = args.num_chunks
+    # The '-blind' suffix keeps the control in its own directory, so it can never
+    # overwrite the sighted run it exists to be compared against. sample_fps stays in the
+    # path even though a blind run has no frames: it makes the pairing a plain suffix
+    # (64-2.0 <-> 64-2.0-blind) rather than a lookup.
+    blind_tag = "-blind" if args.blind else ""
+    save_dir = f"results/{args.model}/odvbench/{args.retrieve_size}-{args.sample_fps}{reduction_tag(args)}{blind_tag}"
+    solver = "blind_vqa" if args.blind else "rekv_ovobench_vqa"
+    anno_path = args.anno_path or "data/odvbench/full_mc.json"
+    if not args.only_eval:
+        # QA
+        processes = []
+        for idx in range(0, num_chunks):
+            cmd = ["python", f"video_qa/{solver}.py",
+                    "--model", args.model,
+                    "--sample_fps", str(args.sample_fps),
+                    "--n_local", str(args.n_local),
+                    "--retrieve_size", str(args.retrieve_size),
+                    "--save_dir", save_dir,
+                    "--anno_path", anno_path,
+                    "--debug", args.debug,
+                    "--num_chunks", str(num_chunks),
+                    "--chunk_idx", str(idx)] + reduction_args(args)
+            p = multiprocessing.Process(target=exec, args=(cmd, True, f'{4*idx},{4*idx+1},{4*idx+2},,{4*idx+3}' if args.model=='llava_ov_72b' else str(idx)))  # llava_ov_72b needs 4x 80GB GPUs
+            processes.append(p)
+            p.start()
+        for p in processes:
+            p.join()
+        # merge results
+        exec(f"> {save_dir}/results.csv")
+        for idx in range(num_chunks):
+            if idx == 0:
+                exec(f"head -n 1 {save_dir}/{num_chunks}_{idx}.csv > {save_dir}/results.csv")
+            exec(f"tail -n +2 {save_dir}/{num_chunks}_{idx}.csv >> {save_dir}/results.csv")
+            exec(f"rm {save_dir}/{num_chunks}_{idx}.csv")
+    # eval: the pooled mean in eval_multiple_choice.py would be dominated by Distance
+    # Prediction (1488 of 6348) and, more importantly, would not check that the streaming
+    # time limit was honoured. eval_odvbench.py does both.
+    score(args, f"python video_qa/eval/eval_odvbench.py --save_dir {save_dir}")
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", type=str, default="llava_ov_7b", choices=['llava_ov_0.5b', 'llava_ov_7b', 'llava_ov_72b', 'video_llava_7b', 'longva_7b'])
-    parser.add_argument("--dataset", type=str, default=None, choices=['mlvu', 'mlvu_test', 'qaego4d', 'egoschema', 'activitynet_qa', 'rvs_ego', 'rvs_movie', 'cgbench', 'ovobench_realtime', 'ovobench_backward', 'fpsbench_stream'])
+    parser.add_argument("--dataset", type=str, default=None, choices=['mlvu', 'mlvu_test', 'qaego4d', 'egoschema', 'activitynet_qa', 'rvs_ego', 'rvs_movie', 'cgbench', 'odvbench', 'ovobench_realtime', 'ovobench_backward', 'fpsbench_stream'])
     parser.add_argument("--num_chunks", type=int, default=1)
+    parser.add_argument("--blind", action="store_true",
+                        help="Blind control: answer every question with no video at all "
+                             "(video_qa/blind_vqa.py). Produces the language-prior floor "
+                             "a real score has to be read against. Results land in a "
+                             "'-blind' directory of their own.")
     parser.add_argument("--only_eval", action="store_true")
     parser.add_argument("--skip_scoring", action="store_true",
                         help="Stop after writing results.csv. For rvs_*/activitynet_qa "
@@ -559,12 +638,14 @@ if __name__ == "__main__":
     parser.add_argument("--no_none_of_above", action="store_true")
     parser.add_argument("--shuffle_choices", action="store_true")
     parser.add_argument("--choice_seed", type=int, default=2024)
-    parser.add_argument("--trigger", type=str, default='end', choices=['end', 'query'],
-                        help="fpsbench_stream only: when each question fires. 'end' "
-                             "(default) asks after the whole 600 s stream has been "
-                             "ingested, so the needle must be retrieved; 'query' asks at "
-                             "query_time_sec, where it is still the newest thing in the "
-                             "cache. The control arm for how much of any gap is retrieval.")
+    parser.add_argument("--trigger", type=str, default='query', choices=['end', 'query'],
+                        help="fpsbench_stream only: when each question fires. 'query' "
+                             "(default) asks at query_time_sec, where the needle is still "
+                             "the newest thing in the cache -- realtime perception, what "
+                             "the model can answer about what it just saw. 'end' asks "
+                             "only after the whole 600 s stream has been ingested, so the "
+                             "needle must be retrieved back out of memory; that is the "
+                             "benchmark's published protocol and the retrieval arm.")
     parser.add_argument("--force_answer_length", action="store_true",
                         help="fpsbench_stream: decode exactly "
                              "--max_new_tokens tokens per question, so QA latency is "
@@ -578,6 +659,13 @@ if __name__ == "__main__":
                              "Costs a CUDA sync per question, which inflates "
                              "latency_seconds, so take the headline latency from a run "
                              "without it.")
+    parser.add_argument("--decode_window", type=int, default=256,
+                        help="fpsbench_stream: slots decoded at a time (0 = the whole "
+                             "stream up front). Frames are held at source resolution, so a "
+                             "whole-stream decode is ~600 x sample_fps x 4.6 MB per worker "
+                             "-- fine at 1 fps, 85 GB per worker at 32 fps. Windowing "
+                             "decodes each block exactly once, so it changes residency, "
+                             "not the frames or the results.")
     parser.add_argument("--anno_path", type=str, default=None,
                         help="fpsbench_stream: annotation file to "
                              "run against, overriding the dataset default. For a subset "
@@ -587,6 +675,37 @@ if __name__ == "__main__":
     # default is off, so a command line without them is the untouched baseline.
     add_reduction_args(parser)
     args = parser.parse_args()
+
+    # Datasets whose eval function knows how to swap in the blind solver. Anything else
+    # would silently run sighted and write to a '-blind' directory, which is the one
+    # outcome worse than an error.
+    # Split the CPU allocation across the workers about to be spawned. Each worker
+    # inherits this through os.environ (exec copies it), and video_qa/base.py sizes
+    # decord's decode pool from it. Without the division four workers would each open a
+    # pool sized to the *whole* allocation and oversubscribe it fourfold, which is the
+    # condition that makes decord's threaded decoder time out mid-run. setdefault so an
+    # explicit REKV_DECORD_THREADS in the environment still wins.
+    try:
+        _cpus = len(os.sched_getaffinity(0))
+    except AttributeError:  # not Linux
+        _cpus = os.cpu_count() or 1
+    os.environ.setdefault('REKV_DECORD_THREADS',
+                          str(max(1, _cpus // max(1, args.num_chunks))))
+
+    BLIND_DATASETS = {'odvbench'}
+    if args.blind:
+        if args.dataset not in BLIND_DATASETS:
+            parser.error(f"--blind is not wired up for {args.dataset!r}; "
+                         f"supported: {sorted(BLIND_DATASETS)}")
+        # Both stages decide what to drop by comparing a frame against the one before it,
+        # so with no frames there is nothing to reduce -- but the reduction tag would
+        # still land in the results path, inventing distinct 'blind at threshold 0.2' and
+        # 'blind at threshold 0.4' directories holding identical runs. Refuse rather than
+        # produce them.
+        if vision_on(args) or pruning_on(args):
+            parser.error("--blind ingests no frames, so the reduction stages have nothing "
+                         "to act on; drop the --vision_*/--prune_* flags.")
+
     func_dic = {
         'mlvu': eval_mlvu,
         'mlvu_test': eval_mlvu_test,
@@ -596,6 +715,7 @@ if __name__ == "__main__":
         'rvs_ego': eval_rvs_ego,
         'rvs_movie': eval_rvs_movie,
         'cgbench': eval_cgbench,
+        'odvbench': eval_odvbench,
         'ovobench_realtime': eval_ovobench_realtime,
         'ovobench_backward': eval_ovobench_backward,
         'fpsbench_stream': eval_fpsbench_stream,

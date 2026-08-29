@@ -174,3 +174,6 @@ htmlcov/
 *.webp
 *.tif
 *.tiff
+
+# sbatch job logs (scripts/eval.slurm)
+slurmlogs/
