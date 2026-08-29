@@ -12,7 +12,10 @@ model=llava_ov_0.5b
 
 # Supported dataset: qaego4d egoschema cgbench mlvu activitynet_qa rvs_ego rvs_movie
 # ovobench_realtime / ovobench_backward / fpsbench_stream are valid --dataset values too,
-# but need their own annotation build and sample_fps -- use their own scripts instead.
+# but each needs its annotation built first (video_qa/convert_ovobench.py,
+# video_qa/convert_fpsbench_stream.py) and a sample_fps of its own. Their extra flags
+# (--trigger, --anno_path) are not knobs here; add them to the run_eval call below if a
+# run needs them.
 # Space-separated: each dataset is evaluated in turn.
 datasets="rvs_ego rvs_movie"
 sample_fps=0.5
@@ -42,7 +45,7 @@ vision_threshold=0.001
 # list to sweep -- each threshold writes to its own results dir, so arms never overwrite
 # each other or the baseline. Scales with sample_fps: fewer frames/sec = less redundancy
 # = higher threshold, so do not transplant a value across frame rates either.
-prune_method=rlt
+prune_method=none
 prune_metric=cosine
 prune_refresh_every=0
 prune_thresholds="0.2"

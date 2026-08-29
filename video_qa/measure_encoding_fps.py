@@ -73,10 +73,11 @@ On ingestion granularity, the two settings answer different questions:
 The default stays at 64 so previously recorded numbers remain comparable. The two must
 not be compared to each other.
 
-Frames are pre-extracted once with ffmpeg into --frame_cache_dir and reused. Decoding the
-video directly at this stride costs ~1.9 frames/second -- ~16 minutes per run, inside
-untimed calls, which reads as a hang -- against ~12 minutes of extraction amortised over
-every model x baseline/reduced run.
+Frames are decoded in-process with decord, as the eval does: one batched `get_batch` over
+the sampled indices before timing starts, which is ReKV's own reader. That happens before
+anything is reported, and it holds the sampled frames in RAM for the run (~11 GB for 1800
+1080p frames). It does not touch the numbers -- the decode sits outside every timer (see
+`encode_frames`), so what is reported is encode time either way.
 
 Encoding throughput is not flat across a video. Until the KV-Cache fills `n_local` the
 local attention window is short and frames are cheap; once it is full, eviction and
@@ -136,10 +137,9 @@ from logzero import logger
 from video_qa.base import (MODELS, str2bool, add_reduction_args,
                            pruning_enabled, pruning_load_kwargs,
                            vision_reduction_enabled, vision_reduction_load_kwargs)
-# Moved to its own module so the eval solvers can use the same cache and the same frame
-# streams; this harness is not the only thing that cannot afford a 22-minute strided
-# decode per video, and two copies of the reader would drift apart.
-from video_qa.frame_cache import ensure_frame_cache, CachedFrameStream, DecordFrameStream
+# The eval's own reader, so this harness measures the path the eval actually runs and the
+# two cannot drift apart.
+from video_qa.rekv_stream_vqa import FrameStream
 from model.attention.kv_cache_manager import ContextManager
 
 
@@ -428,13 +428,6 @@ def main():
     parser.add_argument("--warmup_frames", type=int, default=32,
                         help="Frames encoded, then discarded with the cache, before timing "
                              "starts (CUDA autotune, lazy allocs).")
-    parser.add_argument("--frame_cache_dir", type=str,
-                        default=os.environ.get('REKV_FRAME_CACHE', 'data/frame_cache'),
-                        help="Where to keep frames pre-extracted by ffmpeg, as the paper "
-                             "does. Written on first use and reused after. Needs ~400 MB "
-                             "for 1800 frames, so put it on a filesystem with room (set "
-                             "$REKV_FRAME_CACHE to change the default). 'none' decodes the "
-                             "video directly, which is ~30x slower at this stride.")
     parser.add_argument("--gpu_preprocess", type=str2bool, nargs='?', const=True, default=False,
                         help="Resize/normalize frames on the GPU instead of in the HF "
                              "processor (~2.2 vs ~37 ms/frame at 1080p, and nearly 2x the "
@@ -485,14 +478,6 @@ def main():
     else:
         video_sample = anno[args.video_idx]
 
-    # Before the model load, not after: extraction needs nothing from the model, takes ~12
-    # minutes on a cold cache, and can fail outright on a full disk. Doing it first keeps
-    # the GPU free meanwhile and makes that failure cost seconds instead of a model load.
-    frame_dir = None
-    if args.frame_cache_dir and args.frame_cache_dir.lower() != 'none':
-        frame_dir = ensure_frame_cache(video_sample['video_path'], video_sample['video_id'],
-                                       args.sample_fps, args.frame_cache_dir)
-
     model_path = MODELS[args.model]['model_path']
     load_func = MODELS[args.model]['load_func']
     logger.info(f"Loading VideoQA model: {model_path}")
@@ -522,13 +507,9 @@ def main():
     tokenizer = model.processor.tokenizer
     schedule = [] if args.skip_qa else build_question_schedule(video_sample, args, tokenizer)
 
-    if frame_dir is not None:
-        stream = CachedFrameStream(frame_dir, num_frames=args.num_frames)
-        source = f'cached frames ({frame_dir})'
-    else:
-        stream = DecordFrameStream(video_sample['video_path'], args.sample_fps,
-                                   num_frames=args.num_frames)
-        source = 'decord (slow: expect ~1.9 frames/s)'
+    stream = FrameStream(video_sample['video_path'], args.sample_fps,
+                         num_frames=args.num_frames)
+    source = 'decord, in-process (decoded up front, outside every timer)'
 
     if args.gpu_preprocess:
         model.processor.video_processor = GPUVideoProcessor(

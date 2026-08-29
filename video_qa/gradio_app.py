@@ -48,7 +48,7 @@ import logzero
 from logzero import logger
 
 from video_qa.base import MODELS
-from video_qa.frame_cache import open_frame_stream
+from video_qa.rekv_stream_vqa import FrameStream
 
 # The encode path logs cache size at DEBUG per frame; far too chatty for a
 # server that encodes continuously.
@@ -130,14 +130,8 @@ def open_video(video_path, sample_fps, max_frames=None):
     test set contains videos over two hours long and the KV-Cache, not the frames, is
     what bounds this app.
     """
-    full = open_frame_stream(video_path, sample_fps=sample_fps,
-                             cache_dir=os.environ.get('REKV_FRAME_CACHE'))
-    truncated = max_frames is not None and len(full) > max_frames
-    if not truncated:
-        return full, False
-    return open_frame_stream(video_path, sample_fps=sample_fps,
-                             cache_dir=os.environ.get('REKV_FRAME_CACHE'),
-                             num_frames=max_frames), True
+    stream = FrameStream(video_path, sample_fps=sample_fps, num_frames=max_frames)
+    return stream, stream.n_available > len(stream)
 
 
 def reset_cache():

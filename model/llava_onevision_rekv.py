@@ -110,9 +110,9 @@ class LlavaOneVision_ReKV(LlavaOnevisionForConditionalGeneration, Abstract_ReKV)
         """Logits for `token_ids` at the first generated position. One forward pass.
 
         `token_ids` is a flat list; the returned tensor is parallel to it. The caller
-        groups them (see `video_qa/rekv_fpsbench_stream_small_vqa.py`, which takes the max
-        over the surface forms of "Yes" and of "No"), because which spelling a tokenizer
-        makes a single token of is a property of the backend, not of the metric.
+        groups them -- e.g. taking the max over the surface forms of "Yes" and of "No" --
+        because which spelling a tokenizer makes a single token of is a property of the
+        backend, not of the metric.
         """
         logits, _ = self._retrieve_and_prefill(input_text, retrieved_indices)
         # No decode steps were paid for. Set explicitly so a stale count from a previous

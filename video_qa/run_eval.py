@@ -416,7 +416,7 @@ def eval_fpsbench_stream(args):
     frames, the same ingestion, but asked when the needle is still the newest thing in the
     cache.
 
-    Unlike `fpsbench_stream_small`, this release ships an answer key, so the run ends at a
+    This release ships an answer key, so the run ends at a
     scorer -- accuracy broken down by needle position and by whether retrieval reached the
     needle at all -- rather than at a submission file. Build the annotation first with
     video_qa/convert_fpsbench_stream.py.
@@ -515,7 +515,7 @@ def eval_cgbench(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", type=str, default="llava_ov_7b", choices=['llava_ov_0.5b', 'llava_ov_7b', 'llava_ov_72b', 'video_llava_7b', 'longva_7b'])
-    parser.add_argument("--dataset", type=str, default=None, choices=['mlvu', 'mlvu_test', 'qaego4d', 'egoschema', 'activitynet_qa', 'rvs_ego', 'rvs_movie', 'cgbench', 'ovobench_realtime', 'ovobench_backward', 'fpsbench_stream', 'fpsbench_stream_small'])
+    parser.add_argument("--dataset", type=str, default=None, choices=['mlvu', 'mlvu_test', 'qaego4d', 'egoschema', 'activitynet_qa', 'rvs_ego', 'rvs_movie', 'cgbench', 'ovobench_realtime', 'ovobench_backward', 'fpsbench_stream'])
     parser.add_argument("--num_chunks", type=int, default=1)
     parser.add_argument("--only_eval", action="store_true")
     parser.add_argument("--skip_scoring", action="store_true",
@@ -553,7 +553,7 @@ if __name__ == "__main__":
     parser.add_argument("--n_local", type=int, default=15000)
     parser.add_argument("--retrieve_size", type=int, default=64)
     parser.add_argument("--debug", type=str, default='false')
-    # FPSBench prompt options, forwarded to video_qa/rekv_fpsbench_stream_small_vqa.py. Ignored
+    # FPSBench prompt options, forwarded to video_qa/rekv_fpsbench_stream_vqa.py. Ignored
     # by every other dataset, whose prompts are ReKV's own.
     parser.add_argument("--max_new_tokens", type=int, default=128)
     parser.add_argument("--no_none_of_above", action="store_true")
@@ -566,48 +566,23 @@ if __name__ == "__main__":
                              "query_time_sec, where it is still the newest thing in the "
                              "cache. The control arm for how much of any gap is retrieval.")
     parser.add_argument("--force_answer_length", action="store_true",
-                        help="fpsbench_stream / fpsbench_stream_small: decode exactly "
+                        help="fpsbench_stream: decode exactly "
                              "--max_new_tokens tokens per question, so QA latency is "
                              "measured over a fixed decode length. Answer length is a "
                              "dependent variable of anything that perturbs the KV-Cache, "
                              "so a latency comparison without this partly measures how "
                              "much each arm chose to say. Changes the answers.")
     parser.add_argument("--retrieval_breakdown", action="store_true",
-                        help="fpsbench_stream / fpsbench_stream_small: split retrieval out "
+                        help="fpsbench_stream: split retrieval out "
                              "of QA latency (retrieval_seconds / generation_seconds). "
-                             "Syncs CUDA once per layer per question and inflates "
+                             "Costs a CUDA sync per question, which inflates "
                              "latency_seconds, so take the headline latency from a run "
                              "without it.")
     parser.add_argument("--anno_path", type=str, default=None,
-                        help="fpsbench_stream / fpsbench_stream_small: annotation file to "
+                        help="fpsbench_stream: annotation file to "
                              "run against, overriding the dataset default. For a subset "
                              "built with convert_fpsbench_stream.py --limit/--position_bin, "
                              "or for the keyed FPSBench file that local scoring needs.")
-    parser.add_argument("--mba", action="store_true",
-                        help="fpsbench_stream_small only: ask each question as K "
-                             "independent Yes/No binaries and score Multiple Binary "
-                             "Accuracy (TemporalBench, arXiv 2410.10818) instead of "
-                             "five-way multiple choice. Drops the chance floor from 0.200 "
-                             "to 1/2**K and sends constant-answer strategies to 0, which "
-                             "is what separates a model that understands the video from "
-                             "one riding the floor. Implies the keyed annotation file "
-                             "(data/fpsbench/test_mc_keyed.json) unless --anno_path says "
-                             "otherwise, and ends at video_qa/eval/eval_fpsbench_mba.py "
-                             "rather than at the submission exporter.")
-    parser.add_argument("--mba_include_none", action="store_true",
-                        help="--mba only: keep 'None of the above' among the candidates. "
-                             "Off by default -- FPSBench's key never selects it, so its "
-                             "binary is 'No' on every question.")
-    parser.add_argument("--mba_scoring", type=str, default="logit",
-                        choices=["logit", "generate"],
-                        help="--mba only: 'logit' decides from the Yes/No logits in one "
-                             "forward pass (default); 'generate' decodes and parses text.")
-    parser.add_argument("--mba_max_new_tokens", type=int, default=8,
-                        help="--mba_scoring generate only: decode budget per binary.")
-    parser.add_argument("--full_clip", action="store_true",
-                        help="fpsbench_stream_small only: trigger each question at the end of "
-                             "the clip instead of the end of its temporal certificate. "
-                             "The control arm for 'does answering early cost anything'.")
     # Both reduction stages (llava_ov_* only), forwarded verbatim to the workers. Every
     # default is off, so a command line without them is the untouched baseline.
     add_reduction_args(parser)
@@ -624,7 +599,6 @@ if __name__ == "__main__":
         'ovobench_realtime': eval_ovobench_realtime,
         'ovobench_backward': eval_ovobench_backward,
         'fpsbench_stream': eval_fpsbench_stream,
-        'fpsbench_stream_small': eval_fpsbench_stream_small,
     }
     if args.dataset in func_dic:
         print(f'Execute {args.dataset} evaluation')

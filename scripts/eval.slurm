@@ -57,7 +57,10 @@ MODEL=llava_ov_7b
 
 # Supported dataset: qaego4d egoschema cgbench mlvu activitynet_qa rvs_ego rvs_movie
 # ovobench_realtime / ovobench_backward / fpsbench_stream are valid --dataset values too,
-# but need their own annotation build and sample_fps -- use their own scripts instead.
+# but each needs its annotation built first (video_qa/convert_ovobench.py,
+# video_qa/convert_fpsbench_stream.py) and a sample_fps of its own. Their extra flags
+# (--trigger, --anno_path) are not knobs here; add them to the run_eval call below if a
+# run needs them.
 # Space-separated: each dataset is evaluated in turn.
 DATASETS="rvs_ego rvs_movie"
 SAMPLE_FPS=0.5

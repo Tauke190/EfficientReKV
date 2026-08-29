@@ -7,10 +7,10 @@
 #   scripts/measure_speed.sh                    # llava_ov_0.5b llava_ov_7b
 #   scripts/measure_speed.sh llava_ov_7b        # just the 7B
 #
-# The first run extracts the video's frames with ffmpeg into FRAME_CACHE (~12 min, ~400 MB
-# for 1800 frames); every run after that reuses them. Without the cache, decord decodes
-# this stride at ~1 frame/s -- ~30 min per run, inside untimed calls, which looks like a
-# hang rather than slow progress.
+# Frames are decoded in-process with decord, the same way the eval does -- there is no
+# pre-extraction step to run first. The decode is one batched call before timing starts, so
+# it does not move the reported numbers, but NUM_FRAMES frames stay in RAM for the run
+# (~11 GB at 1800 1080p frames) -- lower NUM_FRAMES if the box cannot hold that.
 #
 # Budget: at ENCODE_CHUNK_SIZE=1 encoding is ~2x slower than the batched default, so allow
 # ~5 min encoding per 0.5b run and considerably more for the 7B, plus QA. `--skip_qa true`
@@ -49,7 +49,6 @@ ENCODE_CHUNK_SIZE=${ENCODE_CHUNK_SIZE:-1}    # 1 = frame-by-frame, as the paper 
 GPU_PREPROCESS=${GPU_PREPROCESS:-true}       # same work, GPU implementation; see note above
 PRUNE_METHOD=${PRUNE_METHOD:-rlt}
 OUT_DIR=${OUT_DIR:-results/speed}
-FRAME_CACHE=${FRAME_CACHE:-/home/av354855/EfficientVideoXLPro/ReKV/data/frame_cache}
 EXTRA=${EXTRA:-}                             # e.g. EXTRA="--skip_qa true"
 
 mkdir -p "${OUT_DIR}"
@@ -76,7 +75,6 @@ for model in ${MODELS}; do
         --model "${model}" \
         --num_frames ${NUM_FRAMES} \
         --num_questions ${NUM_QUESTIONS} \
-        --frame_cache_dir "${FRAME_CACHE}" \
         --encode_chunk_size ${ENCODE_CHUNK_SIZE} \
         --gpu_preprocess ${GPU_PREPROCESS} \
         ${EXTRA} \

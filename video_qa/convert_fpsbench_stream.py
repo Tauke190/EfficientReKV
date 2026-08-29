@@ -135,8 +135,8 @@ def main():
                     'answer': texts[letters.index(answer_letter)],
                     'answer_letter': answer_letter,
                     'question_type': str(rec['question']['type']),
-                    # The FPSBench question id, so a row here joins to the same question in
-                    # the short-clip arm (results/*/fpsbench_stream_small/).
+                    # The FPSBench question id, so a row here joins back to the same
+                    # question in FPSBench's own release.
                     'question_id': rec['id'],
                     # FPSBench's claim about the needle: below this rate the certificate
                     # window is not resolvable at all, whatever retrieval does.

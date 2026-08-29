@@ -1,43 +1,103 @@
 """Streaming solver: frames arrive one at a time, questions are asked mid-stream.
 
-Nothing here ever holds more than the current frame. `open_frame_stream` yields frame t
-and only frame t; `encode_frame` preprocesses it, runs the vision tower on it, and
-prefills it into the KV-Cache before frame t+1 is read. That is the whole point of the
-scenario -- a live stream cannot batch frames it has not received -- and it is what this
-solver used to get wrong: it decoded the entire video into one array up front and then
-handed the model 64 frames per forward pass.
+`FrameStream.frames` yields frame t and only frame t; `encode_frame` preprocesses it,
+runs the vision tower on it, and prefills it into the KV-Cache before frame t+1 is read.
+That is the whole point of the scenario -- a live stream cannot batch frames it has not
+received -- and it is what this solver used to get wrong: it handed the model 64 frames
+per forward pass.
 
 The model side already worked this way; only the driver did not. `encode_frame` is the
 same `_encode_video_chunk` with a chunk of one, ContextManager.append already cuts its
 input into one-frame blocks internally (model/attention/kv_cache_manager.py), and both
 reduction stages already decide frame by frame off a reference carried across calls. So
-the answers are unchanged to within GPU non-determinism; what changes is that the pipeline
-now never depends on a frame that has not arrived, and peak RAM is one frame instead of a
-whole video (~11 GB for a 1-hour 1080p video at 0.5 FPS).
+the answers are unchanged to within GPU non-determinism; what changes is that no stage of
+the *encode* path depends on a frame that has not arrived.
 
-Set REKV_FRAME_CACHE to a directory to stream from pre-extracted frames instead of the
-source video. Still strictly one frame per read, just ~17x faster: at a 0.5 FPS stride
-every decord read seeks across the file (measured 1.9 frames/s against 33 for cached
-JPEGs on an RVS-Ego video) -- see video_qa/frame_cache.py.
+Decoding is ReKV's own: one `vr.get_batch(frame_idx)` over the sampled index list, in
+process, at the start of the video (video_qa/base.py `load_video`, and upstream's
+rekv_stream_vqa.py). There is no frame cache and no pre-extraction step. The sampled
+frames therefore sit in RAM for the length of the video -- ~11 GB for a 1-hour 1080p video
+at 0.5 FPS -- which is the reference implementation's cost and the reason `num_frames`
+exists below.
 """
 
-import os
 
 import torch
+from decord import VideoReader, cpu
 from logzero import logger
 
 from video_qa.base import BaseVQA, work
-from video_qa.frame_cache import open_frame_stream
+
+
+class FrameStream:
+    """The sampled frames of a video, decoded up front and handed over one at a time.
+
+    The decode is upstream ReKV's -- a single `vr.get_batch(frame_idx)` -- so the frames
+    and the decode cost are the reference implementation's. Only what happens afterwards
+    differs: frames leave this object one at a time, so the encode path still never batches
+    a frame with its neighbours and never encodes one past the question it is answering.
+
+    The arrival grid is BaseVQA.load_video's, so a streaming run and an offline run of the
+    same file at the same --sample_fps see the same frames:
+
+    * default (stride): source frames 0, stride, 2*stride, ... with stride =
+      round(avg_fps)/sample_fps, floored to an integer and at least 1;
+    * `exact`: slot k is the source frame most recently shown at t = k / sample_fps, which
+      is the only grid that actually delivers the requested rate -- the integer stride
+      quantizes it (at native 30 fps, 16 and 32 both come out as 30).
+
+    `num_frames` caps the stream where the caller knows the tail will never be looked at
+    (OVO-Bench stops at its last query's timestamp). Nothing past it is decoded or held,
+    which is what keeps a 2-hour source video affordable; `len()` reports the capped
+    length, and `n_available` the length before the cap, so a caller can tell that it
+    truncated something.
+    """
+
+    def __init__(self, video_path, sample_fps, exact=False, num_frames=None):
+        vr = VideoReader(video_path, ctx=cpu(0))
+        self.sample_fps = sample_fps
+        n_src = len(vr)
+        src_fps = round(vr.get_avg_fps())
+        if exact:
+            n_slots = max(1, int(round(n_src / src_fps * sample_fps)))
+            self._index = [min(n_src - 1, int(t * src_fps / sample_fps))
+                           for t in range(n_slots)]
+        else:
+            # Clamped: asking for more frames per second than the file has would make the
+            # stride zero and `range` raise.
+            stride = max(1, int(src_fps / sample_fps))
+            self._index = list(range(0, n_src, stride))
+        self.n_available = len(self._index)
+        if num_frames is not None:
+            self._index = self._index[:max(1, num_frames)]
+        self._video = torch.from_numpy(vr.get_batch(self._index).asnumpy())
+        logger.debug(f'video shape: {tuple(self._video.shape)}')
+
+    def __len__(self):
+        return len(self._index)
+
+    def get(self, k):
+        """Slot k on its own, as a (1, H, W, 3) uint8 tensor.
+
+        Random access, for a caller that assembles its own chunks
+        (video_qa/measure_encoding_fps.py). The streaming solvers go through `frames`,
+        which is the same read in arrival order.
+        """
+        return self._video[k:k + 1]
+
+    def frames(self, start, end):
+        """Yield slots [start, end) as (1, H, W, 3) uint8 tensors, in arrival order."""
+        for k in range(max(0, start), min(end, len(self._index))):
+            yield self.get(k)
 
 
 class ReKVStreamVQA(BaseVQA):
     def open_stream(self, video_sample, num_frames=None):
         """The video as a one-frame-at-a-time source. Reads no pixels yet."""
-        return open_frame_stream(
+        return FrameStream(
             video_sample['video_path'],
-            video_id=video_sample.get('video_id'),
             sample_fps=self.sample_fps,
-            cache_dir=os.environ.get('REKV_FRAME_CACHE'),
+            exact=self.exact_fps,
             num_frames=num_frames,
         )
 

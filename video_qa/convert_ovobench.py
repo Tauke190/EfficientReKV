@@ -56,9 +56,8 @@ def video_id_of(rel_path):
     """Filesystem-safe id from OVO's relative video path.
 
     Paths are nested ('Ego4D/clips/xxx.mp4', 'YouTube_Games/PLJ3...&index=1.mp4') and the
-    basename alone is not unique across the source collections. The id is also the
-    frame-cache directory name (see video_qa/frame_cache.py), so it must survive being a
-    single path component.
+    basename alone is not unique across the source collections. It also names the video in
+    results.csv, so it has to survive being a single path component.
     """
     stem = os.path.splitext(rel_path)[0]
     return stem.replace('/', '__').replace('&', '_')

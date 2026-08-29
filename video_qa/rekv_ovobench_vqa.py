@@ -40,8 +40,8 @@ def n_visible_frames(realtime, sample_fps, n_total):
 
 
 class ReKVOVOBenchVQA(ReKVStreamVQA):
-    """Inherits open_stream/ingest from the streaming solver: frames arrive one at a time
-    and are encoded one per forward pass, and REKV_FRAME_CACHE applies here too."""
+    """Inherits open_stream/ingest from the streaming solver: frames arrive one at a time,
+    decoded in-process, and are encoded one per forward pass."""
 
     def video_close_qa(self, question, candidates, correct_choice):
         input_text = self.format_mcqa_prompt(question, candidates)
