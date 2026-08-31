@@ -50,7 +50,18 @@ export PYTHONPATH="$(pwd)${PYTHONPATH:+:${PYTHONPATH}}"
 # another -- the ratio itself moves, because preprocessing and per-launch overhead are
 # fixed costs that token reduction cannot touch.
 MODELS=${@:-"llava_ov_0.5b llava_ov_7b"}
-NUM_FRAMES=${NUM_FRAMES:-1800}
+# Must be large enough that every arm reaches steady state, which is the only regime the
+# throughput number is measured over. The n_local=15000-token window fills after
+# 15000 / (196 * keep_rate) frames -- 77 at baseline, but 379 at a keep rate of 0.20,
+# because pruning means each frame contributes fewer tokens. A 300-frame run therefore
+# never leaves the warm-up on the aggressive arms and reports the cold start as if it were
+# the sustained rate. 800 leaves ~400 steady frames at the lowest keep rate seen here.
+#
+# It is still a subset: at the default 0.5 fps this is 1600 s of the source video, not the
+# whole 3600 s that 1800 frames covered. That matters because ego4d video_idx 0 is a
+# 2.21 GB 1080p file that trips decord's threaded decoder and falls back to
+# single-threaded decoding, so decode is the dominant cost of this script.
+NUM_FRAMES=${NUM_FRAMES:-800}
 NUM_QUESTIONS=${NUM_QUESTIONS:-100}
 ENCODE_CHUNK_SIZE=${ENCODE_CHUNK_SIZE:-1}    # 1 = frame-by-frame, as the paper describes
 GPU_PREPROCESS=${GPU_PREPROCESS:-true}       # same work, GPU implementation; see note above

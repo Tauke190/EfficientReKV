@@ -136,6 +136,7 @@ class ReKVStreamVQA(BaseVQA):
             sample_fps=self.sample_fps,
             exact=self.exact_fps,
             num_frames=num_frames,
+            window=self.decode_window,
         )
 
     def ingest(self, stream, start, end):

@@ -193,10 +193,15 @@ class BaseVQA:
     def __init__(self, anno, save_dir, sample_fps,
                  qa_model, qa_processor=None,
                  num_chunks=None, chunk_idx=None,
-                 retrieve_size=64, chunk_size=1, exact_fps=False) -> None:
+                 retrieve_size=64, chunk_size=1, exact_fps=False,
+                 decode_window=None) -> None:
 
         self.sample_fps = sample_fps
         self.exact_fps = exact_fps
+        # Slots a FrameStream decodes at a time; None = the whole video up front. Held
+        # here rather than in the streaming solvers because `work()` parses it for every
+        # solver, and a solver that never opens a stream (blind_vqa) simply ignores it.
+        self.decode_window = decode_window
 
         self.qa_model = qa_model
         self.qa_processor = qa_processor
@@ -441,6 +446,16 @@ def work(QA_CLASS, add_args=None):
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--sample_fps", type=float, default=1)
+    parser.add_argument("--decode_window", type=int, default=256,
+                        help="Slots a FrameStream decodes at a time (0 = the whole video "
+                             "up front, which is what every solver here did before this "
+                             "flag). Frames are held at source resolution, so a whole-video "
+                             "decode costs sample_fps x seconds x MB-per-frame per worker: "
+                             "a few GB on a short clip, but 85 GB for a 600 s stream at "
+                             "32 fps, times --num_chunks workers on one node. Frames arrive "
+                             "in order and are never re-read, so windowing decodes each "
+                             "block exactly once and only bounds residency -- the frames, "
+                             "and the results, are identical either way.")
     parser.add_argument("--exact_fps", type=str2bool, nargs='?', const=True, default=False,
                         help="Sample on the exact --sample_fps grid instead of an integer "
                              "stride, repeating frames when the requested rate exceeds the "
@@ -500,6 +515,7 @@ def work(QA_CLASS, add_args=None):
         num_chunks=args.num_chunks,
         chunk_idx=args.chunk_idx,
         save_dir=args.save_dir,
+        decode_window=args.decode_window,
         **({'args': args} if add_args is not None else {}),
     )
 

@@ -120,6 +120,15 @@ def reduction_args(args):
     return cmd
 
 
+def stream_args(args):
+    """Flags for the streaming solvers' frame source.
+
+    Only the streaming datasets take these: the offline solvers read a whole video by
+    definition, so windowing has nothing to bound there.
+    """
+    return ["--decode_window", str(args.decode_window)]
+
+
 def eval_mlvu(args):
     num_chunks = args.num_chunks
     save_dir = f"results/{args.model}/mlvu/{args.retrieve_size}-{args.sample_fps}{reduction_tag(args)}"
@@ -364,10 +373,21 @@ def eval_ovobench(args, mode):
 
     FAR (REC/SSR/CRR) is not wired up -- those tasks are Yes/No-or-count, not multiple
     choice, and need their own prompts and scorer.
+
+    `--blind` swaps in video_qa/blind_vqa.py, which answers every query with no video at
+    all. It works here unchanged because that solver reads `gt_index` and the OVO-Bench
+    annotation carries one -- which matters, since OVO-Bench's `answer` is often a
+    paraphrase of the option rather than a copy of it, so the index is the only reliable
+    route to the gold letter. eval_ovobench.py scores a blind CSV normally: n_frames_seen
+    is 0, which satisfies the no-leak invariant rather than bypassing it.
     """
     num_chunks = args.num_chunks
-    save_dir = f"results/{args.model}/ovobench_{mode}/{args.retrieve_size}-{args.sample_fps}{reduction_tag(args)}"
-    solver = "rekv_ovobench_vqa"
+    # Same '-blind' convention as odvbench: the control lives in its own directory so it
+    # can never overwrite the sighted run it exists to be compared against, and the
+    # pairing stays a plain suffix (64-1.0 <-> 64-1.0-blind) rather than a lookup.
+    blind_tag = "-blind" if args.blind else ""
+    save_dir = f"results/{args.model}/ovobench_{mode}/{args.retrieve_size}-{args.sample_fps}{reduction_tag(args)}{blind_tag}"
+    solver = "blind_vqa" if args.blind else "rekv_ovobench_vqa"
     anno_path = f"data/ovo_bench/{mode}.json"
     if not args.only_eval:
         # QA
@@ -382,7 +402,7 @@ def eval_ovobench(args, mode):
                     "--anno_path", anno_path,
                     "--debug", args.debug,
                     "--num_chunks", str(num_chunks),
-                    "--chunk_idx", str(idx)] + reduction_args(args)
+                    "--chunk_idx", str(idx)] + reduction_args(args) + stream_args(args)
             p = multiprocessing.Process(target=exec, args=(cmd, True, f'{4*idx},{4*idx+1},{4*idx+2},,{4*idx+3}' if args.model=='llava_ov_72b' else str(idx)))  # llava_ov_72b needs 4x 80GB GPUs
             processes.append(p)
             p.start()
@@ -451,7 +471,7 @@ def eval_fpsbench_stream(args):
         prompt_args.append("--force_answer_length")
     if args.retrieval_breakdown:
         prompt_args.append("--retrieval_breakdown")
-    prompt_args += ["--decode_window", str(args.decode_window)]
+    prompt_args += stream_args(args)
     if not args.only_eval:
         # QA
         processes = []
@@ -567,7 +587,7 @@ def eval_odvbench(args):
                     "--anno_path", anno_path,
                     "--debug", args.debug,
                     "--num_chunks", str(num_chunks),
-                    "--chunk_idx", str(idx)] + reduction_args(args)
+                    "--chunk_idx", str(idx)] + reduction_args(args) + stream_args(args)
             p = multiprocessing.Process(target=exec, args=(cmd, True, f'{4*idx},{4*idx+1},{4*idx+2},,{4*idx+3}' if args.model=='llava_ov_72b' else str(idx)))  # llava_ov_72b needs 4x 80GB GPUs
             processes.append(p)
             p.start()
@@ -660,12 +680,13 @@ if __name__ == "__main__":
                              "latency_seconds, so take the headline latency from a run "
                              "without it.")
     parser.add_argument("--decode_window", type=int, default=256,
-                        help="fpsbench_stream: slots decoded at a time (0 = the whole "
-                             "stream up front). Frames are held at source resolution, so a "
-                             "whole-stream decode is ~600 x sample_fps x 4.6 MB per worker "
-                             "-- fine at 1 fps, 85 GB per worker at 32 fps. Windowing "
-                             "decodes each block exactly once, so it changes residency, "
-                             "not the frames or the results.")
+                        help="Streaming datasets (fpsbench_stream, ovobench_*, odvbench): "
+                             "slots decoded at a time, 0 = the whole video up front. "
+                             "Frames are held at source resolution, so a whole-video decode "
+                             "is sample_fps x seconds x MB-per-frame per worker -- fine on "
+                             "a short clip, 85 GB per worker for a 600 s stream at 32 fps. "
+                             "Windowing decodes each block exactly once, so it changes "
+                             "residency, not the frames or the results.")
     parser.add_argument("--anno_path", type=str, default=None,
                         help="fpsbench_stream: annotation file to "
                              "run against, overriding the dataset default. For a subset "
@@ -692,7 +713,7 @@ if __name__ == "__main__":
     os.environ.setdefault('REKV_DECORD_THREADS',
                           str(max(1, _cpus // max(1, args.num_chunks))))
 
-    BLIND_DATASETS = {'odvbench'}
+    BLIND_DATASETS = {'odvbench', 'ovobench_realtime', 'ovobench_backward'}
     if args.blind:
         if args.dataset not in BLIND_DATASETS:
             parser.error(f"--blind is not wired up for {args.dataset!r}; "
