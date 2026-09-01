@@ -69,7 +69,6 @@ weights/
 /runs/
 /experiments/
 /outputs/
-/results/
 /logs/
 wandb/
 mlruns/
