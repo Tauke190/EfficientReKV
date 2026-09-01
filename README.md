@@ -41,31 +41,15 @@ frames up to its own timestamp. Notes:
 
 ### Pruning
 
-Two stages, both off by default (no flags = baseline).
 
 - **`--prune_method rlt`** (stage 2, memory-side) — drops tokens before the LM prefill
   (~84% of encode cost); shrinks throughput, KV RAM and retrieval together. This is the
   one that matters. Flags: `--prune_threshold`, `--prune_metric cosine|l2`,
   `--prune_refresh_every`.
-- **`--vision_method rlt`** (stage 1, encoder-side) — attacks the vision tower only
-  (~13.6%), KV size unchanged. Usually left off.
 
 **`--prune_threshold` is a cosine distance, not a rate** — a token is kept iff its distance
 to the feature its position was last kept with exceeds it. Measured on `llava_ov_0.5b`,
-ovobench_realtime @ 1 fps: 0.25 → 72% kept, 0.5 → 22% kept. Thresholds do not transfer
-across `sample_fps`, datasets, or between the two stages.
-
-Gotcha: a bare `--prune_threshold` with no `--prune_method` still enables `rlt`, so the
-baseline arm must pass *no* reduction flags — not a threshold of 0.
-
-To pick thresholds without running a full eval (keep/drop depends only on projector output,
-never the LM):
-
-```bash
-python video_qa/analyze_rlt_threshold.py --model llava_ov_0.5b \
-    --anno_path data/ovo_bench/realtime.json --sample_fps_list 1 \
-    --thresholds 0.25 0.5 0.6 0.7 0.8 0.9 --num_videos 32
-```
+ovobench_realtime @ 1 fps: 0.25 → 72% kept, 0.5 → 22% kept. Thresholds do not transfer across datasets
 
 ### Results
 
@@ -76,10 +60,6 @@ Keep rates are already in `results.csv` when a pruner is attached: `tokens_kept`
 `tokens_seen`, `token_keep_rate`, `kv_cache_bytes` and more, per question. **Baseline runs
 have none of these columns** — when concatenating arms, fill `token_keep_rate` with 1.0
 rather than dropping rows, and aggregate weighted by `tokens_seen`.
-
-Host RAM, not GPU RAM, is the usual limit — ReKV pins the whole KV-Cache per video, so a
-worker's peak is set by its longest video. The slurm scripts size workers as
-`fixed + fps × seconds × per_frame` (0.5B: 24 GB + 0.0035/frame; 7B: 32 GB + 0.0163/frame).
 
 ## Speed
 
