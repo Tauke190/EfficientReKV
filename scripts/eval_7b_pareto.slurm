@@ -1,25 +1,19 @@
 #!/bin/bash
-#SBATCH --job-name=rekv_pareto_0.5b
-#SBATCH --output=/home/av354855/EfficientReKV/slurmlogs/rekv_pareto_0.5b-%j.out
+#SBATCH --job-name=rekv_pareto_7b
+#SBATCH --output=/home/av354855/EfficientReKV/slurmlogs/rekv_pareto_7b-%j.out
 #SBATCH --gres-flags=enforce-binding
 #SBATCH -p gpu
 #SBATCH -C gmem48
-#SBATCH --gres=gpu:2
+#SBATCH --gres=gpu:4
 #SBATCH --mem-per-cpu=8G
 #SBATCH --cpus-per-gpu=8
 
-# The high end of the memory-side pruning sweep for llava_ov_0.5b: rlt at cosine
+# The high end of the memory-side pruning sweep for llava_ov_7b: rlt at cosine
 # thresholds 0.6, 0.7, 0.8 and 0.9, on ovobench_realtime, ovobench_backward and
 # odvbench. One model, one axis -- everything else is held at the values the rest
 # of the grid uses (64 retrieve, 1 fps, 256 decode window, cosine, no refresh), so
-# these points extend the existing 0.25/0.5 runs upward on the same curve.
-#
-# What the numbers are. --prune_threshold is a *distance* cutoff, not a rate: a
-# visual token is kept iff its cosine distance to the feature its position was
-# last kept with exceeds the threshold (model/token_pruning.py). Raising it drops
-# more, so accuracy falls and the KV-Cache shrinks -- the achieved keep rate lands
-# in results.csv per question (token_keep_rate), and is what the accuracy here has
-# to be plotted against. There is no flag that targets a keep rate directly.
+# these points sit on the same curve as the 0.25/0.5 arms -- see the note below on
+# which of those actually exist for the 7b yet.
 #
 # Why 1 fps on odvbench. Its clips are 5-90 s, so 1 fps gives an early question
 # very few frames and 2+ fps would be the better protocol in isolation -- but the
@@ -27,10 +21,15 @@
 # that mixes two frame rates is not a curve. Change it only by re-running the
 # baseline and the 0.25/0.5 arms to match.
 #
-# Reading the results. The baseline (no --prune_* flags) and the blind floor for
-# each pair come from scripts/eval_remaining_grid.slurm and sit in the same
-# results/llava_ov_0.5b/<dataset>/ directory as 64-1.0 and 64-1.0-blind; these
-# runs land beside them as 64-1.0-rlt<thr>cosine.
+# Reading the results. These land in results/llava_ov_7b/<dataset>/ as
+# 64-1.0-rlt<thr>cosine, beside the baseline (no --prune_* flags, 64-1.0) and the
+# blind floor (64-1.0-blind).
+#
+# NOTE: unlike the 0.5b curve, the lower half of the 7b curve is mostly not on disk
+# yet -- ovobench_realtime has only 64-1.0-blind, and ovobench_backward has only
+# -blind and -rlt0.5cosine. Neither has an unpruned baseline. These runs give the
+# 0.6-0.9 end of a curve whose 0/0.25/0.5 end still has to be filled in from
+# scripts/eval_remaining_grid.slurm before anything can be plotted.
 
 module load anaconda3
 module load cuda
@@ -49,11 +48,11 @@ free -g
 cd /home/av354855/EfficientReKV
 export PYTHONPATH="$(pwd)${PYTHONPATH:+:${PYTHONPATH}}"
 
-MODEL=llava_ov_0.5b
+MODEL=llava_ov_7b
 
 # Space-separated, and it must stay quoted: a bare `A=x y` assignment runs `y` as a
 # command with A in its environment and leaves A empty in the script.
-DATASETS="ovobench_backward odvbench"
+DATASETS="ovobench_realtime ovobench_backward odvbench"
 
 SAMPLE_FPS=1
 N_LOCAL=15000
@@ -68,19 +67,25 @@ PRUNE_REFRESH_EVERY=0
 PRUNE_THRESHOLDS="0.6 0.7 0.8 0.9"
 
 # Must match #SBATCH --gres=gpu:N above.
-GPUS=2
+GPUS=4
 
 # Host RAM all workers together may occupy. ReKV pins the whole KV-Cache for the length of
 # a video and the pool does not come back between videos, so a worker's peak is set by the
 # longest video it touches. Bounded by the job's own allocation, not the node's:
-# --cpus-per-gpu=8 x --mem-per-cpu=8G x 2 GPUs = 128 GB, so this leaves ~18 GB of headroom.
-MEM_BUDGET_GB=110
+# --cpus-per-gpu=8 x --mem-per-cpu=8G x 4 GPUs = 256 GB, so this leaves ~26 GB of headroom.
+MEM_BUDGET_GB=230
 
-# Per-worker memory model for llava_ov_0.5b. Combined with each dataset's longest stream
+# Per-worker memory model for llava_ov_7b. Combined with each dataset's longest stream
 # below, this sets the peak. Pruning only ever shrinks the cache, so sizing off the
 # unpruned figures is the conservative choice.
-MEM_FIXED_GB=24
-MEM_GB_PER_FRAME=0.0035
+#
+# These are the 7b constants (README: 7B = 32 GB + 0.0163/frame). The 0.5b pair this
+# script was copied from -- 24 GB + 0.0035/frame -- undercounts a 7b worker by ~2x, and
+# because NUM_CHUNKS is budget/per_worker, undercounting the worker OVER-schedules the
+# GPUs: on ovobench_realtime it would launch 3 workers needing ~60 GB each against a
+# 110 GB budget. Keep these in step with MODEL.
+MEM_FIXED_GB=32
+MEM_GB_PER_FRAME=0.0163
 
 # Set to 0 to force a re-run of anything already on disk.
 SKIP_EXISTING=1

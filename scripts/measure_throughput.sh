@@ -23,11 +23,13 @@ ENCODE_CHUNK_SIZE=${ENCODE_CHUNK_SIZE:-1}
 GPU_PREPROCESS=${GPU_PREPROCESS:-true}
 OUT_DIR=${OUT_DIR:-results/throughput}
 
-CONFIGS=(
-  "baseline|"
-  "rlt0.25|--prune_method rlt --prune_threshold 0.25"
-  "rlt0.5|--prune_method rlt --prune_threshold 0.5"
-)
+# THRESHOLDS is the sweep axis; baseline is always measured first because every other
+# number here is only meaningful as a ratio against it on the same GPU.
+THRESHOLDS=${THRESHOLDS:-"0.25 0.5 0.6 0.7 0.8 0.9"}
+CONFIGS=("baseline|")
+for thr in ${THRESHOLDS}; do
+  CONFIGS+=("rlt${thr}|--prune_method rlt --prune_threshold ${thr}")
+done
 
 mkdir -p "${OUT_DIR}"
 
