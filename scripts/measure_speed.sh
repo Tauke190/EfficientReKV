@@ -81,6 +81,11 @@ CONFIGS=(
   "baseline|"
   "rlt0.25|--prune_method ${PRUNE_METHOD} --prune_threshold 0.25"
   "rlt0.5|--prune_method ${PRUNE_METHOD} --prune_threshold 0.5"
+  "rlt0.6|--prune_method ${PRUNE_METHOD} --prune_threshold 0.6"
+  "rlt0.7|--prune_method ${PRUNE_METHOD} --prune_threshold 0.7"
+  "rlt0.8|--prune_method ${PRUNE_METHOD} --prune_threshold 0.8"
+  "rlt0.9|--prune_method ${PRUNE_METHOD} --prune_threshold 0.9"
+
 )
 
 for model in ${MODELS}; do

@@ -11,14 +11,8 @@
 # FPS-Bench-Stream frame-rate sweep: the same 990-stream (or subset) benchmark run at
 # 1/2/4/8/16/32 fps, so accuracy can be read against the sampling rate.
 #
-# Why this benchmark answers a frame-rate question at all: every question carries
-# `min_fps`, FPSBench's claim about the rate below which its evidence window is not
-# resolvable however good the model is. The distribution over the 990 streams is
-#     4 fps: 249   5: 206   6: 153   7: 132   8: 80   9-15: 147   16-30: 23
-# so a sweep from 1 to 32 fps crosses every question's threshold: at 1-2 fps no question
-# is resolvable, by 8 fps 83% are, and past 16 fps 98% are. The expected
-# shape is a rise that flattens, and where it flattens is the measurement.
-#
+
+
 # Two ceilings bound the top of the sweep, and both are real:
 #
 # * **The source rate.** The assembled streams are 24-60 fps (25: 502, 30: 372, 24: 101,
@@ -89,28 +83,18 @@ DATASET=fpsbench_stream
 
 # llava_ov_0.5b sweeps the whole range; llava_ov_7b is capped by host RAM (see above) and
 # will skip its top arms rather than run them.
-MODEL=llava_ov_0.5b
+MODEL=llava_ov_7b
 
 # The sweep. Space-separated, and each value writes to its own results directory
 # (results/<model>/fpsbench_stream/<retrieve_size>-<fps>...), so arms never overwrite
 # each other and the list can be run in pieces across jobs.
-FPS_LIST="1 2 4 8 16 32"
+FPS_LIST="1 2 4 8"
 
-# Which question each arm asks. 'query' fires at query_time_sec, with the needle still the
-# newest thing in the cache: that is the perception measurement, and the one the frame rate
-# is actually about -- whether the model saw enough frames to resolve the event. 'end'
-# fires after all 600 s, so the needle has to be retrieved back out of memory; a frame-rate
-# sweep there measures perception and retrieval together, which is worth having but is not
-# the first thing to run. The two write to different directories.
+# The query is trigged at the end of evidence window
 TRIGGER=query
 
-# The subset the sweep runs on. One arm over all 990 streams is 165 hours of footage, so
-# the six arms together are 165 x (1+2+4+8+16+32) = ~10,400 hours of decode-and-encode --
-# not a thing to start. sub135.json is 135 streams balanced over all 9 question types and
-# all 3 needle positions (scripts/make_fpsbench_subset.py), i.e. the same questions in
-# every arm, which is what makes the arms comparable. Set ANNO="" to run the full
-# benchmark, and expect it to take days.
-ANNO=data/fpsbench_stream/sub135.json
+
+ANNO=" "
 
 N_LOCAL=15000
 RETRIEVE_SIZE=64
@@ -208,8 +192,6 @@ for FPS in ${FPS_LIST}; do
         ${ANNO_ARGS} \
         ${REDUCE_ARGS}
     echo "=== finished $(date) ==="
-    # The memory model above is an estimate; this is the ground truth, and it is the line
-    # to look at first if a later arm dies.
     free -g
   done
 done
