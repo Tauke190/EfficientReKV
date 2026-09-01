@@ -1,0 +1,5861 @@
+[
+  {
+    "id": 761,
+    "task": "STU",
+    "question": "Which container is located closer to the top left corner of the table?",
+    "response": "A) The blue container.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 760,
+    "task": "STU",
+    "question": "What's right above the pot?",
+    "response": "A) A shelf with spices is situated just above the pot.Explanation: The",
+    "ground_truth": "D"
+  },
+  {
+    "id": 762,
+    "task": "STU",
+    "question": "What is she putting the seasoning into?",
+    "response": "A) She is putting the seasoning into a small bowl.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 763,
+    "task": "STU",
+    "question": "What is located directly behind the woman wearing the apron with red ties?",
+    "response": "B) A gas stove with pots and bowls on it.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 764,
+    "task": "STU",
+    "question": "What is the position of the wooden spoon in the sauce?",
+    "response": "A) The wooden spoon is partially submerged in the sauce.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1051,
+    "task": "ATR",
+    "question": "What is the character's expression as seen with the headset?",
+    "response": "A) The character's expression appears to be a smile.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1052,
+    "task": "ATR",
+    "question": "What is the color of the character's outfit on the platform?",
+    "response": "A) Red.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1053,
+    "task": "ATR",
+    "question": "What shape are the windows in the background?",
+    "response": "B) Rectangular.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 934,
+    "task": "OJR",
+    "question": "What can be seen on the wall behind the person?",
+    "response": "A) A wall clock.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 936,
+    "task": "OJR",
+    "question": "What is she holding in her hand?",
+    "response": "A) Black gift bagExplanation: The image shows a person holding a black",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1394,
+    "task": "OCR",
+    "question": "What is written on the cake?",
+    "response": "C) Congratulations",
+    "ground_truth": "C"
+  },
+  {
+    "id": 937,
+    "task": "OJR",
+    "question": "What is she holding in her hand?",
+    "response": "A) Black gift bagExplanation: The image shows a person holding a black",
+    "ground_truth": "D"
+  },
+  {
+    "id": 938,
+    "task": "OJR",
+    "question": "What is she holding in her hand?",
+    "response": "A) Black gift bagExplanation: The image shows a person holding a black",
+    "ground_truth": "B"
+  },
+  {
+    "id": 935,
+    "task": "OJR",
+    "question": "What is she holding in her hand?",
+    "response": "A) Black gift bagExplanation: The image shows a person holding a black",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1395,
+    "task": "OCR",
+    "question": "What is written on the gift bag?",
+    "response": "D) Gucci",
+    "ground_truth": "D"
+  },
+  {
+    "id": 939,
+    "task": "OJR",
+    "question": "What is she holding in her hand?",
+    "response": "A) A red box and a green box.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 940,
+    "task": "OJR",
+    "question": "What is she holding in her hand?",
+    "response": "A) A red box and a green box.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 941,
+    "task": "OJR",
+    "question": "What is she holding in her hand?",
+    "response": "B) Black gift bagAnswer: B",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1383,
+    "task": "OCR",
+    "question": "What is the price displayed on the 7-Eleven gas station sign?",
+    "response": "A) Regular: $3.79, Premium: $4.2",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1384,
+    "task": "OCR",
+    "question": "What is the speed limit on the road?",
+    "response": "D) 30.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1385,
+    "task": "OCR",
+    "question": "What is the license plate of the car ahead?",
+    "response": "B) VBT-3030.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1386,
+    "task": "OCR",
+    "question": "What's on the billboard on the right?",
+    "response": "A) NTC.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1063,
+    "task": "ATR",
+    "question": "What is the architectural style of the buildings on the left?",
+    "response": "D) Traditional brick architecture.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 884,
+    "task": "OJR",
+    "question": "What type of ear devices is the person wearing?",
+    "response": "A) Over-ear headphones.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 885,
+    "task": "OJR",
+    "question": "What object is the person approaching?",
+    "response": "A) A stone staircase leading up the hill.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1319,
+    "task": "OCR",
+    "question": "What are the names listed on each lane of the pool?",
+    "response": "D) Lochte, Dressel, Phelps, Cseh, Chalm",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1288,
+    "task": "ACR",
+    "question": "What technique are these swimmers using?",
+    "response": "A) The swimmers are engaging in a racing dive.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1320,
+    "task": "OCR",
+    "question": "What is the leading player's time at the 150m mark?",
+    "response": "A) 1:16.96.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1321,
+    "task": "OCR",
+    "question": "What time did the winner achieve in the 200m freestyle men final?",
+    "response": "C) 1:42.58.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1322,
+    "task": "OCR",
+    "question": "Who was the first to arrive?",
+    "response": "A) POPOVICI.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1313,
+    "task": "ACR",
+    "question": "What is the player in white doing with the ball?",
+    "response": "A) The player in white is passing the ball to a teammate.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 766,
+    "task": "STU",
+    "question": "Which of the players ran ahead?",
+    "response": "A) The player in white.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 767,
+    "task": "STU",
+    "question": "In which direction of the goal are they dribbling the ball? ",
+    "response": "B) They are dribbling towards the right hoop.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1314,
+    "task": "ACR",
+    "question": "What is the player in white doing with the ball?",
+    "response": "D) The player in white is executing a reverse layup.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 765,
+    "task": "STU",
+    "question": "What is the player in white focusing on while preparing to shoot?",
+    "response": "A) The player is facing the basket.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1312,
+    "task": "ACR",
+    "question": "What action is the player in blue attempting?",
+    "response": "A) The player in blue is attempting a serve from the sidelines.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1275,
+    "task": "ACR",
+    "question": "What is he doing with his hand?",
+    "response": "A) He is gesturing.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1276,
+    "task": "ACR",
+    "question": "What is she doing?",
+    "response": "B) She is dancing while sipping.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1277,
+    "task": "ACR",
+    "question": "How does he hold the glass while drinking?",
+    "response": "A) He clasps the glass with a firm hold around the top, bringing",
+    "ground_truth": "B"
+  },
+  {
+    "id": 894,
+    "task": "OJR",
+    "question": "How many animals are sitting in the cart?",
+    "response": "D) 2.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 895,
+    "task": "OJR",
+    "question": "What type of fruit is visible in the penguin's hands?",
+    "response": "A) Apple.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 896,
+    "task": "OJR",
+    "question": "What type of animal is leaping in the sky?",
+    "response": "A) It is a mythical creature with wings and a long tail.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 898,
+    "task": "OJR",
+    "question": "How many animals are interacting in the snow?",
+    "response": "D) Four animals are interacting; two are laying down while the other two are",
+    "ground_truth": "A"
+  },
+  {
+    "id": 897,
+    "task": "OJR",
+    "question": "What is the structure visible in the background of the snowy landscape?",
+    "response": "A) A snowy mountain with a ski resort is visible in the background.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1370,
+    "task": "OCR",
+    "question": "What word is displayed now?",
+    "response": "B) HERO.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1371,
+    "task": "OCR",
+    "question": "Who are the individuals referenced under 3D modeling?",
+    "response": "B) Miguel Gomez Selva and Alvaro Villegas.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 729,
+    "task": "STU",
+    "question": "What is the direction of the path that the airplane is following across the island?",
+    "response": "D) East to West.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 730,
+    "task": "STU",
+    "question": "Which location is directly north of the Terminal?",
+    "response": "A) Yong Cheon.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 731,
+    "task": "STU",
+    "question": "As the character is descending, what is the relative location of the river to them?",
+    "response": "A) The river is in front of them.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 732,
+    "task": "STU",
+    "question": "What is the relative position of the bootcamp to Paradise Resort?",
+    "response": "A) Northwest.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1274,
+    "task": "ACR",
+    "question": "What is he doing?",
+    "response": "D) He is cradling it gently with both hands.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1273,
+    "task": "ACR",
+    "question": "What is he doing with the jalape\u00f1os?",
+    "response": "A) He is roasting them.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1305,
+    "task": "ACR",
+    "question": "What is she doing?",
+    "response": "A) She is eating food.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1304,
+    "task": "ACR",
+    "question": "What is she doing?",
+    "response": "A) She is talking with the man.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1245,
+    "task": "ACR",
+    "question": "What is the player in the burgundy jersey doing?",
+    "response": "A) He is preparing to take a corner kick.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1246,
+    "task": "ACR",
+    "question": "What is the player in the blue jersey doing with the ball near the goal?",
+    "response": "B) The player in the blue jersey is dribbling the ball.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1248,
+    "task": "ACR",
+    "question": "How is the player in red interacting with the player in blue near the goal?",
+    "response": "D) The player in red is blocking the player in blue.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1247,
+    "task": "ACR",
+    "question": "What is the player with blue jersey doing with the ball?",
+    "response": "A) The player is preparing to take a corner kick to set up a scoring",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1249,
+    "task": "ACR",
+    "question": "What is the goalkeeper doing?",
+    "response": "A) The goalkeeper is diving.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1417,
+    "task": "OCR",
+    "question": "What date is the event taking place?",
+    "response": "C) Sep-16-2023.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1415,
+    "task": "OCR",
+    "question": "What date is the event taking place?",
+    "response": "C) Sep-16-2023.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1416,
+    "task": "OCR",
+    "question": "What date is the event taking place?",
+    "response": "C) Sep-16-2023.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 798,
+    "task": "STU",
+    "question": "How is the oil spread initially in the frying pan?",
+    "response": "C) The oil is placed in the center of the pan and then tilted around",
+    "ground_truth": "D"
+  },
+  {
+    "id": 797,
+    "task": "STU",
+    "question": "Which way is this person twisting the knob?",
+    "response": "A) Fast to the right.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1098,
+    "task": "ATR",
+    "question": "What type of pan is being used, based on its appearance?",
+    "response": "A) Cast iron pan with a shiny black surface.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1257,
+    "task": "ACR",
+    "question": "What is he doing?",
+    "response": "D) He is playing tennis.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1258,
+    "task": "ACR",
+    "question": "What is he doing?",
+    "response": "B) He is playing guitar.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 870,
+    "task": "OJR",
+    "question": "What is the child playing with at the table?",
+    "response": "A) A toy drum set.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1259,
+    "task": "ACR",
+    "question": "What is he doing?",
+    "response": "B) He is playing guitar.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1260,
+    "task": "ACR",
+    "question": "What is he doing?",
+    "response": "B) He is playing guitar.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 871,
+    "task": "OJR",
+    "question": "How many children are visible?",
+    "response": "A) 3.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1256,
+    "task": "ACR",
+    "question": "What is the boy with glasses concentrating on?",
+    "response": "A) He is drawing on a large piece of paper.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1055,
+    "task": "ATR",
+    "question": "How is her expression in the close-up?",
+    "response": "A) Neutral.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1336,
+    "task": "OCR",
+    "question": "What is the name of the object with high acceleration and top speed?",
+    "response": "D) Cyclone-X Engine.The Cyclone-X Engine is known for its",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1337,
+    "task": "OCR",
+    "question": "What name is displayed at the top of the list on the left?",
+    "response": "A) ForgePhantom.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1339,
+    "task": "OCR",
+    "question": "Which player is right in front?",
+    "response": "A) ForgePhantom.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1338,
+    "task": "OCR",
+    "question": "Which player is right in front?",
+    "response": "A) ForgePhantom.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 931,
+    "task": "OJR",
+    "question": "What color is his tie?",
+    "response": "C) purple.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 927,
+    "task": "OJR",
+    "question": "How many people are sitting on the bench?",
+    "response": "A) There are three people occupying the bench.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 928,
+    "task": "OJR",
+    "question": "How many people are sitting on the bench?",
+    "response": "A) There are three people occupying the bench.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 929,
+    "task": "OJR",
+    "question": "How many people appear together in this part?",
+    "response": "A) Three people are seen together.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 930,
+    "task": "OJR",
+    "question": "What color is his tie?",
+    "response": "C) purple.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1266,
+    "task": "ACR",
+    "question": "What is the person in the white outfit doing?",
+    "response": "A) Lying down on a frozen lake, adjusting the sights on their rifle",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1267,
+    "task": "ACR",
+    "question": "What is the person in the white outfit doing?",
+    "response": "A) The individual is walking briskly.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1096,
+    "task": "ATR",
+    "question": "What type of clothing is he wearing?",
+    "response": "B) light-colored shirt.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1097,
+    "task": "ATR",
+    "question": "How does his facial expression appear?",
+    "response": "D).",
+    "ground_truth": "D"
+  },
+  {
+    "id": 921,
+    "task": "OJR",
+    "question": "What weapon is being used?",
+    "response": "D) The weapon being used is a Remington 870 shotgun.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1091,
+    "task": "ATR",
+    "question": "What pattern is visible on the wall?",
+    "response": "A) Abstract art.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 920,
+    "task": "OJR",
+    "question": "What weapon is being used?",
+    "response": "D) The weapon being used is a Remington 870 shotgun.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1034,
+    "task": "ATR",
+    "question": "What type of footwear is the character wearing?",
+    "response": "D) black boots.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1033,
+    "task": "ATR",
+    "question": "What is the primary color of the vehicle seen in the background while the character is running?",
+    "response": "A) The vehicle is blue.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 735,
+    "task": "STU",
+    "question": "Who is riding the wave closer to the shore, the child in blue or the child in green?",
+    "response": "A) The child in blue.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 736,
+    "task": "STU",
+    "question": "Is the person in the picture standing on the surfboard or lying on the surfboard?",
+    "response": "D) Standing on a surfboard.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1400,
+    "task": "OCR",
+    "question": "What logo is present before the text begins to fade?",
+    "response": "A) The logo shows 'WRSC' in a circular design.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 949,
+    "task": "OJR",
+    "question": "What is the person holding near the water faucet?",
+    "response": "A) A large water bottle.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1073,
+    "task": "ATR",
+    "question": "How is his facial expression as he exercises?",
+    "response": "A) His facial expression is relaxed.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 911,
+    "task": "OJR",
+    "question": "What is she holding?",
+    "response": "A) A bag of blue oatmeal.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 912,
+    "task": "OJR",
+    "question": "What is she holding?",
+    "response": "A) A bag of blue oatmeal.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 910,
+    "task": "OJR",
+    "question": "What is she holding?",
+    "response": "A) A bag of blue oatmeal.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 908,
+    "task": "OJR",
+    "question": "What is the object being prepared on the counter in the currently visible scene?",
+    "response": "A) Pizza.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 909,
+    "task": "OJR",
+    "question": "What items are on the plate he is holding?",
+    "response": "A) The plate holds a couple of chocolate chip cookies, a sliced orange,",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1364,
+    "task": "OCR",
+    "question": "What text is displayed on the door now?",
+    "response": "A) Japanese Food Support.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1081,
+    "task": "ATR",
+    "question": "What type of clothing is the person wearing?",
+    "response": "A) Black shirt.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1082,
+    "task": "ATR",
+    "question": "What emotion does the person appear to be showing?",
+    "response": "A) The person appears to be excited.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1365,
+    "task": "OCR",
+    "question": "What text is displayed on the Computer screen now?",
+    "response": "C) A healthy life starts with FOOD.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1362,
+    "task": "OCR",
+    "question": "What time is it shown on the screen?",
+    "response": "A) 2.00 PM.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1363,
+    "task": "OCR",
+    "question": "What time is displayed on the screen now?",
+    "response": "B) 9:30 PM.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 751,
+    "task": "STU",
+    "question": "How are the mannequins along the hallway arranged?",
+    "response": "B) They are in a line on the left side, and there are two",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1459,
+    "task": "OCR",
+    "question": "What text is being shown on the screen?",
+    "response": "A) PLAY AREA CLOSURE COUNTDOWN: 1 MINUTEExplanation",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1460,
+    "task": "OCR",
+    "question": "What is the name of the town shown on the map?",
+    "response": "B) The town featured on the map is 'Zorlan'.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1461,
+    "task": "OCR",
+    "question": "How many players are still alive according to the HUD?",
+    "response": "A) 18 players remaining.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1462,
+    "task": "OCR",
+    "question": "What weapon is displayed in the vicinity overlay?",
+    "response": "A) The weapon is MK47 Mutant.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 752,
+    "task": "STU",
+    "question": "What is the person doing near the rock?",
+    "response": "A) The person is crouching and moving beside the large rock.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 753,
+    "task": "STU",
+    "question": "What is the person throwing from behind the rock?",
+    "response": "A) A snowball.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 754,
+    "task": "STU",
+    "question": "What is the position of the tree in front of the player that is farther away than the tree that is closer to the player?",
+    "response": "B).",
+    "ground_truth": "B"
+  },
+  {
+    "id": 778,
+    "task": "STU",
+    "question": "Which object is located directly in front of the person on the right, closest to them?",
+    "response": "A) Hot pot.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1420,
+    "task": "OCR",
+    "question": "What does the text above them say?",
+    "response": "D) Empire Hotpot & Cantonese Cuisine",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1421,
+    "task": "OCR",
+    "question": "What seafood platter options are available based on the menu shown on the screen?",
+    "response": "B) Oysters on the Half Shell, Lobster Tail, Grilled Oct",
+    "ground_truth": "A"
+  },
+  {
+    "id": 779,
+    "task": "STU",
+    "question": "Where are the beetroot noodles being placed by the person?",
+    "response": "B) In the section of the hotpot with the yellow soup.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1279,
+    "task": "ACR",
+    "question": "What is he doing?",
+    "response": "B) He is aiming an M416 rifle at the target.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1278,
+    "task": "ACR",
+    "question": "What is he doing?",
+    "response": "A) Sketching a landscape with charcoal.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1280,
+    "task": "ACR",
+    "question": "How is he positioned while shot at from the left?",
+    "response": "D) He is crouching behind a vehicle.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 918,
+    "task": "OJR",
+    "question": "What type of car is passing by on the left lane?",
+    "response": "B) Two motorcycles.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1048,
+    "task": "ATR",
+    "question": "What color is the illumination around the dashboard?",
+    "response": "C) The glow emanates a soft turquoise hue.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1442,
+    "task": "OCR",
+    "question": "Which brand name appears repeatedly on the side panels?",
+    "response": "B) Michelin.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1297,
+    "task": "ACR",
+    "question": "What just happened to the car in front?",
+    "response": "A) The car flipped over and crashed.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1441,
+    "task": "OCR",
+    "question": "What number is displayed on the side window of the silver car?",
+    "response": "A) 85.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1074,
+    "task": "ATR",
+    "question": "What color is the cape?",
+    "response": "A) The cape is blue.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1075,
+    "task": "ATR",
+    "question": "What is the terrain texture in the environment where they are standing?",
+    "response": "A) The terrain is rocky and uneven.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1325,
+    "task": "OCR",
+    "question": "What is the text on the label of the containers?",
+    "response": "A) STARBUCKS.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1323,
+    "task": "OCR",
+    "question": "What is the label at the top of this brand?",
+    "response": "A) STARBUCKS.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1324,
+    "task": "OCR",
+    "question": "What is the text on the label of the containers?",
+    "response": "A) STARBUCKS.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1076,
+    "task": "ATR",
+    "question": "How is the character in the center styled?",
+    "response": "A) The character is styled with a glowing aura, suggesting power.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1037,
+    "task": "ATR",
+    "question": "What color and texture does the ball have?",
+    "response": "A) The ball is white with black patches and has a smooth texture.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1240,
+    "task": "ACR",
+    "question": "What action is being performed with this tool?",
+    "response": "C) The tool is being displayed.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 803,
+    "task": "STU",
+    "question": "What is the orientation of the screwdriver?",
+    "response": "A) The screwdriver forms a 45-degree angle with the wall.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 802,
+    "task": "STU",
+    "question": "What is hanging above the power outlet on the left side?",
+    "response": "A) A small painting is hanging above the electrical socket to the left.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1241,
+    "task": "ACR",
+    "question": "What action is he performing with the device in his hand?",
+    "response": "A) He is testing the electrical current.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1242,
+    "task": "ACR",
+    "question": "What action does the device indicate when it lights up?",
+    "response": "A) It signifies that the device is powered on.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1366,
+    "task": "OCR",
+    "question": "What brand is displayed on the front of the box?",
+    "response": "D) Corsair.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1367,
+    "task": "OCR",
+    "question": "What is the name printed on top-left of the large component box?",
+    "response": "A) NVIDIA.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1369,
+    "task": "OCR",
+    "question": "What model is this GPU??",
+    "response": "C) RTX3070",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1368,
+    "task": "OCR",
+    "question": "What connector is he holding?",
+    "response": "D) Front USB-A connector.Explanation: The correct answer is the front USB",
+    "ground_truth": "C"
+  },
+  {
+    "id": 737,
+    "task": "STU",
+    "question": "What is the position of the glass beaker relative to the white block?",
+    "response": "C) The glass beaker is in front of the white block.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 738,
+    "task": "STU",
+    "question": "What tool is being used to cut the white block in half?",
+    "response": "A) Saw.A saw is being used to cut the white block in half",
+    "ground_truth": "A"
+  },
+  {
+    "id": 886,
+    "task": "OJR",
+    "question": "What object is being cut in the hands that are wearing orange gloves?",
+    "response": "A) Small pumpkin.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 739,
+    "task": "STU",
+    "question": "What is to the left of the figure with wings?",
+    "response": "B) A small helicopter.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 887,
+    "task": "OJR",
+    "question": "What type of figure is prominently displayed, and what action is it performing?",
+    "response": "A) A superhero toy with a cape, acting as if it's flying or",
+    "ground_truth": "D"
+  },
+  {
+    "id": 889,
+    "task": "OJR",
+    "question": "How many white containers are visible in the scene?",
+    "response": "A) One white container.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 888,
+    "task": "OJR",
+    "question": "What is the person holding in their hands while wearing orange gloves?",
+    "response": "A) A frozen fish wrapped in plastic.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 740,
+    "task": "STU",
+    "question": "In which direction is the person standing on the dry ice?",
+    "response": "A) Right.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 785,
+    "task": "STU",
+    "question": "Which direction is the hand pointing at the doorbell facing relative to the door frame?",
+    "response": "C).",
+    "ground_truth": "C"
+  },
+  {
+    "id": 786,
+    "task": "STU",
+    "question": "Where is the wire located in relation to the hole in the wall?",
+    "response": "B) The wire is protruding from the center of the hole.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 903,
+    "task": "OJR",
+    "question": "What are these two people holding?",
+    "response": "A) Black Camera.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 916,
+    "task": "OJR",
+    "question": "How many athletes are visible in the race scene?",
+    "response": "B) There are three athletes visible in the race scene.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 915,
+    "task": "OJR",
+    "question": "How many athletes are visible in the race scene?",
+    "response": "B) There are three athletes visible in the race scene.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 913,
+    "task": "OJR",
+    "question": "What flag is the athlete holding up?",
+    "response": "A) The flag of Switzerland.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 914,
+    "task": "OJR",
+    "question": "How many athletes are visible in the race scene?",
+    "response": "B) There are three athletes visible in the race scene.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1307,
+    "task": "ACR",
+    "question": "What is the posture of the person kneeling on the grass?",
+    "response": "B) He is kneeling to examine the grass for insects.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1306,
+    "task": "ACR",
+    "question": "What is he doing?",
+    "response": "B) He is kneeling to tie the shoelace of the child next to",
+    "ground_truth": "A"
+  },
+  {
+    "id": 712,
+    "task": "STU",
+    "question": "Which direction are the four red players running",
+    "response": "D) The four red players are running to the right.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 713,
+    "task": "STU",
+    "question": "What is the position of the soccer balls relative to the coach and the players?",
+    "response": "C) The coach is facing away from the soccer balls, while the players are",
+    "ground_truth": "C"
+  },
+  {
+    "id": 714,
+    "task": "STU",
+    "question": "What is the arrangement of the team from left to right based on their jersey numbers?",
+    "response": "B) From left to right, the team is arranged as 2 and ",
+    "ground_truth": "A"
+  },
+  {
+    "id": 716,
+    "task": "STU",
+    "question": "How does the size of the man on the left compare to the size of the man on the right in terms of height?",
+    "response": "A) The man on the left is significantly taller than the man on the right",
+    "ground_truth": "B"
+  },
+  {
+    "id": 715,
+    "task": "STU",
+    "question": "What is the relative position of the two men in black and white jackets?",
+    "response": "A) The man in the black jacket is in front of the man in the",
+    "ground_truth": "C"
+  },
+  {
+    "id": 717,
+    "task": "STU",
+    "question": "What is the orientation of the footballs relative to the man?",
+    "response": "D) The footballs are to the man's right.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 919,
+    "task": "OJR",
+    "question": "What is this person holding in his hand?",
+    "response": "A) black bag.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1069,
+    "task": "ATR",
+    "question": "What type of accessory is the person wearing around the neck?",
+    "response": "D) Necklace.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1070,
+    "task": "ATR",
+    "question": "What pattern is present on the shirt?",
+    "response": "B) Plain pattern with text.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1038,
+    "task": "ATR",
+    "question": "What color is the horse in the front that has a rider wearing an orange cap?",
+    "response": "B) The horse is white.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1039,
+    "task": "ATR",
+    "question": "What is the predominant color of the jockey's outfit on the horse in the blue jacket?",
+    "response": "B).",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1407,
+    "task": "OCR",
+    "question": "Which number of horses is slightly behind now?",
+    "response": "D).",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1405,
+    "task": "OCR",
+    "question": "What is the winning amount mentioned?",
+    "response": "A) WIN $2,848,500.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1404,
+    "task": "OCR",
+    "question": "What is the final odds for the horse numbered 4?",
+    "response": "A) 8.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1406,
+    "task": "OCR",
+    "question": "What are the words on this microphone?",
+    "response": "A) CHAMPIONS.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1418,
+    "task": "OCR",
+    "question": "What text is on the block that was just hit?",
+    "response": "A) STOP.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1419,
+    "task": "OCR",
+    "question": "What is the score now?",
+    "response": "C) 000001100Explanation:The",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1454,
+    "task": "OCR",
+    "question": "How many entries in column C are numeric?",
+    "response": "D) 3.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1456,
+    "task": "OCR",
+    "question": "What numbers are listed in the cells of column C?",
+    "response": "C).",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1455,
+    "task": "OCR",
+    "question": "What text is being written in the B column?",
+    "response": "A) Activities.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1457,
+    "task": "OCR",
+    "question": "Which menu option is being selected?",
+    "response": "A) Shadow Text.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1458,
+    "task": "OCR",
+    "question": "What font size is he choosing for the current table?",
+    "response": "C) 12.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1084,
+    "task": "ATR",
+    "question": "What is the material of the containers visible?",
+    "response": "A) Metal.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1085,
+    "task": "ATR",
+    "question": "What is on the cardboard box?",
+    "response": "A) It is adorned with abstract shapes and minimalist design.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1086,
+    "task": "ATR",
+    "question": "What is the state of the drawers?",
+    "response": "D) The drawers are completely closed but uneven and scratched.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1049,
+    "task": "ATR",
+    "question": "How would you describe the hairstyle of the person completing the obstacle course?",
+    "response": "D) The participant completing the obstacle course has shoulder-length wavy hair.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1317,
+    "task": "ACR",
+    "question": "What is this woman doing?",
+    "response": "C) She is cleaning the bin very carefully with a blue cloth.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1316,
+    "task": "ACR",
+    "question": "What is the person doing?",
+    "response": "D) See is steping on the pedal to open the trash bin.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1315,
+    "task": "ACR",
+    "question": "What is someone doing with their foot?",
+    "response": "A) Someone is using their foot to press a pedal.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 923,
+    "task": "OJR",
+    "question": "What is this monkey holding in his hand?",
+    "response": "C) Empty glass.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 924,
+    "task": "OJR",
+    "question": "What is this monkey holding in his hand?",
+    "response": "C) Empty glass.Explanation: The monkey is holding an empty glass in his",
+    "ground_truth": "C"
+  },
+  {
+    "id": 925,
+    "task": "OJR",
+    "question": "What is this monkey holding in his hand?",
+    "response": "C) Empty glass.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 926,
+    "task": "OJR",
+    "question": "What is this monkey holding in his hand?",
+    "response": "C) Empty glass.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1036,
+    "task": "ATR",
+    "question": "What color is the scooter that the child is standing on?",
+    "response": "A) Black with silver.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 872,
+    "task": "OJR",
+    "question": "What is the object seen at the table?",
+    "response": "A) A red bowl.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 874,
+    "task": "OJR",
+    "question": "What is the animal seen at the table?",
+    "response": "A) A monkey.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 873,
+    "task": "OJR",
+    "question": "What is the monkey holding?",
+    "response": "C) A banana.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 875,
+    "task": "OJR",
+    "question": "How many cups are present on the table?",
+    "response": "D) One cup.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 876,
+    "task": "OJR",
+    "question": "What is the monkey holding in its hands?",
+    "response": "A) A piece of food.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 792,
+    "task": "STU",
+    "question": "Which objects are on the wall above the couch?",
+    "response": "B) An abstract metal sculpture and a vintage clock.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 793,
+    "task": "STU",
+    "question": "How are the cherry tomatoes organized in the pan?",
+    "response": "A) The cherry tomatoes are halved and placed in alternating rows on the pan",
+    "ground_truth": "C"
+  },
+  {
+    "id": 794,
+    "task": "STU",
+    "question": "What is the man holding in his right hand when entering the room?",
+    "response": "A) He is holding a mug.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 795,
+    "task": "STU",
+    "question": "Where is the mug placed relative to the keyboard?",
+    "response": "B) The mug is to the left of the keyboard.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1350,
+    "task": "OCR",
+    "question": "What is the number of the bus?",
+    "response": "B) 3321.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1349,
+    "task": "OCR",
+    "question": "What is displayed on the phone screen?",
+    "response": "A) Blinding Lights by The Weeknd on YouTube Music.Explanation: The",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1351,
+    "task": "OCR",
+    "question": "What word is printed on the front of the hoodie worn by the person?",
+    "response": "D) NOAH.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1281,
+    "task": "ACR",
+    "question": "What is he doing with the bottle?",
+    "response": "A) He shakes the bottle vigorously.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1282,
+    "task": "ACR",
+    "question": "What did he do with the clothes?",
+    "response": "C) He folded the clothes.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1283,
+    "task": "ACR",
+    "question": "What is he doing with his shoe?",
+    "response": "A) He is examining a small scratch on the sole.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1411,
+    "task": "OCR",
+    "question": "Who is introducing the other three to Dancing?",
+    "response": "A) Greg Hartley.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1410,
+    "task": "OCR",
+    "question": "What are the names of the individuals mentioned?",
+    "response": "A) Josh Winters, Emily Bennett, Georgia Ryan, Nathan Lewis.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1412,
+    "task": "OCR",
+    "question": "Who is introducing the other three to Dancing?",
+    "response": "A) Greg Hartley.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1413,
+    "task": "OCR",
+    "question": "Who is introducing the other three to Dancing?",
+    "response": "A) Greg Hartley.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1414,
+    "task": "OCR",
+    "question": "Who is introducing the other three to Dancing?",
+    "response": "A) Greg Hartley.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1463,
+    "task": "OCR",
+    "question": "What is displayed on the house number plate?",
+    "response": "A) 33-D.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1464,
+    "task": "OCR",
+    "question": "What text can be seen on the yellow sign in the background?",
+    "response": "A) YOU GOT THIS.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1101,
+    "task": "ATR",
+    "question": "What is the prominent color of the obstacle on the structure?",
+    "response": "A) Red.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1102,
+    "task": "ATR",
+    "question": "What type of clothing is the person wearing?",
+    "response": "B) Wetsuit.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1043,
+    "task": "ATR",
+    "question": "What shape is the bread on the plate?",
+    "response": "B) The bread is a sliced.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 890,
+    "task": "OJR",
+    "question": "What type of meat is being cut on the board?",
+    "response": "A) Pork chops.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 892,
+    "task": "OJR",
+    "question": "How many cloves of garlic are displayed on the table?",
+    "response": "A) 1.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 891,
+    "task": "OJR",
+    "question": "What herb is being chopped in the bowl?",
+    "response": "C) The herb being chopped in the bowl is cilantro.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 893,
+    "task": "OJR",
+    "question": "What vegetables are being cut on the chopping board?",
+    "response": "B) Green onion fresh chives.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 804,
+    "task": "STU",
+    "question": "Which player stands closer to the audience behind them?",
+    "response": "A) The players in red shirts stand closer to the audience behind them.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 805,
+    "task": "STU",
+    "question": "How many players are competing on the field now?",
+    "response": "A) There are five players on the field.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 808,
+    "task": "STU",
+    "question": "Which player is closer to the net?",
+    "response": "A) The players in white shirts.Explanation: In a soccer match, the",
+    "ground_truth": "A"
+  },
+  {
+    "id": 806,
+    "task": "STU",
+    "question": "How many players are competing on the field now?",
+    "response": "A) There are five players on the field.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 807,
+    "task": "STU",
+    "question": "Which player stands closer to the audience behind them?",
+    "response": "A) The players in green shirts.Explanation: The players in green shirts are",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1392,
+    "task": "OCR",
+    "question": "Who are the winners of the mixed team match listed on the scoreboard?",
+    "response": "A) Yu-jie WANG / Han-sheng YANG",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1393,
+    "task": "OCR",
+    "question": "What is the final score displayed for the match in the result table?",
+    "response": "A) 3 - 2.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1380,
+    "task": "OCR",
+    "question": "What is the text on the screen now?",
+    "response": "B) Vegan Eggless EggsAnswer: (B) Vegan Eggless Eggs",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1381,
+    "task": "OCR",
+    "question": "What is the text on the screen now?",
+    "response": "B) Vegan Eggless EggsAnswer: (B) Vegan Eggless Eggs",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1378,
+    "task": "OCR",
+    "question": "What is the text on the screen now?",
+    "response": "B) Vegan Eggless EggsAnswer: (B) Vegan Eggless Eggs",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1379,
+    "task": "OCR",
+    "question": "What word is written above the plate?",
+    "response": "C) Chicken EggExplanation: The word written above the plate is \"CH",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1382,
+    "task": "OCR",
+    "question": "What is the text on this packaging bag?",
+    "response": "B) Vegan Eggless Eggs",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1445,
+    "task": "OCR",
+    "question": "What text appears at the bottom of the scene when she is talking to someone in the car?",
+    "response": "A) 'Siblings Ignore Little Sister'.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1341,
+    "task": "OCR",
+    "question": "What name and number are visible on the back of this person's jacket?",
+    "response": "A) LAFFONT, 00.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 877,
+    "task": "OJR",
+    "question": "What type of vehicles are mainly seen traveling down the road?",
+    "response": "D) Cars.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 878,
+    "task": "OJR",
+    "question": "How many go-karts are visible in the area?",
+    "response": "A) One go-kart.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1467,
+    "task": "OCR",
+    "question": "What is the name visible on the front go-karts?",
+    "response": "A) One of the go-karts has the name 'MOTEEA",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1342,
+    "task": "OCR",
+    "question": "What name and number are visible on the back of this person's jacket?",
+    "response": "A) LAFFONT, 00.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1340,
+    "task": "OCR",
+    "question": "What name and number are visible on the back of this person's jacket?",
+    "response": "A) LAFFONT, 00.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1040,
+    "task": "ATR",
+    "question": "What color is the man's wetsuit in this moment?",
+    "response": "A) The wetsuit appears to be a dark color with bright logos or",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1041,
+    "task": "ATR",
+    "question": "What kind of texture does the water appear to have?",
+    "response": "A) The water appears to have a clear texture with a smooth surface.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 869,
+    "task": "OJR",
+    "question": "What item is the boxer holding while being surrounded by others?",
+    "response": "B) The boxer is holding a microphone.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1078,
+    "task": "ATR",
+    "question": "What type of accessory is the person wearing on their head?",
+    "response": "B) The person is wearing ski goggles.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1301,
+    "task": "ACR",
+    "question": "What action is she performing in the beginning?",
+    "response": "A) She is preparing to climb over a fence.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1302,
+    "task": "ACR",
+    "question": "How is she trying to evade the bull?",
+    "response": "A) She is ducking into a narrow alleyway.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1303,
+    "task": "ACR",
+    "question": "What gesture is she making when she stops on the field?",
+    "response": "A) She is waving her hands.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1433,
+    "task": "OCR",
+    "question": "What text is displayed on the lower left in the frame?",
+    "response": "A) APPLY TODAY...Explanation: The text displayed on the lower left in the",
+    "ground_truth": "D"
+  },
+  {
+    "id": 774,
+    "task": "STU",
+    "question": "Where is the group gathered?",
+    "response": "A) The group is gathered around the blue barrel.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 775,
+    "task": "STU",
+    "question": "What is inside the blue barrel from a top view?",
+    "response": "B) A small orange container with a white substance.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 859,
+    "task": "OJR",
+    "question": "What is coming out of the barrel at this moment?",
+    "response": "A) Smoke.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 776,
+    "task": "STU",
+    "question": "What happens above the blue barrel after the people leave?",
+    "response": "A) Smoke or vapor rises vertically above the blue barrel.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 858,
+    "task": "OJR",
+    "question": "What is this person holding in his hands?",
+    "response": "B) BucketExplanation: The person is holding a bucket, which is a",
+    "ground_truth": "A"
+  },
+  {
+    "id": 777,
+    "task": "STU",
+    "question": "Who put the lid back on top of the blue barrel.",
+    "response": "A) The person in black with the white helmet.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1434,
+    "task": "OCR",
+    "question": "What words are crossed out in the text?",
+    "response": "B) recent food processor purchasersAnswer: B",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1435,
+    "task": "OCR",
+    "question": "What brand is the juicer?",
+    "response": "D) Cuisinart.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1044,
+    "task": "ATR",
+    "question": "What color is the shirt that the person is wearing?",
+    "response": "B) The shirt is blue.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1045,
+    "task": "ATR",
+    "question": "What shape are the containers on the shelf?",
+    "response": "D) Rectangular prisms.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1436,
+    "task": "OCR",
+    "question": "What is written on this note?",
+    "response": "A) FEED ME!Explanation: The note is written in a way that",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1437,
+    "task": "OCR",
+    "question": "What are the words on the apron?",
+    "response": "B) Breville.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1046,
+    "task": "ATR",
+    "question": "What texture does the mixture appear to have?",
+    "response": "B) Smooth and liquidy.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 866,
+    "task": "OJR",
+    "question": "How many tent are visible in the area surrounding the person?",
+    "response": "A) There are two tents in the area behind the person.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 867,
+    "task": "OJR",
+    "question": "What type of vegetation is visible near the rocky area?",
+    "response": "A) Cacti and rocks are visible near the rocky area.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 868,
+    "task": "OJR",
+    "question": "What is the state of the person's hand shown?",
+    "response": "A) The person's hand is shown with a bandage.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1422,
+    "task": "OCR",
+    "question": "What brand is on the water bottle she is holding?",
+    "response": "A) Volvic.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1423,
+    "task": "OCR",
+    "question": "What brand is on the bottle she is holding?",
+    "response": "A) Volvic.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1077,
+    "task": "ATR",
+    "question": "What type of clothing is the person wearing?",
+    "response": "A) Black jacket.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 899,
+    "task": "OJR",
+    "question": "What is the type of container the person is holding while standing in the bathroom?",
+    "response": "A) A small bottle of essential oil labeled 'Lavender'.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 900,
+    "task": "OJR",
+    "question": "What items are currently visible in the lunchbox?",
+    "response": "C) granola bar.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 901,
+    "task": "OJR",
+    "question": "How many different types of food items are packed in the lunchbox?",
+    "response": "B) There are four different types of food items in the lunchbox.Explanation",
+    "ground_truth": "B"
+  },
+  {
+    "id": 902,
+    "task": "OJR",
+    "question": "What is the content in the zip bag that is being held?",
+    "response": "A) Glazed almonds.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1311,
+    "task": "ACR",
+    "question": "What is she doing with the chicken in her hands?",
+    "response": "C) She is holding the chicken while preparing to cook it.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 950,
+    "task": "OJR",
+    "question": "What device is being interacted with?",
+    "response": "A) Smartphone.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 951,
+    "task": "OJR",
+    "question": "How many exercise balls can be seen?",
+    "response": "A) Three exercise balls are visible.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 800,
+    "task": "STU",
+    "question": "What is the orientation of the tree with lights in relation to the two children?",
+    "response": "C) The tree with lights is behind and slightly to the left of the two",
+    "ground_truth": "C"
+  },
+  {
+    "id": 799,
+    "task": "STU",
+    "question": "What is the position of the two bowls in relation to the food on the table?",
+    "response": "A) The bowls are to the right of the food.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 801,
+    "task": "STU",
+    "question": "What is the person on the left holding in front of them?",
+    "response": "A) A blue notebook.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1440,
+    "task": "OCR",
+    "question": "What name is on the cardboard house?",
+    "response": "C) BiBi.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1035,
+    "task": "ATR",
+    "question": "What color is the soup in the bowl that appears in the scene?",
+    "response": "C) The soup is yellow.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1295,
+    "task": "ACR",
+    "question": "What is the man in the red shirt doing?",
+    "response": "C) He is using chopsticks to pick up food.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1296,
+    "task": "ACR",
+    "question": "How is the monkey in the orange shirt eating?",
+    "response": "C) The monkey is eating with its hands.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1438,
+    "task": "OCR",
+    "question": "What is the text above the person in black saying?",
+    "response": "A) Haha! Things are about to get spicy!Explanation: The text",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1439,
+    "task": "OCR",
+    "question": "What is the statement that strong man just made?",
+    "response": "A) Repercussions will be drastic.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1100,
+    "task": "ATR",
+    "question": "What is the hairstyle of the person holding an ice cream?",
+    "response": "A) The person has long hair tied in a bun.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1284,
+    "task": "ACR",
+    "question": "What is she doing?",
+    "response": "B) She is holding her hands together.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1285,
+    "task": "ACR",
+    "question": "What is she doing?",
+    "response": "B) She is working with computer.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1286,
+    "task": "ACR",
+    "question": "What is she doing?",
+    "response": "A) She is working with computer.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1287,
+    "task": "ACR",
+    "question": "What is she doing?",
+    "response": "A) She is working with computer.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 847,
+    "task": "OJR",
+    "question": "What is the girl holding in her hand while sitting at the sofa?",
+    "response": "A) The girl is holding a small chalkboard.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 745,
+    "task": "STU",
+    "question": "Which hand is the person holding the baby with?",
+    "response": "D) The person is holding the baby with their right hand.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 746,
+    "task": "STU",
+    "question": "What is the person doing?",
+    "response": "D) The baby is cradled in the man's arms.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 748,
+    "task": "STU",
+    "question": "Whose arms is this baby in?",
+    "response": "B) The man in black T-shirt is holding the baby.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 747,
+    "task": "STU",
+    "question": "What direction is the person on the left facing relative to the person holding the baby?",
+    "response": "D).",
+    "ground_truth": "D"
+  },
+  {
+    "id": 749,
+    "task": "STU",
+    "question": "Where is the pink blanket relative to the baby in the car seat?",
+    "response": "B) The pink blanket is draped over the car seat, partially covering the baby",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1408,
+    "task": "OCR",
+    "question": "What are the letters on the sign?",
+    "response": "A) SC",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1409,
+    "task": "OCR",
+    "question": "What is written on the rear wing of this car?",
+    "response": "D) TENEG.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 917,
+    "task": "OJR",
+    "question": "What item is placed on the floor in front of the people celebrating?",
+    "response": "A) Rug.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1095,
+    "task": "ATR",
+    "question": "What expression does the person in the rearview mirror have?",
+    "response": "C).",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1331,
+    "task": "OCR",
+    "question": "What brand name is on the toothpaste?",
+    "response": "C) Crest.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1334,
+    "task": "OCR",
+    "question": "What is the text on the package?",
+    "response": "A) Breyers.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1335,
+    "task": "OCR",
+    "question": "What is the text on the package?",
+    "response": "C) SOUR PATCH.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1332,
+    "task": "OCR",
+    "question": "What type of gas is indicated on the container to the right?",
+    "response": "D) Propane.Explanation:Propane is a type of gas that is",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1333,
+    "task": "OCR",
+    "question": "What text is visible on the bottle in the middle?",
+    "response": "A) Heineken.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 733,
+    "task": "STU",
+    "question": "What is written on the white paper?",
+    "response": "A) '200ml DI' and '40mg Ery",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1465,
+    "task": "OCR",
+    "question": "What is written on the white paper?",
+    "response": "A) '200ml DI' and '40mg Ery",
+    "ground_truth": "D"
+  },
+  {
+    "id": 734,
+    "task": "STU",
+    "question": "What is this transparent beaker placed on?",
+    "response": "A) Is placed on a white table.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1466,
+    "task": "OCR",
+    "question": "What is the angle between the side of the jar and the swirl of the liquid?",
+    "response": "B).",
+    "ground_truth": "D"
+  },
+  {
+    "id": 769,
+    "task": "STU",
+    "question": "Which sheet has the less strips on it?",
+    "response": "A) First on the left.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 770,
+    "task": "STU",
+    "question": "Which spoon is he touching with the test strip?",
+    "response": "B) First from the left.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 771,
+    "task": "STU",
+    "question": "Which spoon is he touching with the test strip?",
+    "response": "A) He is touching the second spoon from the left with the test strip.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 772,
+    "task": "STU",
+    "question": "Which spoon is he touching with the test strip?",
+    "response": "A) He is touching the second spoon from the right with the test strip.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 773,
+    "task": "STU",
+    "question": "Which spoon is marked by the yellow circle?",
+    "response": "D) The third from the left.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 768,
+    "task": "STU",
+    "question": "How many spoons are there on the table?",
+    "response": "B) On the table, there are eight spoons.Explanation:The question",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1357,
+    "task": "OCR",
+    "question": "What is written on the clear bottle beside the water bottle?",
+    "response": "B) Demi Water.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1358,
+    "task": "OCR",
+    "question": "What does the label on the bottle with the blue cap say?",
+    "response": "B) Electrolyte Water Hydration.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1359,
+    "task": "OCR",
+    "question": "What does the label on the bottle?",
+    "response": "A) EM 400Explanation: The label on the bottle is",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1360,
+    "task": "OCR",
+    "question": "What does the label on the bottle?",
+    "response": "A) EM 400Explanation: The label on the bottle is",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1372,
+    "task": "OCR",
+    "question": "What is the current value displayed on the energy meter?",
+    "response": "A) 1.88 kWh.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1373,
+    "task": "OCR",
+    "question": "How does the text on the screen describe the extreme weather?",
+    "response": "C).",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1243,
+    "task": "ACR",
+    "question": "What is the person in the blue raincoat doing?",
+    "response": "A) He is photographing the waves from the bridge during the storm.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1244,
+    "task": "ACR",
+    "question": "How is the water flowing?",
+    "response": "A) The water is flowing smoothly downstream.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1308,
+    "task": "ACR",
+    "question": "What is he doing?",
+    "response": "D) He is playing a guitar.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1309,
+    "task": "ACR",
+    "question": "What is she gesturing towards with her hand?",
+    "response": "A) The sculpture behind them.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1310,
+    "task": "ACR",
+    "question": "What is he doing?",
+    "response": "A) He is pouring a drink into the glass.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1424,
+    "task": "OCR",
+    "question": "What is the name on the small brown box?",
+    "response": "B) Earthen Fiber.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1425,
+    "task": "OCR",
+    "question": "What is written on the little yellow house?",
+    "response": "B) 19POLICE",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1426,
+    "task": "OCR",
+    "question": "What's the label on this lid?",
+    "response": "A) DRIED ROSE PETALS.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 882,
+    "task": "OJR",
+    "question": "What type of bird is visible in the area where a person is sitting?",
+    "response": "C) Brown sparrow is present.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 883,
+    "task": "OJR",
+    "question": "What type of vehicle is parked in the background?",
+    "response": "A) Green bicycle.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1352,
+    "task": "OCR",
+    "question": "What word is on the board now?",
+    "response": "B) Emerald.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1353,
+    "task": "OCR",
+    "question": "What text is displayed now?",
+    "response": "A) Milk Bucket.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1428,
+    "task": "OCR",
+    "question": "What is written on the red truck's license plate?",
+    "response": "A) K243BM66.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1427,
+    "task": "OCR",
+    "question": "What time is displayed at the top left corner?",
+    "response": "A) 2010/12/31 23",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1429,
+    "task": "OCR",
+    "question": "What date and time is visible on the screen?",
+    "response": "A) 2012-11-11 14",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1430,
+    "task": "OCR",
+    "question": "What is the license plate number of this car?",
+    "response": "A) K243BM66.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1431,
+    "task": "OCR",
+    "question": "What is the license plate number of this car?",
+    "response": "A) K243BM66.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1432,
+    "task": "OCR",
+    "question": "What is the license plate number of this car?",
+    "response": "A) K243BM66.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1031,
+    "task": "ATR",
+    "question": "What color pants is the person on the right wearing?",
+    "response": "A) Khaki.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1032,
+    "task": "ATR",
+    "question": "What is the hair type of the boxer on the right?",
+    "response": "A) Short hair.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1065,
+    "task": "ATR",
+    "question": "What is the expression on their faces?",
+    "response": "D) Calm and relaxed.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 844,
+    "task": "OJR",
+    "question": "What object is being used to constructe the paper aircraft wing?",
+    "response": "A) A plastic frame.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 750,
+    "task": "STU",
+    "question": "What direction is the cannon under the green pipeline firing shells in?",
+    "response": "B) left.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 742,
+    "task": "STU",
+    "question": "What is the direction of the stairs here?",
+    "response": "B) The stairs lead upward.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 743,
+    "task": "STU",
+    "question": "What is the relative position of the large statue and the player character?",
+    "response": "D) The large statue is to the player's right.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 744,
+    "task": "STU",
+    "question": "What is the relative position of the character on the right from the one holding the shield?",
+    "response": "A) The character on the right is diagonally positioned relative to the shield holder",
+    "ground_truth": "D"
+  },
+  {
+    "id": 787,
+    "task": "STU",
+    "question": "What is the pig facing as it eats the watermelon?",
+    "response": "B) The pig is facing a man in red.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 788,
+    "task": "STU",
+    "question": "Which direction is the driver facing while ordering?",
+    "response": "D) The driver is facing forward.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 789,
+    "task": "STU",
+    "question": "Where is the person in the black sweatshirt standing?",
+    "response": "B) Stand first on the left.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 790,
+    "task": "STU",
+    "question": "Which direction is the open door facing relative to the person outside the bathroom?",
+    "response": "D) The open door is facing towards the person outside the bathroom.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 791,
+    "task": "STU",
+    "question": "Which side shows a greater weight increase in the scales?",
+    "response": "A) The left side demonstrates a more substantial gain in weight.Explanation: The",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1326,
+    "task": "OCR",
+    "question": "What is the name visible on the men's jacket?",
+    "response": "A) A. Wade",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1327,
+    "task": "OCR",
+    "question": "What is written on the jacket of the person sitting on the bed?",
+    "response": "B) CARPENTER 316512.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 945,
+    "task": "OJR",
+    "question": "What object is being held by the person with light hair?",
+    "response": "A) A bouquet of flowers.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 946,
+    "task": "OJR",
+    "question": "What object is she holding in her hand?",
+    "response": "B) gun.The object the person is holding in her hand is a gun",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1298,
+    "task": "ACR",
+    "question": "What is he doing with his hands.",
+    "response": "B) He is folding a shirt.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1300,
+    "task": "ACR",
+    "question": "What is he doing behind the glass?",
+    "response": "A) He is taking a shower.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1299,
+    "task": "ACR",
+    "question": "What is he doing?",
+    "response": "A) He is playing a musical instrument.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 904,
+    "task": "OJR",
+    "question": "What object is displayed prominently on the red wall?",
+    "response": "B) A large clock with Roman numerals.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 905,
+    "task": "OJR",
+    "question": "What color is the wall behind the painting?",
+    "response": "B) The wall behind the painting is red.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1107,
+    "task": "ATR",
+    "question": "What color is the wall behind the painting?",
+    "response": "B) The wall behind the painting is red.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 906,
+    "task": "OJR",
+    "question": "What is the item being carried by the person in the suit?",
+    "response": "B) A rectangular picture frame.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1108,
+    "task": "ATR",
+    "question": "What is the item being carried by the person in the suit?",
+    "response": "B) A rectangular picture frame.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 907,
+    "task": "OJR",
+    "question": "What does the person in the striped shirt hold while examining the wall?",
+    "response": "A) A sketchbook and a pencil.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1254,
+    "task": "ACR",
+    "question": "What is he doing?",
+    "response": "D) He is operating the copier.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1255,
+    "task": "ACR",
+    "question": "What is he doing?",
+    "response": "B) He is looking at the paper.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 922,
+    "task": "OJR",
+    "question": "What objects are visible on the floor?",
+    "response": "A) Scattered papers.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1397,
+    "task": "OCR",
+    "question": "What is the height range of the eagle?",
+    "response": "B) 60cm to 90cm.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1398,
+    "task": "OCR",
+    "question": "What animal's height range is listed as 60cm to 90cm?",
+    "response": "A) Domestic Goat.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1399,
+    "task": "OCR",
+    "question": "What is the height range of the dog?",
+    "response": "A) 20cm to 1.2m.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1061,
+    "task": "ATR",
+    "question": "What is the color pattern of the creature on the left?",
+    "response": "A) Green color.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1062,
+    "task": "ATR",
+    "question": "Which animal has a unique tail shape compared to the others?",
+    "response": "A) The animal in the middle has a triangular-shaped tail.Explanation: The",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1029,
+    "task": "ATR",
+    "question": "What shape can be observed in the object displayed?",
+    "response": "C).",
+    "ground_truth": "D"
+  },
+  {
+    "id": 848,
+    "task": "OJR",
+    "question": "What animal is seen on the floor of the enclosure?",
+    "response": "A) A lizard.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 849,
+    "task": "OJR",
+    "question": "What is located at the top of the chicken enclosure?",
+    "response": "A) Birdhouse-like structure.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1060,
+    "task": "ATR",
+    "question": "What type of trees are surrounding the area with the sign?",
+    "response": "A) The trees are palm trees.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1447,
+    "task": "OCR",
+    "question": "What is the total score shown for Monica Gavaris?",
+    "response": "A) 41.50.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1448,
+    "task": "OCR",
+    "question": "Who is the diver being scored in Round 1?",
+    "response": "A) Jessica Wong.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1446,
+    "task": "OCR",
+    "question": "What scores did J1,J2,J3,J4,J5,J6,and J7 give in Round 1?",
+    "response": "D) J1: 6.5, J2: 4.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1064,
+    "task": "ATR",
+    "question": "How is the woman's hair styled?",
+    "response": "C) Braided.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1450,
+    "task": "OCR",
+    "question": "What is the total score shown for Monica Gavaris?",
+    "response": "A) 43.40.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1449,
+    "task": "OCR",
+    "question": "What is the total score shown for Monica Gavaris?",
+    "response": "A) 43.40.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 942,
+    "task": "OJR",
+    "question": "What small animal appears next to them on the bridge?",
+    "response": "A) A squirrel.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 943,
+    "task": "OJR",
+    "question": "What is the animal lying on the ground near the bridge?",
+    "response": "A) Snow leopard.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 944,
+    "task": "OJR",
+    "question": "What type of animal is being held above the bridge?",
+    "response": "A) A cat.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 718,
+    "task": "STU",
+    "question": "What direction is the man facing?",
+    "response": "A) The man is facing the center of the room.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 719,
+    "task": "STU",
+    "question": "What is the relative position of the knives to the door?",
+    "response": "B) The knives are right of the door.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 720,
+    "task": "STU",
+    "question": "What is the man doing in relation to the elevator?",
+    "response": "C).",
+    "ground_truth": "C"
+  },
+  {
+    "id": 721,
+    "task": "STU",
+    "question": "Where is the person's hand positioned?",
+    "response": "A) The hand is holding the pole below the toothbrush, while the other",
+    "ground_truth": "D"
+  },
+  {
+    "id": 722,
+    "task": "STU",
+    "question": "What is the position of the note \"I'm here for you!\" in relation to \"CALL ON ME\"?",
+    "response": "A) The note \"I'm here for you!\" is directly beneath \"CALL",
+    "ground_truth": "D"
+  },
+  {
+    "id": 723,
+    "task": "STU",
+    "question": "What are the relative positions of the notes saying \"I'm still here...\" and \"Love you loads\" on the counter?",
+    "response": "A) The note \"I'm still here...\" is to the right of \"",
+    "ground_truth": "D"
+  },
+  {
+    "id": 864,
+    "task": "OJR",
+    "question": "How many players in yellow uniforms are near the blue player with the ball?",
+    "response": "A) Two players in yellow uniforms.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 865,
+    "task": "OJR",
+    "question": "What object is being played by the player in blue?",
+    "response": "A) Soccer ball.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 724,
+    "task": "STU",
+    "question": "Where are the players in blue going?",
+    "response": "A) The players in blue are approaching the Stadium penalty area.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 725,
+    "task": "STU",
+    "question": "What is the position of the player in the yellow jersey relative to the blue team?",
+    "response": "A) The player in the yellow jersey is in the middle of the blue team",
+    "ground_truth": "B"
+  },
+  {
+    "id": 726,
+    "task": "STU",
+    "question": "Where is the ball currently located on the field?",
+    "response": "A) The ball is near the left sideline towards the opponent's goal area.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 727,
+    "task": "STU",
+    "question": "What is the player in the yellow jersey trying to do with the ball?",
+    "response": "C) The player in the yellow jersey is trying to score a goal.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 728,
+    "task": "STU",
+    "question": "From which direction is the ball approaching the goal area?",
+    "response": "D) The ball is coming from the right side.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1396,
+    "task": "OCR",
+    "question": "What does the sign read?",
+    "response": "B) The billboard reads 'Gerayo Amahoro'.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1093,
+    "task": "ATR",
+    "question": "What style is the tattoo on the person's neck?",
+    "response": "A) Neo-traditional.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1092,
+    "task": "ATR",
+    "question": "What is the texture of the sofa fabric?",
+    "response": "B) The texture of the sofa fabric is smooth.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1289,
+    "task": "ACR",
+    "question": "What is she doing with the cushion?",
+    "response": "D) She is putting the cushion back on the sofa.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1290,
+    "task": "ACR",
+    "question": "What is she doing with the blanket?",
+    "response": "B) She is spreading the blanket over the bed.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1291,
+    "task": "ACR",
+    "question": "What is her posture while cleaning the mirror?",
+    "response": "A) She is crouching.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 782,
+    "task": "STU",
+    "question": "Which object is directly behind the girl?",
+    "response": "B) The yellow triangular warning signal is directly behind them.The yellow triangular warning",
+    "ground_truth": "C"
+  },
+  {
+    "id": 780,
+    "task": "STU",
+    "question": "What direction is she facing?",
+    "response": "B).",
+    "ground_truth": "A"
+  },
+  {
+    "id": 781,
+    "task": "STU",
+    "question": "What is the relative position of the two people on stage?",
+    "response": "C) The person in the pink top is in front of the person in the",
+    "ground_truth": "D"
+  },
+  {
+    "id": 783,
+    "task": "STU",
+    "question": "What is the girl in the pink shirt holding in her hand?",
+    "response": "A) The girl in the pink shirt is holding a yellow pencil.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 784,
+    "task": "STU",
+    "question": "What is the relative position of the lockers compared to the person in black?",
+    "response": "A) The lockers are to the left of the person in black.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1089,
+    "task": "ATR",
+    "question": "What is the pattern on the potato's skin?",
+    "response": "C).",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1090,
+    "task": "ATR",
+    "question": "What is the tool made of?",
+    "response": "C) The tool is made of metal and plastic.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 697,
+    "task": "STU",
+    "question": "What is the position of the red and green parrot relative to the blue parrot?",
+    "response": "A) The red and green parrot is below the blue parrot.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 698,
+    "task": "STU",
+    "question": "Which direction is the blue parrot facing from your perspective?",
+    "response": "D) The parrot is facing towards the right side.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 699,
+    "task": "STU",
+    "question": "Is the bird standing on top of the cage facing you or away from you?",
+    "response": "D) The bird is facing you.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 700,
+    "task": "STU",
+    "question": "What is the position of the blue bird relative to the human?",
+    "response": "B) The blue bird is hovering a few feet away in front of the human",
+    "ground_truth": "A"
+  },
+  {
+    "id": 701,
+    "task": "STU",
+    "question": "What is the position of the blue bird relative to the stacked toys from Your perspective?",
+    "response": "A) the bird is perched to the right of the stacked toys.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 702,
+    "task": "STU",
+    "question": "How is the cage door?",
+    "response": "D) The cage door is closed.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 703,
+    "task": "STU",
+    "question": "From your perspective, What is the position of the person relative to the the cage?",
+    "response": "B) The person is positioned inside the cage.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 852,
+    "task": "OJR",
+    "question": "What type of bird is being held by the person?",
+    "response": "C) African Grey parrot.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 704,
+    "task": "STU",
+    "question": "Which direction is the parrot facing?",
+    "response": "B) The parrot is facing right.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 705,
+    "task": "STU",
+    "question": "From your perspective, where is the green parrot in relation to the woman's head?",
+    "response": "B) The green parrot is perched on the woman's right shoulder.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 853,
+    "task": "OJR",
+    "question": "What animal is seen prominently in the vicinity, close to the person in the blue shirt?",
+    "response": "D) African Grey parrot.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 854,
+    "task": "OJR",
+    "question": "What type of item is present near the bottom of the cage with the smaller birds?",
+    "response": "B) A food bowl.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 706,
+    "task": "STU",
+    "question": "Where is this person placing the green parrot?",
+    "response": "A) placing it on his shoulder.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 707,
+    "task": "STU",
+    "question": "Which cage did the man put the parrot in?",
+    "response": "A) The cage on the lower left.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 708,
+    "task": "STU",
+    "question": "What is the position of the person relative to the cage she put the green parrot on?",
+    "response": "C) The person is to the right of the bird cage.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1292,
+    "task": "ACR",
+    "question": "What is he doing with the bird?",
+    "response": "B) He is holding and examining the bird.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1293,
+    "task": "ACR",
+    "question": "What gesture is he making while interacting with the birds?",
+    "response": "A) He is holding the ball with one hand and gently touching it with the",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1294,
+    "task": "ACR",
+    "question": "What is he doing?",
+    "response": "B) He is observing his surroundings.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 755,
+    "task": "STU",
+    "question": "What is the position of the woman relative to the tree branches?",
+    "response": "A) The person is crouching on a branch with arms around it.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 756,
+    "task": "STU",
+    "question": "How is the person at the base of the tree supporting the climber's movement?",
+    "response": "D) The person is supporting the climber by holding the climbing rope.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1361,
+    "task": "OCR",
+    "question": "What is written below the logo on the building?",
+    "response": "A) AEGIS.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1354,
+    "task": "OCR",
+    "question": "What is written on the shirt they are wearing?",
+    "response": "A) \u4f0a\u4e4b\u52a9.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1355,
+    "task": "OCR",
+    "question": "What is the name of the book?",
+    "response": "B) A Time for Mercy.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1356,
+    "task": "OCR",
+    "question": "What is written on the shirt they are wearing?",
+    "response": "C) VIRGIN WHO CAN'T DRIVEExplanation: The shirt worn by the",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1343,
+    "task": "OCR",
+    "question": "What number is on the mailbox?",
+    "response": "A) 6895.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1103,
+    "task": "ATR",
+    "question": "What is the pattern on the woman's clothing?",
+    "response": "B) Polka dots.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1104,
+    "task": "ATR",
+    "question": "What is notable about the man's tie?",
+    "response": "A) The man's tie is yellow and textured.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1346,
+    "task": "OCR",
+    "question": "What is written on this bottle?",
+    "response": "B) ladylee Water.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1347,
+    "task": "OCR",
+    "question": "What is written on this bottle?",
+    "response": "A) Ladylee Milk.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1344,
+    "task": "OCR",
+    "question": "What name appears on the small license plate attached to the wall?",
+    "response": "A) JASON.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1271,
+    "task": "ACR",
+    "question": "What is he doing with the mug?",
+    "response": "D) He is drying the mug with a towel.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1272,
+    "task": "ACR",
+    "question": "What is he doing?",
+    "response": "A) He is typing on a laptop keyboard.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1348,
+    "task": "OCR",
+    "question": "What is the label on this?",
+    "response": "A) Ladylee Milk.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1345,
+    "task": "OCR",
+    "question": "What is the name written on the sign in front of the building?",
+    "response": "A) TEMPLETON.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1047,
+    "task": "ATR",
+    "question": "What shape is the piece of bread on the plate?",
+    "response": "C) The piece of bread is shaped like a circle.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1094,
+    "task": "ATR",
+    "question": "What kind of expression does the small animal wrapped in the cloth have?",
+    "response": "C).",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1377,
+    "task": "OCR",
+    "question": "What text appears on the shirts worn by the players?",
+    "response": "C).",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1376,
+    "task": "OCR",
+    "question": "What text appears on the shirts worn by the players?",
+    "response": "C).",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1374,
+    "task": "OCR",
+    "question": "What text appears on the white shirts worn by the players in the dugout?",
+    "response": "D) The shirts display 'Buccaneers.'.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 796,
+    "task": "STU",
+    "question": "What is the relative position of the person in the light shirt to the person in the dark shirt?",
+    "response": "A) The person in the light shirt is in front of the person in the",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1375,
+    "task": "OCR",
+    "question": "What happened to the umpire in the series?",
+    "response": "A) the umpire has been removed from the series and suspended indefinitely.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 709,
+    "task": "STU",
+    "question": "What is the position of the person relative to the bench?",
+    "response": "D) He is standing next to the bench.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 710,
+    "task": "STU",
+    "question": "Which side is the motorcycle facing from your perspective?",
+    "response": "D) The motorcycle is facing to the right from my perspective.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 711,
+    "task": "STU",
+    "question": "Which side of the motorcycle is the person standing on?",
+    "response": "C) The person is on the left of the motorcycle.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1030,
+    "task": "ATR",
+    "question": "What type of traffic light is visible in the scene?",
+    "response": "A) There is a green traffic light illuminated.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 846,
+    "task": "OJR",
+    "question": "How many dogs are visible?",
+    "response": "C) Two dogs are visible.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 845,
+    "task": "OJR",
+    "question": "How many dogs are visible?",
+    "response": "C) Two dogs are visible.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1071,
+    "task": "ATR",
+    "question": "What color is the helmet he's wearing?",
+    "response": "A) The helmet is white.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1072,
+    "task": "ATR",
+    "question": "What type of pattern is on the girl's shirt?",
+    "response": "A) The shirt has a striped pattern in pink and white.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 741,
+    "task": "STU",
+    "question": "How are the apples positioned along the wire?",
+    "response": "B) Two apples are arranged side by side on the wire.Explanation: The",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1261,
+    "task": "ACR",
+    "question": "What is he doing?",
+    "response": "D) He is dribbling the ball with skill and control.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1262,
+    "task": "ACR",
+    "question": "What gesture is he making to the goalkeeper?",
+    "response": "B) He is leaning forward in an aggressive stance.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1263,
+    "task": "ACR",
+    "question": "What is he doing with the ball?",
+    "response": "A) He's driving forward with the ball.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1264,
+    "task": "ACR",
+    "question": "How does this player score a goal?",
+    "response": "B) He found the net with a header.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1265,
+    "task": "ACR",
+    "question": "How does this player score a goal?",
+    "response": "A) He scored with a penalty kick.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1389,
+    "task": "OCR",
+    "question": "What is the current score displayed on the scoreboard?",
+    "response": "A) Patriots BC 5, Rivers Hoopers 13Explanation:",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1387,
+    "task": "OCR",
+    "question": "What is the current score displayed on the scoreboard?",
+    "response": "B) Patriots BC 8, Rivers Hoopers 13Explanation:",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1388,
+    "task": "OCR",
+    "question": "How much time is left for the offensive team in basketball?",
+    "response": "B) 8s.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1057,
+    "task": "ATR",
+    "question": "What is the color of the jersey worn by the person sitting on the bench?",
+    "response": "B) The person on the bench is wearing a red jersey.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1390,
+    "task": "OCR",
+    "question": "What is the current score displayed on the scoreboard?",
+    "response": "A) Patriots BC 8, Rivers Hoopers 13Explanation:",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1391,
+    "task": "OCR",
+    "question": "Which player is making a free throw?",
+    "response": "A) 12.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1058,
+    "task": "ATR",
+    "question": "What is the pattern on the jerseys of the player in white running towards the goal?",
+    "response": "A) The jersey is primarily white with bold, contrasting bands along the sleeves.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1059,
+    "task": "ATR",
+    "question": "What is the expression of the crowd in the background as the ball heads towards the goal?",
+    "response": "C).",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1042,
+    "task": "ATR",
+    "question": "What shape are the pieces of potato in the pan?",
+    "response": "D) The pieces of potato in the pan are diced cubes.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 879,
+    "task": "OJR",
+    "question": "What cars are visible on the left side of the road?",
+    "response": "B) There are many red auto-rickshaws visible on the left side",
+    "ground_truth": "A"
+  },
+  {
+    "id": 880,
+    "task": "OJR",
+    "question": "What type of vehicle is being observed?",
+    "response": "A) Sedan.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 881,
+    "task": "OJR",
+    "question": "How many motorcycles are visible in the area?",
+    "response": "D) One motorcycle is visible.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 850,
+    "task": "OJR",
+    "question": "What is the elderly woman using to assist her in moving?",
+    "response": "A) Cane.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 851,
+    "task": "OJR",
+    "question": "What is the object being used by the elderly in the left?",
+    "response": "A) walker.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1079,
+    "task": "ATR",
+    "question": "What emotion is evident on their face after the play?",
+    "response": "A) They appear elated.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1080,
+    "task": "ATR",
+    "question": "What pattern is on the black and red uniform?",
+    "response": "D) Checkered.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1318,
+    "task": "ACR",
+    "question": "What is the activity occurring with the football?",
+    "response": "B) A player in a red uniform is attempting to Pass the football.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1099,
+    "task": "ATR",
+    "question": "What color pattern is on the person's shorts?",
+    "response": "A) Red with a yellow stripe and black trim.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1443,
+    "task": "OCR",
+    "question": "What does title on the screen say?",
+    "response": "A) 'Wildlife Conservation Display'.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1444,
+    "task": "OCR",
+    "question": "What text can be seen on the tablecloth?",
+    "response": "A) black ops.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 855,
+    "task": "OJR",
+    "question": "How many dogs are visible in the current observation?",
+    "response": "D) Three dogs.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1087,
+    "task": "ATR",
+    "question": "What pattern is visible on the harness of the dog lying on the floor?",
+    "response": "A) The harness has a red plaid pattern with white accents.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1088,
+    "task": "ATR",
+    "question": "What distinctive color and pattern is present on the small dog walking away?",
+    "response": "D).",
+    "ground_truth": "A"
+  },
+  {
+    "id": 857,
+    "task": "OJR",
+    "question": "What is the person behind the dog holding in his hand?",
+    "response": "A) A green bag.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 856,
+    "task": "OJR",
+    "question": "What type of animals are visible in the scene?",
+    "response": "B) Birds.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1068,
+    "task": "ATR",
+    "question": "What is the pattern on the wall behind him?",
+    "response": "B) The wall has a geometric pattern with interlocking circles and squares.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1054,
+    "task": "ATR",
+    "question": "What is the expression on his face?",
+    "response": "C).",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1050,
+    "task": "ATR",
+    "question": "How does the animal's facial expression appear?",
+    "response": "C).",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1056,
+    "task": "ATR",
+    "question": "What is the color of the clothing of the individual on the digital display?",
+    "response": "D) Red and black.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 932,
+    "task": "OJR",
+    "question": "How many people are in the picture?",
+    "response": "D) 0",
+    "ground_truth": "B"
+  },
+  {
+    "id": 933,
+    "task": "OJR",
+    "question": "How many people are in the picture?",
+    "response": "D) 0",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1453,
+    "task": "OCR",
+    "question": "What is the title of the book?",
+    "response": "C) The BestYear JournalExplanation: The best option is the one that",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1451,
+    "task": "OCR",
+    "question": "What's written on the side of the white plastic bag?",
+    "response": "A) Nike.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1452,
+    "task": "OCR",
+    "question": "What does the subtitle say during the bed making?",
+    "response": "A) making comfort happen <3",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1268,
+    "task": "ACR",
+    "question": "What is he doing with the object in his hand?",
+    "response": "A) He is unwrapping the chocolate bar.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1270,
+    "task": "ACR",
+    "question": "In this moment, what is his posture while interacting with the person opposite him?",
+    "response": "A) He is sitting on the rug, facing the other person directly.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 947,
+    "task": "OJR",
+    "question": "What is on the table in front of them?",
+    "response": "D) plate with food remnants and glass of yellow liquid.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1269,
+    "task": "ACR",
+    "question": "What are they doing?",
+    "response": "B) displaying the object palm upwards with a slight tilt towards the lens.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 948,
+    "task": "OJR",
+    "question": "What is the person on the left holding in their hand?",
+    "response": "B) They are holding a smartphone.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1330,
+    "task": "OCR",
+    "question": "What is the text on the package?",
+    "response": "D) THICK CUT BACONExplanation: The text on the package",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1329,
+    "task": "OCR",
+    "question": "What is the text on the package?",
+    "response": "D) THICK CUT BACONExplanation: The text on the package",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1328,
+    "task": "OCR",
+    "question": "What is the text on the shirt?",
+    "response": "C) I Love New York.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1402,
+    "task": "OCR",
+    "question": "What's the time left on the clock?",
+    "response": "A) 5.1 seconds.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1401,
+    "task": "OCR",
+    "question": "What is the score displayed at the bottom of the scene?",
+    "response": "A) Phillies 90, Raptors 90Explanation: The score",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1083,
+    "task": "ATR",
+    "question": "What is the expression of the man in the white jersey with braided hair?",
+    "response": "A) He appears contemplative.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1403,
+    "task": "OCR",
+    "question": "Which player is shooting?",
+    "response": "A) 23.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 757,
+    "task": "STU",
+    "question": "Can the player in the number 10 shirt fit between the defender and the goal line?",
+    "response": "A) No, its the player in the number 11 shirt.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 759,
+    "task": "STU",
+    "question": "Where did the football hit?",
+    "response": "A) The football hit the goal.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 758,
+    "task": "STU",
+    "question": "What is the position of the blue player relative to the yellow goalkeeper when the ball is about to be struck?",
+    "response": "B) The blue player is near the yellow goalkeeper, slightly to his right.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1066,
+    "task": "ATR",
+    "question": "What color is the material being used?",
+    "response": "A) The material in question is green.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1067,
+    "task": "ATR",
+    "question": "What kind of material seems to be on the ground around the structure?",
+    "response": "A) Concrete and asphalt.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1250,
+    "task": "ACR",
+    "question": "What is being done with the black mesh?",
+    "response": "B) It is being secured over the crate.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1251,
+    "task": "ACR",
+    "question": "How is the wire being used?",
+    "response": "B) The wire is wrapped and tied to secure the mesh.Explanation: The",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1252,
+    "task": "ACR",
+    "question": "What is he doing with the crate?",
+    "response": "C) He is examining the contents of the crate carefully.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1253,
+    "task": "ACR",
+    "question": "What is he doing with the animal?",
+    "response": "D) He is holding and petting the animal.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 860,
+    "task": "OJR",
+    "question": "How many people are sitting on the bench?",
+    "response": "A) Two people are sitting on the bench.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 861,
+    "task": "OJR",
+    "question": "What signage is visible behind the ticket counter at the cinema?",
+    "response": "A) Cineplex.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1105,
+    "task": "ATR",
+    "question": "What color is the plant pot located beside the two people on the bench?",
+    "response": "B).",
+    "ground_truth": "A"
+  },
+  {
+    "id": 863,
+    "task": "OJR",
+    "question": "What type of bird is seen accompanying the person in the green outfit?",
+    "response": "C) Great Green Macaw.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1106,
+    "task": "ATR",
+    "question": "What is the color of the hat worn by the person in the green outfit?",
+    "response": "A) Green.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 862,
+    "task": "OJR",
+    "question": "How many people are visible in the immediate area?",
+    "response": "A) Two people are visible.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1111,
+    "task": "FPD",
+    "question": "What is this person about to do?",
+    "response": "A) The person is about to insert a battery into the cordless drill.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1109,
+    "task": "FPD",
+    "question": "What is this person going to do?",
+    "response": "A) The individual intends to plant a tree.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1110,
+    "task": "FPD",
+    "question": "What is the person preparing to manipulate?",
+    "response": "B) The person is about to handle or manipulate the plastic tubing.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1150,
+    "task": "FPD",
+    "question": "What is this person going to do with the containers?",
+    "response": "A) The person is going to fill the container with ingredients.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1151,
+    "task": "FPD",
+    "question": "What is this person going to prepare to do?",
+    "response": "A) start a car.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1152,
+    "task": "FPD",
+    "question": "What is this person about to do with the large item on the counter?",
+    "response": "B) The person is going to serve the food.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1202,
+    "task": "FPD",
+    "question": "What is this person going to do next?",
+    "response": "A) The person is going to make a phone call.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1204,
+    "task": "FPD",
+    "question": "What is this person preparing to do?",
+    "response": "A) The person is preparing to cook a meal.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1203,
+    "task": "FPD",
+    "question": "What is this person about to do with the object in their hand?",
+    "response": "A) The person is about to swing a bat to hit a ball.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1114,
+    "task": "FPD",
+    "question": "What is this person preparing to do?",
+    "response": "A) The person is arranging flowers in a vase.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1113,
+    "task": "FPD",
+    "question": "What is the person about to do with the container and glass?",
+    "response": "A) The person is about to transfer the liquid from the container into the glass",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1112,
+    "task": "FPD",
+    "question": "What is the person planning to do with the soil from the bag?",
+    "response": "B) The individual intends to spread the soil evenly over the garden plot to provide",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1154,
+    "task": "FPD",
+    "question": "What is this person preparing to do?",
+    "response": "B) The person is preparing to cook a meal.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1153,
+    "task": "FPD",
+    "question": "What is this person going to do?",
+    "response": "A) The person is going to start cooking.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1028,
+    "task": "ATR",
+    "question": "Which color is his brush picking?",
+    "response": "A) Bright yellow.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1155,
+    "task": "FPD",
+    "question": "What is this person about to do?",
+    "response": "A) The person is about to write.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1205,
+    "task": "FPD",
+    "question": "What is this person preparing to do next?",
+    "response": "B) The person is setting up a toolkit for an engine repair task.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1232,
+    "task": "ACR",
+    "question": "What is this person doing?",
+    "response": "C) Checking the tire pressure.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1115,
+    "task": "FPD",
+    "question": "What is this person about to do?",
+    "response": "A) The person is about to tighten a screw on the bicycle wheel.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1231,
+    "task": "ACR",
+    "question": "What is this person doing with the bike?",
+    "response": "A) Repairing a flat tire on the bike.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 982,
+    "task": "OJR",
+    "question": "What tool is being used?",
+    "response": "B) Cordless drill.The cordless drill is being used, as indicated",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1156,
+    "task": "FPD",
+    "question": "What is this person about to do?",
+    "response": "A) The person is about to sweep with a broom.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1157,
+    "task": "FPD",
+    "question": "What is this person about to do?",
+    "response": "A) The person is about to fill the gas tank.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 983,
+    "task": "OJR",
+    "question": "What is he holding in his hand?",
+    "response": "B) A black bottle that resembled motor oil.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1206,
+    "task": "FPD",
+    "question": "What is this person about to do?",
+    "response": "B) The person is preparing to stand up from their chair.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1207,
+    "task": "FPD",
+    "question": "What is this person going to do with the small object in their hands?",
+    "response": "D) The person is going to use the screw to fix a chair.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1208,
+    "task": "FPD",
+    "question": "What is this person going to do?",
+    "response": "A) The person is going to assemble a new piece of furniture.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1225,
+    "task": "ACR",
+    "question": "What is he doing with his hands above the table?",
+    "response": "A) He is stacking coins on the table.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1227,
+    "task": "ACR",
+    "question": "What action is he doing as he moves to the side?",
+    "response": "B) He is swinging a rope back and forth.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1226,
+    "task": "ACR",
+    "question": "What is he doing?",
+    "response": "A) carry small parts.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1209,
+    "task": "FPD",
+    "question": "What is this person about to do next?",
+    "response": "C) The person is going to close the drawer.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 677,
+    "task": "STU",
+    "question": "What is the relative position of the person to the car?",
+    "response": "A) The person is standing at the front of the car.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1117,
+    "task": "FPD",
+    "question": "What is this person about to do from the desk?",
+    "response": "B) The person is going to organize the documents on the desk.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 679,
+    "task": "STU",
+    "question": "Which toolbox do you remove the parts from?",
+    "response": "B) Middle boxExplanation: The toolbox is typically the middle section of a",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1116,
+    "task": "FPD",
+    "question": "What is this person going to do?",
+    "response": "A) The person is going to pick up a book.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 984,
+    "task": "OJR",
+    "question": "What is lying on the ground beside the metal rods?",
+    "response": "A) A pair of gloves and a small wrench.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 985,
+    "task": "OJR",
+    "question": "How many long metal rods are on the floor?",
+    "response": "A) There are five long metal rods on the floor.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1118,
+    "task": "FPD",
+    "question": "What is the person about to do with the knife?",
+    "response": "A) The person is about to use the knife to cut a piece of fruit",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1158,
+    "task": "FPD",
+    "question": "What is this person going to do next?",
+    "response": "A) The person is going to turn on the lamp beside the desk.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1160,
+    "task": "FPD",
+    "question": "What is this person preparing to do?",
+    "response": "A) The person is preparing to cook a meal.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1159,
+    "task": "FPD",
+    "question": "What is the person planning to do with the sponge?",
+    "response": "C) The person is preparing to clean with the sponge.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 981,
+    "task": "OJR",
+    "question": "What is this person placing on the grinder?",
+    "response": "A) The person is placing a metal sheet on the grinder.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1121,
+    "task": "FPD",
+    "question": "What is this person about to do?",
+    "response": "B) The person is about to shape the dough into balls.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1120,
+    "task": "FPD",
+    "question": "What is this person going to do next with the prepared items?",
+    "response": "C) The person is going to cover the dough to let it rise.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1119,
+    "task": "FPD",
+    "question": "What is this person about to do?",
+    "response": "A) The person is about to plant a seed.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1162,
+    "task": "FPD",
+    "question": "What is this person about to do?",
+    "response": "A) The person is about to press a button.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 979,
+    "task": "OJR",
+    "question": "What object is the person holding with both hands?",
+    "response": "A) A metal rod.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1161,
+    "task": "FPD",
+    "question": "What is this person about to do with the tool they are holding?",
+    "response": "A) The person is about to use it to dig into the soil.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 980,
+    "task": "OJR",
+    "question": "What type of tool is being used by the person?",
+    "response": "A) The tool being used is a saw.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1123,
+    "task": "FPD",
+    "question": "What action is this person getting ready for?",
+    "response": "A) They are likely preparing to write or take notes.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1122,
+    "task": "FPD",
+    "question": "What is this person about to do?",
+    "response": "B) The individual is preparing to swipe right on their smartphone screen.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1124,
+    "task": "FPD",
+    "question": "What is the person going to do with the stylus?",
+    "response": "A) The person is about to interact with the tablet using the stylus.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1165,
+    "task": "FPD",
+    "question": "What is this person about to do?",
+    "response": "A) The person is about to throw a ball.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1164,
+    "task": "FPD",
+    "question": "What is this person about to do with the circular object?",
+    "response": "A) The person is about to attach the wheel to the bicycle.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1235,
+    "task": "ACR",
+    "question": "What is this person doing?",
+    "response": "A) inspect the tire for punctures.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1163,
+    "task": "FPD",
+    "question": "What is this person about to do with the object in the stand?",
+    "response": "A) The person is about to fix or adjust the bicycle.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1234,
+    "task": "ACR",
+    "question": "What is the man holding while using his phone?",
+    "response": "B) The man is holding a cup of coffee while using his phone.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 956,
+    "task": "OJR",
+    "question": "What object is being attached to the back of it?",
+    "response": "B) A saddlebag.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1219,
+    "task": "ACR",
+    "question": "What is this person doing with the basket?",
+    "response": "D) Adjusting the basket attached to the bike.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1220,
+    "task": "ACR",
+    "question": "What is this man doing?",
+    "response": "C) They inspect a tool closely.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1221,
+    "task": "ACR",
+    "question": "What action does this individual perform with the tool?",
+    "response": "B) They grasp the tool as they examine the bicycle's tire.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 957,
+    "task": "OJR",
+    "question": "What is being used to secure the basket?",
+    "response": "A) A metal clasp.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 975,
+    "task": "OJR",
+    "question": "What tool is being held in the right hand?",
+    "response": "A) A hammer.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 976,
+    "task": "OJR",
+    "question": "What is being worked on in the vehicle?",
+    "response": "B) The engine.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1126,
+    "task": "FPD",
+    "question": "What is this person preparing to do?",
+    "response": "A) The person is preparing to pump air into a pool float.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1125,
+    "task": "FPD",
+    "question": "What is this person preparing to do?",
+    "response": "A) The person is preparing to write a letter.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1239,
+    "task": "ACR",
+    "question": "What action is being performed with the objects on her hands?",
+    "response": "A) They are being folded.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1167,
+    "task": "FPD",
+    "question": "What is this person about to do?",
+    "response": "A) The person is about to turn on the cooker.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1228,
+    "task": "ACR",
+    "question": "What is the person doing with the vegetables?",
+    "response": "A) They are eating vegetables.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1229,
+    "task": "ACR",
+    "question": "What does the person do after chopping the onion?",
+    "response": "A) They grab a skillet to stir-fry the vegetables.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1222,
+    "task": "ACR",
+    "question": "What action is being performed with the mushrooms?",
+    "response": "A) They are being examined for quality.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1166,
+    "task": "FPD",
+    "question": "What is this person about to do?",
+    "response": "C) The person is reaching for a knife.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 676,
+    "task": "STU",
+    "question": "What is the arrangement of the mushrooms on the cutting board?",
+    "response": "A) The mushrooms are arranged closely together.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1230,
+    "task": "ACR",
+    "question": "What action takes place with the pan on the stove?",
+    "response": "A) Pasta is boiled in the pan.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1223,
+    "task": "ACR",
+    "question": "What is being added to the pan?",
+    "response": "D) Oil.Oil is being added to the pan, as it is a",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1224,
+    "task": "ACR",
+    "question": "What is done after retrieving the bottle cap from the floor?",
+    "response": "A) It is thrown into the recycling bin.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 978,
+    "task": "OJR",
+    "question": "What is he holding in his hand?",
+    "response": "A) a yellow tape measure.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 977,
+    "task": "OJR",
+    "question": "What is the person on the right doing?",
+    "response": "B) The person on the right is holding a plank of wood.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1168,
+    "task": "FPD",
+    "question": "What is this person going to do?",
+    "response": "D) Peel a carrot.Explanation: The person is likely preparing to cut or",
+    "ground_truth": "D"
+  },
+  {
+    "id": 954,
+    "task": "OJR",
+    "question": "How many lime halves are on the cutting board?",
+    "response": "C) 2Explanation: There are two lime halves on the cutting board",
+    "ground_truth": "C"
+  },
+  {
+    "id": 955,
+    "task": "OJR",
+    "question": "How many lime halves are on the cutting board?",
+    "response": "C) 2Explanation: There are two lime halves on the cutting board",
+    "ground_truth": "B"
+  },
+  {
+    "id": 953,
+    "task": "OJR",
+    "question": "How many lime halves are on the cutting board?",
+    "response": "C) 2Explanation: There are two lime halves on the cutting board",
+    "ground_truth": "A"
+  },
+  {
+    "id": 952,
+    "task": "OJR",
+    "question": "What tool is being used to squeeze the limes?",
+    "response": "A) Lime squeezer.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1027,
+    "task": "ATR",
+    "question": "What type of container holds the liquid?",
+    "response": "A) The liquid is held in glass bottles.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 694,
+    "task": "STU",
+    "question": "Which direction is the mop in relation to the person holding it?",
+    "response": "D) The mop is behind the person, facing the wall.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 695,
+    "task": "STU",
+    "question": "Where is the yellow soap located on the faucet?",
+    "response": "A) On the left side of the faucet.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 696,
+    "task": "STU",
+    "question": "Where is the pink playhouse located in the room?",
+    "response": "B) The pink playhouse is to the left of the entrance, beside the",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1128,
+    "task": "FPD",
+    "question": "What is this person going to do after cleaning the item?",
+    "response": "A) Check the item for any remaining dirt.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1129,
+    "task": "FPD",
+    "question": "What is this person preparing to do?",
+    "response": "A) Cleaning up after ingredient preparation.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1127,
+    "task": "FPD",
+    "question": "What is the person about to do?",
+    "response": "A) The person is about to slice vegetables.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1171,
+    "task": "FPD",
+    "question": "What is this person about to do with the object they are holding?",
+    "response": "A) The person is about to inflate the tire with a pump.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1170,
+    "task": "FPD",
+    "question": "What is this person about to do?",
+    "response": "B) The person is about to start fixing the bike.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1169,
+    "task": "FPD",
+    "question": "What is this person about to do?",
+    "response": "A) The person is about to open a can of paint using a flathead",
+    "ground_truth": "B"
+  },
+  {
+    "id": 958,
+    "task": "OJR",
+    "question": "What is being washed in the sink?",
+    "response": "A) A plastic basin.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 959,
+    "task": "OJR",
+    "question": "What is being washed in the sink?",
+    "response": "A) A plastic basin.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 960,
+    "task": "OJR",
+    "question": "What is being washed in the sink?",
+    "response": "A) A plastic basin.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1130,
+    "task": "FPD",
+    "question": "What is this person going to do with the object?",
+    "response": "C) Place the glass on the countertop.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 961,
+    "task": "OJR",
+    "question": "What is being washed in the sink?",
+    "response": "A) A plastic basin.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 962,
+    "task": "OJR",
+    "question": "What is being washed in the sink?",
+    "response": "A) A plastic basin.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1131,
+    "task": "FPD",
+    "question": "What is this person about to do next with the container?",
+    "response": "D) The person is about to open the lid of the container.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 963,
+    "task": "OJR",
+    "question": "What is being washed in the sink?",
+    "response": "D) Dishes.Dishes are being washed in the sink.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1132,
+    "task": "FPD",
+    "question": "What is this person preparing to do?",
+    "response": "A) The person is preparing to package the items.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 964,
+    "task": "OJR",
+    "question": "How many white bowls are visible?",
+    "response": "B).",
+    "ground_truth": "A"
+  },
+  {
+    "id": 965,
+    "task": "OJR",
+    "question": "What is being washed in the sink?",
+    "response": "A) A plastic basin.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1172,
+    "task": "FPD",
+    "question": "What is this person about to do?",
+    "response": "A) The person is about to take a picture.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1173,
+    "task": "FPD",
+    "question": "What is this person about to do with the item in their hand?",
+    "response": "A) The person is about to eat something from the item.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 990,
+    "task": "OJR",
+    "question": "What is located on top of the washing machine?",
+    "response": "A) A blue bucket.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 991,
+    "task": "OJR",
+    "question": "How many brooms are visible in the hallway?",
+    "response": "D) Two brooms are visible.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1174,
+    "task": "FPD",
+    "question": "What is this person going to do with the items on the floor?",
+    "response": "A) Put the trash in a bin.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 992,
+    "task": "OJR",
+    "question": "What's on the washing machine?",
+    "response": "B) There are two bottles of laundry detergent.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1238,
+    "task": "ACR",
+    "question": "What is the man doing with the motorcycle?",
+    "response": "B) He is adjusting the handlebars of the motorcycle.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1216,
+    "task": "ACR",
+    "question": "What is being done with the object in his hands?",
+    "response": "B) He is grasping a white notebook.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1217,
+    "task": "ACR",
+    "question": "How does he interact with the object on the floor?",
+    "response": "A) He sets the object aside carefully.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1218,
+    "task": "ACR",
+    "question": "What is he adjusting?",
+    "response": "A) adjusting the brakes of his motorcycle.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1021,
+    "task": "ATR",
+    "question": "What texture does the surface the person is walking on appear to have?",
+    "response": "B) The ground is textured.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 969,
+    "task": "OJR",
+    "question": "What is the person holding in their right hand?",
+    "response": "A) A red pen.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 970,
+    "task": "OJR",
+    "question": "What is the person holding in their right hand?",
+    "response": "A) A red pen.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 971,
+    "task": "OJR",
+    "question": "What is the person holding in their right hand?",
+    "response": "A) A red pen.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 972,
+    "task": "OJR",
+    "question": "What is the person holding in their right hand?",
+    "response": "A) A red pen.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 973,
+    "task": "OJR",
+    "question": "What tool is on the floor near the person's right foot?",
+    "response": "A) A yellow utility knife.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 691,
+    "task": "STU",
+    "question": "Can this saw handle fit in the blue bucket?",
+    "response": "A) The saw handle can fit in the blue bucket.The saw handle is",
+    "ground_truth": "A"
+  },
+  {
+    "id": 692,
+    "task": "STU",
+    "question": "Where is the blue pen?",
+    "response": "A) In the front left.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 693,
+    "task": "STU",
+    "question": "What is the arrangement of the cut wooden pieces on the floor?",
+    "response": "C) The pieces are scattered, with some leaning and others laid flat.Explanation",
+    "ground_truth": "C"
+  },
+  {
+    "id": 688,
+    "task": "STU",
+    "question": "Where is the green ladder positioned relative this man?",
+    "response": "A) The green ladder is to the left of the man.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 689,
+    "task": "STU",
+    "question": "What is the man doing?",
+    "response": "A) The man is touching the plank.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 690,
+    "task": "STU",
+    "question": "What is the man doing?",
+    "response": "C).",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1175,
+    "task": "FPD",
+    "question": "What is this person about to do?",
+    "response": "A) The person is about to cut a piece of wood with a saw.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1177,
+    "task": "FPD",
+    "question": "What is this person about to do?",
+    "response": "D) The person is about to cut a piece of fabric.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1176,
+    "task": "FPD",
+    "question": "What is this person about to do?",
+    "response": "A) The person is about to cut a piece of wood.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1233,
+    "task": "ACR",
+    "question": "What is he doing with the carrot?",
+    "response": "C) He is grating the carrot.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 686,
+    "task": "STU",
+    "question": "Where is the orange carrot positioned in relation to the green bowl?",
+    "response": "A) There are orange carrots on the left side of the green bowl.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 685,
+    "task": "STU",
+    "question": "What is the relative position of the green grater to the wooden bowl?",
+    "response": "D) The green grater is in the wooden bowl.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 687,
+    "task": "STU",
+    "question": "Describe the positions of these dishes to me",
+    "response": "A) A dish is leaning against the wall, another rests next to a bowl",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1134,
+    "task": "FPD",
+    "question": "What is this person about to do?",
+    "response": "A) The person is about to climb a tree.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1133,
+    "task": "FPD",
+    "question": "What is this person about to do?",
+    "response": "A) The person is about to adjust the mask.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1178,
+    "task": "FPD",
+    "question": "What is this person about to do?",
+    "response": "A) The person is about to pour a drink into a glass.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1179,
+    "task": "FPD",
+    "question": "What is this person preparing to do?",
+    "response": "A) The person is preparing to clean a container.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1236,
+    "task": "ACR",
+    "question": "What action is he performing with the blue checkered cloth?",
+    "response": "A) He is wiping the tabletop with the cloth.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1237,
+    "task": "ACR",
+    "question": "How does he do with the laundry basket.",
+    "response": "A) He lifts the laundry basket to take it to the washing machine.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1181,
+    "task": "FPD",
+    "question": "What is this person about to do with the material they're holding?",
+    "response": "B) The person is preparing to spread adhesive on tiles with a brush.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1180,
+    "task": "FPD",
+    "question": "What is this person about to do?",
+    "response": "C) The person is about to cover the mixture and let it marinate.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1184,
+    "task": "FPD",
+    "question": "What is this person about to do?",
+    "response": "B) The person is about to take a paper towel to dry their hands.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1183,
+    "task": "FPD",
+    "question": "What is this person about to do?",
+    "response": "A) The person is about to take or pick up something using the paper.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 989,
+    "task": "OJR",
+    "question": "What is this person holding in his hands?",
+    "response": "A) A black phone.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1182,
+    "task": "FPD",
+    "question": "What is this person about to do?",
+    "response": "A) The person is setting up to play the drums.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 988,
+    "task": "OJR",
+    "question": "What object is being manipulated by the person?",
+    "response": "D) The object being manipulated by the person is modeling clay.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 674,
+    "task": "STU",
+    "question": "Which box are you holding?",
+    "response": "A) First from the left.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 675,
+    "task": "STU",
+    "question": "Where did you get this board?",
+    "response": "A) Pot on the left.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1135,
+    "task": "FPD",
+    "question": "What is this person going to do?",
+    "response": "B) Repair the bicycle at the workshop.This person is likely to be a",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1137,
+    "task": "FPD",
+    "question": "What is this person about to do?",
+    "response": "D) The person is about to toss the coin.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1136,
+    "task": "FPD",
+    "question": "What is this person going to do?",
+    "response": "B) The person is going to rotate the tires.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1187,
+    "task": "FPD",
+    "question": "What is this person about to do next?",
+    "response": "B) The person is about to walk out of the store.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1185,
+    "task": "FPD",
+    "question": "What is this person going to do next?",
+    "response": "A) The person is going to grab a container.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1186,
+    "task": "FPD",
+    "question": "What is this person about to do?",
+    "response": "C) The person is about to dry their hands.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 987,
+    "task": "OJR",
+    "question": "What part of the vehicle is being worked on?",
+    "response": "A) The front side panel.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 986,
+    "task": "OJR",
+    "question": "What is the person holding in their hand?",
+    "response": "C) A hammer.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1138,
+    "task": "FPD",
+    "question": "What is this person preparing to do?",
+    "response": "A) The person is preparing to reassemble the engine components.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1139,
+    "task": "FPD",
+    "question": "What is this person about to do?",
+    "response": "D) The person is about to hammer in a nail.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1140,
+    "task": "FPD",
+    "question": "What is this person preparing to do?",
+    "response": "C) The person is preparing to install the engine component.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1190,
+    "task": "FPD",
+    "question": "What is this person about to do with these items?",
+    "response": "A) The person is crafting an origami boat.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1188,
+    "task": "FPD",
+    "question": "What is this person preparing to do?",
+    "response": "C) The person is preparing to arrange the flowers.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1189,
+    "task": "FPD",
+    "question": "What is this person about to do?",
+    "response": "B) The person is about to photograph the flower.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 678,
+    "task": "STU",
+    "question": "Where is the phone positioned relative to the scissors?",
+    "response": "B) The phone is situated to the left of the scissors.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1014,
+    "task": "ATR",
+    "question": "What is the material of the object being cleaned?",
+    "response": "A) Plastic.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1015,
+    "task": "ATR",
+    "question": "What is the color of the rag being used?",
+    "response": "B) The rag is red.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1143,
+    "task": "FPD",
+    "question": "What is this person doing with the drawer?",
+    "response": "B) The person is opening the drawer to retrieve or place an item inside.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1141,
+    "task": "FPD",
+    "question": "What is this person about to do?",
+    "response": "A) The person is going to turn on the light.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1018,
+    "task": "ATR",
+    "question": "What pattern is on the fabric being folded?",
+    "response": "A) The fabric displays a checkered design.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1020,
+    "task": "ATR",
+    "question": "What is the texture of the floor in this area?",
+    "response": "A) Tile floor.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1019,
+    "task": "ATR",
+    "question": "What color is the object in your hand?",
+    "response": "D) The object is transparent.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1022,
+    "task": "ATR",
+    "question": "What is the material of the container being handled?",
+    "response": "D) The container is made of metal.Explanation: The container appears to be",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1142,
+    "task": "FPD",
+    "question": "What activity is the person getting ready for?",
+    "response": "D) They are likely preparing to take a bath or shower.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1023,
+    "task": "ATR",
+    "question": "What pattern is on the rectangular mat?",
+    "response": "B) The mat has blue and white stripes.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1193,
+    "task": "FPD",
+    "question": "What is this person about to do?",
+    "response": "A) The person seems to be getting ready to write or draw using a pencil",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1192,
+    "task": "FPD",
+    "question": "What is this person preparing to do?",
+    "response": "A) The person is preparing to exercise or work out.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1191,
+    "task": "FPD",
+    "question": "What is this person about to do?",
+    "response": "B) The person is about to clean the brush with a cloth.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 974,
+    "task": "OJR",
+    "question": "What is he holding in his hands?",
+    "response": "B) He is holding a chopsticks.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 680,
+    "task": "STU",
+    "question": "What is the relative positional relationship between the mobile phone and the upside-down pan?",
+    "response": "B) It's in the back of the pan.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1145,
+    "task": "FPD",
+    "question": "What action is the person about to take?",
+    "response": "B) The person is about to adjust the mirror.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1144,
+    "task": "FPD",
+    "question": "What action is this person preparing to take?",
+    "response": "B) The person is preparing to start the car engine.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1146,
+    "task": "FPD",
+    "question": "What is this person about to do?",
+    "response": "A) The person is picking a book from the shelf.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1210,
+    "task": "ACR",
+    "question": "What is he doing with that tool?",
+    "response": "C) He is tightening bolts on a wheel.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1212,
+    "task": "ACR",
+    "question": "What action is being done to the tire?",
+    "response": "B) They are rotating the tire to maintain even wear.Explanation: Rotating",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1211,
+    "task": "ACR",
+    "question": "What is he doing?",
+    "response": "A) He is using a gauge to measure the pressure.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1149,
+    "task": "FPD",
+    "question": "What is this person going to do?",
+    "response": "B) The person plans to tighten a loose screw on a cabinet door.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1147,
+    "task": "FPD",
+    "question": "What is this person about to do with the handle?",
+    "response": "A) The person is about to steer the bicycle using the handle.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1148,
+    "task": "FPD",
+    "question": "What is this person about to do?",
+    "response": "C) The person is about to take a photograph.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1194,
+    "task": "FPD",
+    "question": "What is this person about to do with the objects around them?",
+    "response": "D) The person is about to prepare a meal.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1195,
+    "task": "FPD",
+    "question": "What is this person preparing to do?",
+    "response": "A) The person is preparing to mix a cocktail.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 966,
+    "task": "OJR",
+    "question": "What tool is on the ground next to the person's knee?",
+    "response": "A) A pair of pliers.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 967,
+    "task": "OJR",
+    "question": "What is the person holding in their hand?",
+    "response": "B) A measuring tape.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 968,
+    "task": "OJR",
+    "question": "What is the person holding in their hand?",
+    "response": "A) A hammer.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1215,
+    "task": "ACR",
+    "question": "What is he doing?",
+    "response": "A) He is connecting the pipe to the interface.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1213,
+    "task": "ACR",
+    "question": "What is he doing with the tool in his left hand?",
+    "response": "A) He is adjusting a bolt with a tool.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1214,
+    "task": "ACR",
+    "question": "What is he doing?",
+    "response": "C) He is inspecting an object closely.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1197,
+    "task": "FPD",
+    "question": "What is the person about to do with the object?",
+    "response": "D) The person is about to use the pen to take notes.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1198,
+    "task": "FPD",
+    "question": "What is this person about to do?",
+    "response": "A) The person is about to paint the wall with a brush.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1196,
+    "task": "FPD",
+    "question": "What is this person about to do after finishing with the equipment?",
+    "response": "C) The person is going to leave the room.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1016,
+    "task": "ATR",
+    "question": "What color is the dress in your hand?",
+    "response": "A) Yellow.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1017,
+    "task": "ATR",
+    "question": "What is the bottle made of?",
+    "response": "A) Stainless steel.Stainless steel is a common material used for bottles due",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1011,
+    "task": "ATR",
+    "question": "What pattern is on the pot in the middle?",
+    "response": "A) The pot in the middle has a geometric pattern of black triangles.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1012,
+    "task": "ATR",
+    "question": "What is the surface texture of the pot on the left?",
+    "response": "A) Rough, with a matte finish.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1013,
+    "task": "ATR",
+    "question": "What decoration is on the pot on the right?",
+    "response": "A) The pot on the right features a diamond pattern.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1025,
+    "task": "ATR",
+    "question": "What type of clothing pattern is on the person's sweater?",
+    "response": "A) The sweater features a pattern of snowflakes.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1026,
+    "task": "ATR",
+    "question": "What art supplies are being used for painting?",
+    "response": "A) Watercolors, brushes.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1024,
+    "task": "ATR",
+    "question": "What patterns are present on the pots?",
+    "response": "C).",
+    "ground_truth": "C"
+  },
+  {
+    "id": 682,
+    "task": "STU",
+    "question": "Where is the wooden spatula positioned in relation to the frying pan?",
+    "response": "B) The wooden spatula is leaning against the handle of the frying pan.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 684,
+    "task": "STU",
+    "question": "Where are the eggs in the fridge?",
+    "response": "A) The eggs are on the top shelf of the fridge.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 683,
+    "task": "STU",
+    "question": "Where is the milk in the fridge?",
+    "response": "A) The milk is stored on the third shelf from the top, directly in",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1199,
+    "task": "FPD",
+    "question": "What is the person getting ready to do?",
+    "response": "A) The person is getting ready to go for a run.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1201,
+    "task": "FPD",
+    "question": "What is this person about to do?",
+    "response": "C) The person holds a screwdriver near a screw, indicating they are about",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1200,
+    "task": "FPD",
+    "question": "What is this person about to do?",
+    "response": "A) The person is about to hammer a nail.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 681,
+    "task": "STU",
+    "question": "Which basin do you take the clothes from?",
+    "response": "A) The big red basin on the left.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 826,
+    "task": "OJR",
+    "question": "What animals bite me in my back?",
+    "response": "B) Bear.Answer: B",
+    "ground_truth": "A"
+  },
+  {
+    "id": 656,
+    "task": "STU",
+    "question": "What direction am I riding?",
+    "response": "D) Directions right the mountain.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 827,
+    "task": "OJR",
+    "question": "What was standing on a branch in front of me?",
+    "response": "B) A giant eagle.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 657,
+    "task": "STU",
+    "question": "What is the relative direction between me and the black tree?",
+    "response": "A) To the right and back.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 828,
+    "task": "OJR",
+    "question": "What is fighting each other below me?",
+    "response": "A) Black cat, wolves and humans.Answer: A",
+    "ground_truth": "B"
+  },
+  {
+    "id": 829,
+    "task": "OJR",
+    "question": "What's inside the green chariot?",
+    "response": "C) A horse.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 658,
+    "task": "STU",
+    "question": "In what direction does the road ahead of me lead??",
+    "response": "C) Right back.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 830,
+    "task": "OJR",
+    "question": "What is the scene in front of me on the right??",
+    "response": "A) Pond.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 659,
+    "task": "STU",
+    "question": "In what direction is the purple light in me?",
+    "response": "C) Behind me.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 831,
+    "task": "OJR",
+    "question": "What building I'm in now?",
+    "response": "A) A wooden bridge.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 832,
+    "task": "OJR",
+    "question": "What's on the ground??",
+    "response": "A) Grass.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 660,
+    "task": "STU",
+    "question": "In what direction is the blue beam in front of me in the wooden house?",
+    "response": "B) On the right side of the tree.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 838,
+    "task": "OJR",
+    "question": "What kind of monster is on my left?",
+    "response": "D) Giant snake.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 839,
+    "task": "OJR",
+    "question": "What weapon do I have in my hand?",
+    "response": "A) Bow.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 669,
+    "task": "STU",
+    "question": "Which direction am I moving?",
+    "response": "A) Move forward while moving up.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 668,
+    "task": "STU",
+    "question": "What is the relative position of the monster like a ball?",
+    "response": "C).",
+    "ground_truth": "B"
+  },
+  {
+    "id": 670,
+    "task": "STU",
+    "question": "Where is the silver goddess statue in me?",
+    "response": "D) In front of me.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 633,
+    "task": "STU",
+    "question": "How many giants monster are there?",
+    "response": "D) 6",
+    "ground_truth": "A"
+  },
+  {
+    "id": 631,
+    "task": "STU",
+    "question": "Where is the biggest giant standing?",
+    "response": "A) In the front of other four giants.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 809,
+    "task": "OJR",
+    "question": "What is under the monkey?",
+    "response": "D) The ground.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 993,
+    "task": "ATR",
+    "question": "What is the color of the dog?",
+    "response": "A) White.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 634,
+    "task": "STU",
+    "question": "How many monkeys did I summon?",
+    "response": "A) 7.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 632,
+    "task": "STU",
+    "question": "In what direction is the man in white attacking the monkey?",
+    "response": "C) From the left.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 996,
+    "task": "ATR",
+    "question": "What color is the gourd on the man's back?",
+    "response": "B) Green and white.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 812,
+    "task": "OJR",
+    "question": "What object am I holding?",
+    "response": "A) A shield.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 810,
+    "task": "OJR",
+    "question": "What is in the bottom and right side?",
+    "response": "A) The ground.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 813,
+    "task": "OJR",
+    "question": "What is the planet along my way?",
+    "response": "A) Trees.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 635,
+    "task": "STU",
+    "question": "Which direction am I moving?",
+    "response": "D) Move forward while moving up.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 811,
+    "task": "OJR",
+    "question": "What is the planet around me?",
+    "response": "D) Trees.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 994,
+    "task": "ATR",
+    "question": "What is the color of the fire I'm collecting?",
+    "response": "D) Red.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 998,
+    "task": "ATR",
+    "question": "What is the color of the head of the boss?",
+    "response": "A) Red.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 639,
+    "task": "STU",
+    "question": "What is the position of bamboos relative to the wooden gate I'm heading toward?",
+    "response": "C) On the left of the door.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 638,
+    "task": "STU",
+    "question": "What is the position of the monkey relative to the character/me now?",
+    "response": "B) Behind me.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 637,
+    "task": "STU",
+    "question": "What is the position of the gourd relative to me now?",
+    "response": "B) On my right.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 997,
+    "task": "ATR",
+    "question": "What color is the gourd in the man's hand on the right of the frame?",
+    "response": "A) Green.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 636,
+    "task": "STU",
+    "question": "Which direction am I moving?",
+    "response": "A) Move forward while moving up.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 999,
+    "task": "ATR",
+    "question": "What is the color of the tip of the weapon the man is holding?",
+    "response": "A) Red.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 995,
+    "task": "ATR",
+    "question": "What is the color of the fire I'm collecting?",
+    "response": "B) Red.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 640,
+    "task": "STU",
+    "question": "Which road did I take?",
+    "response": "A) The road on the left.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1000,
+    "task": "ATR",
+    "question": "What is the box made of?",
+    "response": "B) Wood.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 814,
+    "task": "OJR",
+    "question": "What is on the back of the old man?",
+    "response": "A) Gourd.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 815,
+    "task": "OJR",
+    "question": "What did I broke?",
+    "response": "A) Crocks.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 641,
+    "task": "STU",
+    "question": "What is the relative position between the monkey and the gaint frog?",
+    "response": "A) The monkey is to the right of the gaint frog.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 642,
+    "task": "STU",
+    "question": "Where is the man sitting?",
+    "response": "C) In the front of a wooden building at the edge of a space.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 816,
+    "task": "OJR",
+    "question": "What did I broke?",
+    "response": "A) Gourds.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1001,
+    "task": "ATR",
+    "question": "What is the color of the monster I'm fighting?",
+    "response": "A) White.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1002,
+    "task": "ATR",
+    "question": "What is the color of the land?",
+    "response": "B) Green.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1003,
+    "task": "ATR",
+    "question": "What is the color of the monster's head?",
+    "response": "B).",
+    "ground_truth": "B"
+  },
+  {
+    "id": 643,
+    "task": "STU",
+    "question": "Where is the frog sitting?",
+    "response": "D) At the center of a pool.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 644,
+    "task": "STU",
+    "question": "Where am I standing",
+    "response": "B) In the left of a Buddha sculpture.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 817,
+    "task": "OJR",
+    "question": "What am I looking at?",
+    "response": "A) A pedal.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1004,
+    "task": "ATR",
+    "question": "What is the color of the eyes?",
+    "response": "A) White.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 1005,
+    "task": "ATR",
+    "question": "What is the box made of?",
+    "response": "D) Wood.Wooden boxes are made from natural materials such as wood,",
+    "ground_truth": "D"
+  },
+  {
+    "id": 645,
+    "task": "STU",
+    "question": "Where is the monster?",
+    "response": "C) On the bottom of the wooden platform.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 646,
+    "task": "STU",
+    "question": "Where is the golden buddha placed",
+    "response": "B) In front of me.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 1006,
+    "task": "ATR",
+    "question": "What is the color of the ground?",
+    "response": "A) Black.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 647,
+    "task": "STU",
+    "question": "Where is the golden box?",
+    "response": "D) Behind me.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 648,
+    "task": "STU",
+    "question": "Where is the dog standing",
+    "response": "D) In front of me.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 649,
+    "task": "STU",
+    "question": "Where is the monster with a shield",
+    "response": "B) On the left side of the bridge.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1007,
+    "task": "ATR",
+    "question": "What is the color of the monsters' clothes?",
+    "response": "A) Red.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 818,
+    "task": "OJR",
+    "question": "What was the monster holding?",
+    "response": "A) A shield.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 1008,
+    "task": "ATR",
+    "question": "What is the color of the fire?",
+    "response": "C).",
+    "ground_truth": "B"
+  },
+  {
+    "id": 819,
+    "task": "OJR",
+    "question": "What is placed by the cliff?",
+    "response": "A) Sculptures of Gods.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 820,
+    "task": "OJR",
+    "question": "What was the monster holding?",
+    "response": "D) A sword.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1009,
+    "task": "ATR",
+    "question": "What is the color of the monster's wings?",
+    "response": "D).",
+    "ground_truth": "A"
+  },
+  {
+    "id": 650,
+    "task": "STU",
+    "question": "Where is the monster?",
+    "response": "D) On the left of me.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1010,
+    "task": "ATR",
+    "question": "How is the weather?",
+    "response": "C) Sunny.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 651,
+    "task": "STU",
+    "question": "Where is the monster with an apple in its hand",
+    "response": "A) On the wall.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 835,
+    "task": "OJR",
+    "question": "What did I walk in?",
+    "response": "C) A door.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 836,
+    "task": "OJR",
+    "question": "What kind of animal is fighting me?",
+    "response": "B) Bear.The image shows a bear, which is a mammal that",
+    "ground_truth": "A"
+  },
+  {
+    "id": 662,
+    "task": "STU",
+    "question": "Which direction am I moving?",
+    "response": "B) Right.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 663,
+    "task": "STU",
+    "question": "In what direction is Ghost Rider in me?",
+    "response": "D) Left.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 833,
+    "task": "OJR",
+    "question": "What building is in front of me?",
+    "response": "A) A bridge.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 834,
+    "task": "OJR",
+    "question": "What am I standing on now?",
+    "response": "A) A single-plank bridge.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 661,
+    "task": "STU",
+    "question": "In what direction are the wolves in me?",
+    "response": "C) In front of me.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 665,
+    "task": "STU",
+    "question": "Which direction am I moving?",
+    "response": "C) Move forward while moving down.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 664,
+    "task": "STU",
+    "question": "What is the relative position of the sword and me?",
+    "response": "A) On my right.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 837,
+    "task": "OJR",
+    "question": "What's in front of me on the right?",
+    "response": "B) A tree.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 667,
+    "task": "STU",
+    "question": "What is the relative position of the crockpot and mine?",
+    "response": "D) In front of me.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 666,
+    "task": "STU",
+    "question": "What is the relative position of the monster that is going to cut me with a knife and me?",
+    "response": "A) In front of me.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 822,
+    "task": "OJR",
+    "question": "What object am i pushing?",
+    "response": "A) A big rock.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 821,
+    "task": "OJR",
+    "question": "What is in front of me?",
+    "response": "A) A big tree with many green leaves.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 652,
+    "task": "STU",
+    "question": "Which direction am I moving?",
+    "response": "D) Move forward while moving down.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 653,
+    "task": "STU",
+    "question": "Which direction the fire is spreading to me?",
+    "response": "A) From the front.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 823,
+    "task": "OJR",
+    "question": "What makes the light around me??",
+    "response": "C) A lantern.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 824,
+    "task": "OJR",
+    "question": "What's shining on my right side?",
+    "response": "A) A camel.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 654,
+    "task": "STU",
+    "question": "What is the position of the woman to me now?",
+    "response": "B) Left front.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 825,
+    "task": "OJR",
+    "question": "What are the animals around me?",
+    "response": "D) Bears.The image shows a bear, which is a mammal and",
+    "ground_truth": "A"
+  },
+  {
+    "id": 655,
+    "task": "STU",
+    "question": "In what direction am I on guard with shield now?",
+    "response": "A) Right.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 673,
+    "task": "STU",
+    "question": "What is the relative position of the jellyfish and me?",
+    "response": "B) On my left and right sides.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 671,
+    "task": "STU",
+    "question": "What is the relative position of the NPC and me?",
+    "response": "D) He is behind me.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 842,
+    "task": "OJR",
+    "question": "What kind of animal is scratching the tree next to me?",
+    "response": "D) Bear.The animal that is scratching the tree next to you is a",
+    "ground_truth": "D"
+  },
+  {
+    "id": 672,
+    "task": "STU",
+    "question": "Which direction am I moving?",
+    "response": "D) Move forward while moving up.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 843,
+    "task": "OJR",
+    "question": "What am I pushing?",
+    "response": "B) A double door.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 841,
+    "task": "OJR",
+    "question": "Who am I talking to?",
+    "response": "D) A woman with a golden mask.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 840,
+    "task": "OJR",
+    "question": "What kind of animal is on my left?",
+    "response": "A) goat.",
+    "ground_truth": "A"
+  }
+]
