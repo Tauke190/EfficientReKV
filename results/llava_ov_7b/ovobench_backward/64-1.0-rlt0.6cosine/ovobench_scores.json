@@ -1,0 +1,16 @@
+{
+  "strict_letter": {
+    "EPM": 54.21,
+    "ASI": 58.11,
+    "HLD": 22.04,
+    "backward_average": 44.79
+  },
+  "ovo_substring": {
+    "EPM": 54.55,
+    "ASI": 58.11,
+    "HLD": 23.66,
+    "backward_average": 45.44
+  },
+  "n_queries": 631,
+  "unparseable": 0
+}

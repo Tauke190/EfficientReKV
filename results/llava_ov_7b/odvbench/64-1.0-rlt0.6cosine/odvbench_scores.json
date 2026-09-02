@@ -1,0 +1,23 @@
+{
+  "Real-time Traffic Perception": 29.0,
+  "Past Traffic Memory": 28.4,
+  "Driving Decision-Making": 29.7,
+  "Hallucination detection": 8.13,
+  "Traffic Change Detection": 49.09,
+  "Key Information Extraction": 22.64,
+  "TS_Retrieval_average": 27.82,
+  "Distance Prediction": 46.64,
+  "Location Prediction": 63.28,
+  "Action Prediction": 67.15,
+  "TOI_Recognition_average": 55.92,
+  "Risk Prediction": 61.57,
+  "Risk Analysis": 74.24,
+  "Accident Reason Answering": 51.92,
+  "TR_Analysis_average": 65.32,
+  "micro_average": 51.2,
+  "macro_average": 44.31,
+  "chance": 34.74,
+  "n_questions": 6348,
+  "unparseable": 0,
+  "blind": false
+}

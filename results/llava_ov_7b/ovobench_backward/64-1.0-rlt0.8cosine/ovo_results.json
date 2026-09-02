@@ -1,0 +1,4419 @@
+[
+  {
+    "id": 486,
+    "task": "ASI",
+    "question": "What does the person do before prepare meat",
+    "response": "B) string together",
+    "ground_truth": "C"
+  },
+  {
+    "id": 490,
+    "task": "ASI",
+    "question": "What does the person do after install the SSD onto the hard disk tray",
+    "response": "B) install the screws and sheetmetals and baffles onto the hard disk",
+    "ground_truth": "B"
+  },
+  {
+    "id": 491,
+    "task": "ASI",
+    "question": "What does the person do after wipe screen again",
+    "response": "D) paste protector on the screen",
+    "ground_truth": "A"
+  },
+  {
+    "id": 488,
+    "task": "ASI",
+    "question": "What does the person do before use sandpaper/metal to polish rubber near leak",
+    "response": "A) look for leaks",
+    "ground_truth": "A"
+  },
+  {
+    "id": 483,
+    "task": "ASI",
+    "question": "What does the person do after load the wheel",
+    "response": "A) pump up the tire",
+    "ground_truth": "A"
+  },
+  {
+    "id": 494,
+    "task": "ASI",
+    "question": "What does the person do after load a new battery",
+    "response": "B) restore the fixed battery components and the back cover",
+    "ground_truth": "B"
+  },
+  {
+    "id": 495,
+    "task": "ASI",
+    "question": "What does the person do before unscrew the screws used to fix the screen",
+    "response": "C) pull out the screen connector and remove the screen",
+    "ground_truth": "A"
+  },
+  {
+    "id": 484,
+    "task": "ASI",
+    "question": "What does the person do after install the SSD onto the hard disk tray",
+    "response": "A) install the screws and sheetmetals and baffles onto the hard disk",
+    "ground_truth": "A"
+  },
+  {
+    "id": 489,
+    "task": "ASI",
+    "question": "What does the person do after ink the marked area",
+    "response": "C) transfer pattern to board or tarpaulin",
+    "ground_truth": "D"
+  },
+  {
+    "id": 496,
+    "task": "ASI",
+    "question": "What does the person do before install the air nozzle",
+    "response": "D) screw off the valve cap and open the valve",
+    "ground_truth": "D"
+  },
+  {
+    "id": 497,
+    "task": "ASI",
+    "question": "What does the person do before put nicely and align the quilt and the cover",
+    "response": "C) turn over the quilt cover",
+    "ground_truth": "C"
+  },
+  {
+    "id": 493,
+    "task": "ASI",
+    "question": "What does the person do before use sandpaper/metal to polish rubber near leak",
+    "response": "B) look for leaks",
+    "ground_truth": "B"
+  },
+  {
+    "id": 487,
+    "task": "ASI",
+    "question": "What does the person do before prepare seasonings and side dishes",
+    "response": "C) prepare meat",
+    "ground_truth": "C"
+  },
+  {
+    "id": 485,
+    "task": "ASI",
+    "question": "What does the person do before arrange the seperated wire",
+    "response": "C) strip the insulation",
+    "ground_truth": "C"
+  },
+  {
+    "id": 492,
+    "task": "ASI",
+    "question": "What does the person do after mix and pickle",
+    "response": "C) prepare meat",
+    "ground_truth": "A"
+  },
+  {
+    "id": 312,
+    "task": "HLD",
+    "question": "what did l put in the sink",
+    "response": "A) A plastic bag",
+    "ground_truth": "B"
+  },
+  {
+    "id": 311,
+    "task": "HLD",
+    "question": "What color was the napkin I used last",
+    "response": "D) Unable to answer",
+    "ground_truth": "D"
+  },
+  {
+    "id": 370,
+    "task": "HLD",
+    "question": "Who did I talk to at the garage?",
+    "response": "C) a man wearing a hat",
+    "ground_truth": "A"
+  },
+  {
+    "id": 371,
+    "task": "HLD",
+    "question": "In what location did I see the wooden frame?",
+    "response": "B) in top of cupboard",
+    "ground_truth": "A"
+  },
+  {
+    "id": 192,
+    "task": "EPM",
+    "question": "What did I put on the table?",
+    "response": "A) saw",
+    "ground_truth": "C"
+  },
+  {
+    "id": 193,
+    "task": "EPM",
+    "question": "Where did I pick the piece of timber?",
+    "response": "B) on the floor",
+    "ground_truth": "A"
+  },
+  {
+    "id": 194,
+    "task": "EPM",
+    "question": "What did I put on the table?",
+    "response": "A) saw",
+    "ground_truth": "A"
+  },
+  {
+    "id": 168,
+    "task": "EPM",
+    "question": "How many pieces of wood did I remove from the table?",
+    "response": "B) two",
+    "ground_truth": "C"
+  },
+  {
+    "id": 169,
+    "task": "EPM",
+    "question": "How many tools did I clear from the work table?",
+    "response": "C) three",
+    "ground_truth": "D"
+  },
+  {
+    "id": 195,
+    "task": "EPM",
+    "question": "Where did I pick the screwdriver?",
+    "response": "B) on the table",
+    "ground_truth": "C"
+  },
+  {
+    "id": 170,
+    "task": "EPM",
+    "question": "How many chisels did I pick from the shelf above the work table?",
+    "response": "B) two",
+    "ground_truth": "C"
+  },
+  {
+    "id": 171,
+    "task": "EPM",
+    "question": "What color was the hammer on the work table?",
+    "response": "B) red",
+    "ground_truth": "C"
+  },
+  {
+    "id": 407,
+    "task": "HLD",
+    "question": "where was chilli after i poured in the food",
+    "response": "A) Unable to answer",
+    "ground_truth": "A"
+  },
+  {
+    "id": 408,
+    "task": "HLD",
+    "question": "What color is the plate I picked from the cabinet",
+    "response": "C) red",
+    "ground_truth": "B"
+  },
+  {
+    "id": 369,
+    "task": "HLD",
+    "question": "Where did I put the door mat?",
+    "response": "B) Unable to answer",
+    "ground_truth": "B"
+  },
+  {
+    "id": 342,
+    "task": "HLD",
+    "question": "Where was the fork?",
+    "response": "B) Unable to answer",
+    "ground_truth": "B"
+  },
+  {
+    "id": 58,
+    "task": "EPM",
+    "question": "Where is the tissue roll?",
+    "response": "B) on the table",
+    "ground_truth": "B"
+  },
+  {
+    "id": 59,
+    "task": "EPM",
+    "question": "Where was the spray bottle after I place it down?",
+    "response": "D) on the table",
+    "ground_truth": "D"
+  },
+  {
+    "id": 60,
+    "task": "EPM",
+    "question": "Where is the book?",
+    "response": "B) on the table",
+    "ground_truth": "B"
+  },
+  {
+    "id": 362,
+    "task": "HLD",
+    "question": "who did I talk to when I was playing cards?",
+    "response": "A) Unable to answer",
+    "ground_truth": "A"
+  },
+  {
+    "id": 61,
+    "task": "EPM",
+    "question": "What did I put in the lizard's mouth?",
+    "response": "D) food",
+    "ground_truth": "D"
+  },
+  {
+    "id": 382,
+    "task": "HLD",
+    "question": "What color is the chord I folded?",
+    "response": "C) Unable to answer",
+    "ground_truth": "C"
+  },
+  {
+    "id": 381,
+    "task": "HLD",
+    "question": "Where did I put the first aid tool kit",
+    "response": "B) on the desk",
+    "ground_truth": "A"
+  },
+  {
+    "id": 98,
+    "task": "EPM",
+    "question": "What did I pick from the fridge?",
+    "response": "A) bread",
+    "ground_truth": "C"
+  },
+  {
+    "id": 99,
+    "task": "EPM",
+    "question": "Where was the kitchen paper towel before I picked it?",
+    "response": "A)",
+    "ground_truth": "A"
+  },
+  {
+    "id": 101,
+    "task": "EPM",
+    "question": "How many rolls of paper towel did I cut",
+    "response": "B) one",
+    "ground_truth": "B"
+  },
+  {
+    "id": 100,
+    "task": "EPM",
+    "question": "Did I leave the drawer open?",
+    "response": "A) yes",
+    "ground_truth": "B"
+  },
+  {
+    "id": 386,
+    "task": "HLD",
+    "question": "where is the chopsticks?",
+    "response": "B) on the counter",
+    "ground_truth": "A"
+  },
+  {
+    "id": 355,
+    "task": "HLD",
+    "question": "Where did I put the frying pan?",
+    "response": "A) In the sink",
+    "ground_truth": "B"
+  },
+  {
+    "id": 356,
+    "task": "HLD",
+    "question": "where did l wash the utensils",
+    "response": "B) at the bathroom sink",
+    "ground_truth": "C"
+  },
+  {
+    "id": 322,
+    "task": "HLD",
+    "question": "what did i put in the plate?",
+    "response": "D) noodles",
+    "ground_truth": "A"
+  },
+  {
+    "id": 321,
+    "task": "HLD",
+    "question": "Where did I last put the sieve?",
+    "response": "C) Unable to answer",
+    "ground_truth": "C"
+  },
+  {
+    "id": 383,
+    "task": "HLD",
+    "question": "where was the pink flower?",
+    "response": "B) Unable to answer",
+    "ground_truth": "B"
+  },
+  {
+    "id": 301,
+    "task": "HLD",
+    "question": "Where is the rice cooker?",
+    "response": "C) cabinet on the bottom",
+    "ground_truth": "A"
+  },
+  {
+    "id": 70,
+    "task": "EPM",
+    "question": "Where did  I pick the spatula?",
+    "response": "B) from the drawer",
+    "ground_truth": "C"
+  },
+  {
+    "id": 71,
+    "task": "EPM",
+    "question": "How much food did I put in the bowl?",
+    "response": "B) two spoons",
+    "ground_truth": "D"
+  },
+  {
+    "id": 72,
+    "task": "EPM",
+    "question": "What color is the towel I wiped hands with?",
+    "response": "B) pink",
+    "ground_truth": "B"
+  },
+  {
+    "id": 73,
+    "task": "EPM",
+    "question": "What did I pick from the drawer?",
+    "response": "D) spatula",
+    "ground_truth": "B"
+  },
+  {
+    "id": 160,
+    "task": "EPM",
+    "question": "Where was the hammer before I picked it?",
+    "response": "C) on the wood",
+    "ground_truth": "A"
+  },
+  {
+    "id": 161,
+    "task": "EPM",
+    "question": "Where did I put the wood?",
+    "response": "B) on the floor",
+    "ground_truth": "B"
+  },
+  {
+    "id": 162,
+    "task": "EPM",
+    "question": "Where was the tape measure before I picked it?",
+    "response": "C) on the wood",
+    "ground_truth": "C"
+  },
+  {
+    "id": 163,
+    "task": "EPM",
+    "question": "Where is the bottle",
+    "response": "A) on the wood",
+    "ground_truth": "A"
+  },
+  {
+    "id": 387,
+    "task": "HLD",
+    "question": "in what location did I tighten the nut on the board?",
+    "response": "D) on the table",
+    "ground_truth": "A"
+  },
+  {
+    "id": 388,
+    "task": "HLD",
+    "question": "Where was the shelf ?",
+    "response": "B) on the left side",
+    "ground_truth": "A"
+  },
+  {
+    "id": 400,
+    "task": "HLD",
+    "question": "where did i put the box?",
+    "response": "D) Unable to answer",
+    "ground_truth": "D"
+  },
+  {
+    "id": 399,
+    "task": "HLD",
+    "question": "Where was the folding rule before I picked it?",
+    "response": "D) on a table",
+    "ground_truth": "B"
+  },
+  {
+    "id": 317,
+    "task": "HLD",
+    "question": "What stick did I pick from the container?",
+    "response": "B) screw driver",
+    "ground_truth": "A"
+  },
+  {
+    "id": 316,
+    "task": "HLD",
+    "question": "What colour is the paper I put on the table",
+    "response": "C) Unable to answer",
+    "ground_truth": "C"
+  },
+  {
+    "id": 380,
+    "task": "HLD",
+    "question": "What colour is the pant I put on the table",
+    "response": "D) army green",
+    "ground_truth": "A"
+  },
+  {
+    "id": 379,
+    "task": "HLD",
+    "question": "Did I open the door?",
+    "response": "B) no",
+    "ground_truth": "A"
+  },
+  {
+    "id": 333,
+    "task": "HLD",
+    "question": "In what location did I leave the scooping spoon?",
+    "response": "B) sink",
+    "ground_truth": "A"
+  },
+  {
+    "id": 334,
+    "task": "HLD",
+    "question": "Where is the groundnut oil bottle?",
+    "response": "D) on the sink",
+    "ground_truth": "B"
+  },
+  {
+    "id": 82,
+    "task": "EPM",
+    "question": "Where was the bottle before I picked it?",
+    "response": "A) on the counter",
+    "ground_truth": "C"
+  },
+  {
+    "id": 83,
+    "task": "EPM",
+    "question": "Where was the wooden spoon before I picked it?",
+    "response": "A) placed on the counter",
+    "ground_truth": "C"
+  },
+  {
+    "id": 84,
+    "task": "EPM",
+    "question": "Where was the plate before I picked it?",
+    "response": "A) on the counter",
+    "ground_truth": "B"
+  },
+  {
+    "id": 340,
+    "task": "HLD",
+    "question": "where did I put the bowl?",
+    "response": "D) on the table",
+    "ground_truth": "B"
+  },
+  {
+    "id": 85,
+    "task": "EPM",
+    "question": "What did I put in the frying pan?",
+    "response": "C) liquid seasonings",
+    "ground_truth": "C"
+  },
+  {
+    "id": 104,
+    "task": "EPM",
+    "question": "Where did I put the alien toy box?",
+    "response": "D) On the shelf",
+    "ground_truth": "B"
+  },
+  {
+    "id": 105,
+    "task": "EPM",
+    "question": "Where did i put the white robot toy",
+    "response": "A) On the toy rack",
+    "ground_truth": "C"
+  },
+  {
+    "id": 367,
+    "task": "HLD",
+    "question": "Where did I put the video game box?",
+    "response": "A) Unable to answer",
+    "ground_truth": "A"
+  },
+  {
+    "id": 102,
+    "task": "EPM",
+    "question": "Where s shopping cart?",
+    "response": "D) Near the book section",
+    "ground_truth": "C"
+  },
+  {
+    "id": 103,
+    "task": "EPM",
+    "question": "What color is the shopping basket?",
+    "response": "C) Blue",
+    "ground_truth": "C"
+  },
+  {
+    "id": 345,
+    "task": "HLD",
+    "question": "where did I put the hammer",
+    "response": "D) near the door",
+    "ground_truth": "A"
+  },
+  {
+    "id": 346,
+    "task": "HLD",
+    "question": "Where did i put the plywood?",
+    "response": "D) beside the stares",
+    "ground_truth": "A"
+  },
+  {
+    "id": 309,
+    "task": "HLD",
+    "question": "where was the wire before I picked it?",
+    "response": "D) Unable to answer",
+    "ground_truth": "D"
+  },
+  {
+    "id": 310,
+    "task": "HLD",
+    "question": "What did I put on the table behind me?",
+    "response": "C) a wooden board",
+    "ground_truth": "A"
+  },
+  {
+    "id": 19,
+    "task": "EPM",
+    "question": "what color was the hand towel  I wiped my hand with?",
+    "response": "C) White",
+    "ground_truth": "C"
+  },
+  {
+    "id": 20,
+    "task": "EPM",
+    "question": "What did I pick from the utensil holder?",
+    "response": "A) Knife",
+    "ground_truth": "C"
+  },
+  {
+    "id": 21,
+    "task": "EPM",
+    "question": "what did I pick from the fridge?",
+    "response": "A) Meat",
+    "ground_truth": "A"
+  },
+  {
+    "id": 22,
+    "task": "EPM",
+    "question": "what did I put in the plastic bag?",
+    "response": "C) Potato",
+    "ground_truth": "B"
+  },
+  {
+    "id": 110,
+    "task": "EPM",
+    "question": "In what location did I see the plastic wraps?",
+    "response": "A) in the refrigerator",
+    "ground_truth": "B"
+  },
+  {
+    "id": 113,
+    "task": "EPM",
+    "question": "In what location did I see the electric kettle?",
+    "response": "A) in the left side of microwave",
+    "ground_truth": "B"
+  },
+  {
+    "id": 111,
+    "task": "EPM",
+    "question": "Did I close the microwave?",
+    "response": "A) yes",
+    "ground_truth": "A"
+  },
+  {
+    "id": 112,
+    "task": "EPM",
+    "question": "Where is the paper towel?",
+    "response": "A) right of the microwave",
+    "ground_truth": "A"
+  },
+  {
+    "id": 402,
+    "task": "HLD",
+    "question": "Where was the piece of paper before i picked it?",
+    "response": "C) Unable to answer",
+    "ground_truth": "C"
+  },
+  {
+    "id": 338,
+    "task": "HLD",
+    "question": "How many spring onions did I cut?",
+    "response": "A) Two spring onions",
+    "ground_truth": "D"
+  },
+  {
+    "id": 90,
+    "task": "EPM",
+    "question": "Where did I put the disposable plate?",
+    "response": "A) in the garbage",
+    "ground_truth": "A"
+  },
+  {
+    "id": 91,
+    "task": "EPM",
+    "question": "where did I pick the soy sauce?",
+    "response": "D) inside the container",
+    "ground_truth": "D"
+  },
+  {
+    "id": 92,
+    "task": "EPM",
+    "question": "Where did i put the soy sauce?",
+    "response": "D) on the sink",
+    "ground_truth": "C"
+  },
+  {
+    "id": 93,
+    "task": "EPM",
+    "question": "Where was the cabbage before i picked it?",
+    "response": "C) inside the cabinet",
+    "ground_truth": "B"
+  },
+  {
+    "id": 35,
+    "task": "EPM",
+    "question": "where is the bottle?",
+    "response": "A) in a box",
+    "ground_truth": "C"
+  },
+  {
+    "id": 36,
+    "task": "EPM",
+    "question": "where did I put the piece of metal?",
+    "response": "B) at the left side foot of table",
+    "ground_truth": "B"
+  },
+  {
+    "id": 37,
+    "task": "EPM",
+    "question": "where did I put the pliers?",
+    "response": "A) in a box",
+    "ground_truth": "C"
+  },
+  {
+    "id": 38,
+    "task": "EPM",
+    "question": "where is the nail gun?",
+    "response": "A) on the floor",
+    "ground_truth": "B"
+  },
+  {
+    "id": 300,
+    "task": "HLD",
+    "question": "Where was the cordless drill ?",
+    "response": "C) inside the drawer",
+    "ground_truth": "A"
+  },
+  {
+    "id": 34,
+    "task": "EPM",
+    "question": "what color was the bag?",
+    "response": "B) blue",
+    "ground_truth": "A"
+  },
+  {
+    "id": 31,
+    "task": "EPM",
+    "question": "where was the phone before I picked it?",
+    "response": "C) on the mat",
+    "ground_truth": "B"
+  },
+  {
+    "id": 32,
+    "task": "EPM",
+    "question": "where was the sandals?",
+    "response": "B) ground",
+    "ground_truth": "B"
+  },
+  {
+    "id": 33,
+    "task": "EPM",
+    "question": "what color was the phone?",
+    "response": "C)",
+    "ground_truth": "C"
+  },
+  {
+    "id": 357,
+    "task": "HLD",
+    "question": "How many path way did I saw",
+    "response": "B) one",
+    "ground_truth": "A"
+  },
+  {
+    "id": 341,
+    "task": "HLD",
+    "question": "Which belt did I select?",
+    "response": "A) Unable to answer",
+    "ground_truth": "A"
+  },
+  {
+    "id": 4,
+    "task": "EPM",
+    "question": "Where was the paper towel before I picked it?",
+    "response": "A) on the counter",
+    "ground_truth": "C"
+  },
+  {
+    "id": 5,
+    "task": "EPM",
+    "question": "What drawer did I pull?",
+    "response": "D) fridge",
+    "ground_truth": "A"
+  },
+  {
+    "id": 6,
+    "task": "EPM",
+    "question": "Where Was the plate before I picked it?",
+    "response": "A) on the counter",
+    "ground_truth": "B"
+  },
+  {
+    "id": 7,
+    "task": "EPM",
+    "question": "What did I pour in the container?",
+    "response": "B) bread crumbs",
+    "ground_truth": "B"
+  },
+  {
+    "id": 401,
+    "task": "HLD",
+    "question": "Where did I put the tissue?",
+    "response": "C) bowl",
+    "ground_truth": "A"
+  },
+  {
+    "id": 329,
+    "task": "HLD",
+    "question": "Did I leave the kitchen window open ?",
+    "response": "B) Unable to answer",
+    "ground_truth": "B"
+  },
+  {
+    "id": 330,
+    "task": "HLD",
+    "question": "where did I put  bucket?",
+    "response": "A) on the table",
+    "ground_truth": "C"
+  },
+  {
+    "id": 347,
+    "task": "HLD",
+    "question": "Where did I put the trash bin I carried?",
+    "response": "A) inside the house",
+    "ground_truth": "B"
+  },
+  {
+    "id": 148,
+    "task": "EPM",
+    "question": "Where was the litter bin before I picked it?",
+    "response": "B) on the floor",
+    "ground_truth": "A"
+  },
+  {
+    "id": 149,
+    "task": "EPM",
+    "question": "In what location did I see the white van?",
+    "response": "D) at the backyard",
+    "ground_truth": "A"
+  },
+  {
+    "id": 150,
+    "task": "EPM",
+    "question": "Where was my phone?",
+    "response": "C) at the floor",
+    "ground_truth": "A"
+  },
+  {
+    "id": 151,
+    "task": "EPM",
+    "question": "What did I put in the wood cutter?",
+    "response": "A) a piece of wood",
+    "ground_truth": "A"
+  },
+  {
+    "id": 315,
+    "task": "HLD",
+    "question": "Where were game boards?",
+    "response": "B) in the shelves",
+    "ground_truth": "A"
+  },
+  {
+    "id": 8,
+    "task": "EPM",
+    "question": "How many poker cards did I hold pick?",
+    "response": "A) two",
+    "ground_truth": "D"
+  },
+  {
+    "id": 9,
+    "task": "EPM",
+    "question": "who did I interact with when I was playing poker?",
+    "response": "B) a man wearing a black shirt",
+    "ground_truth": "B"
+  },
+  {
+    "id": 10,
+    "task": "EPM",
+    "question": "what did I put in the mouth?",
+    "response": "D) nothing",
+    "ground_truth": "D"
+  },
+  {
+    "id": 122,
+    "task": "EPM",
+    "question": "What did I put on the table?",
+    "response": "C) ace heart",
+    "ground_truth": "A"
+  },
+  {
+    "id": 123,
+    "task": "EPM",
+    "question": "How many cards did I pick?",
+    "response": "B) two",
+    "ground_truth": "C"
+  },
+  {
+    "id": 124,
+    "task": "EPM",
+    "question": "How many cards did I place on the table?",
+    "response": "C) three",
+    "ground_truth": "A"
+  },
+  {
+    "id": 125,
+    "task": "EPM",
+    "question": "What card did I carry?",
+    "response": "A) ace heart",
+    "ground_truth": "A"
+  },
+  {
+    "id": 325,
+    "task": "HLD",
+    "question": "Did i leave the door open?",
+    "response": "B) Unable to answer",
+    "ground_truth": "B"
+  },
+  {
+    "id": 324,
+    "task": "HLD",
+    "question": "In what location did I see the television?",
+    "response": "C) Unable to answer",
+    "ground_truth": "C"
+  },
+  {
+    "id": 176,
+    "task": "EPM",
+    "question": "Did i switch on the measuring machine?",
+    "response": "A) yes",
+    "ground_truth": "B"
+  },
+  {
+    "id": 177,
+    "task": "EPM",
+    "question": "where is the towel?",
+    "response": "B) on the bucket",
+    "ground_truth": "A"
+  },
+  {
+    "id": 178,
+    "task": "EPM",
+    "question": "Did i cut the dough?",
+    "response": "A) yes",
+    "ground_truth": "A"
+  },
+  {
+    "id": 179,
+    "task": "EPM",
+    "question": "What did i pour in the jug?",
+    "response": "B) yeast",
+    "ground_truth": "A"
+  },
+  {
+    "id": 393,
+    "task": "HLD",
+    "question": "Where was the sheet pan before I placed it on the oven?",
+    "response": "C) counter",
+    "ground_truth": "B"
+  },
+  {
+    "id": 56,
+    "task": "EPM",
+    "question": "Where was the plier before I picked it?",
+    "response": "A) on the work bench",
+    "ground_truth": "C"
+  },
+  {
+    "id": 57,
+    "task": "EPM",
+    "question": "How many power tools are on the work becnh?",
+    "response": "B) three",
+    "ground_truth": "A"
+  },
+  {
+    "id": 23,
+    "task": "EPM",
+    "question": "Where is my pressure drill?",
+    "response": "B) in the long square box",
+    "ground_truth": "A"
+  },
+  {
+    "id": 54,
+    "task": "EPM",
+    "question": "In what location did I see the fire extinguisher?",
+    "response": "B) at the wall",
+    "ground_truth": "B"
+  },
+  {
+    "id": 24,
+    "task": "EPM",
+    "question": "ln what location did l see the drill?",
+    "response": "C) inside the drawer",
+    "ground_truth": "A"
+  },
+  {
+    "id": 55,
+    "task": "EPM",
+    "question": "What color is the broom?",
+    "response": "C) green",
+    "ground_truth": "C"
+  },
+  {
+    "id": 25,
+    "task": "EPM",
+    "question": "Did l touch the exhaust pipe?",
+    "response": "B) no",
+    "ground_truth": "A"
+  },
+  {
+    "id": 26,
+    "task": "EPM",
+    "question": "Where did l put the grass?",
+    "response": "A) garbage can",
+    "ground_truth": "A"
+  },
+  {
+    "id": 188,
+    "task": "EPM",
+    "question": "who did I talk to in the house?",
+    "response": "C) the woman with long hair",
+    "ground_truth": "A"
+  },
+  {
+    "id": 189,
+    "task": "EPM",
+    "question": "where is the blue bucket",
+    "response": "A) on the floor",
+    "ground_truth": "A"
+  },
+  {
+    "id": 190,
+    "task": "EPM",
+    "question": "where is the impact wrench before drilling",
+    "response": "A) under the table",
+    "ground_truth": "A"
+  },
+  {
+    "id": 299,
+    "task": "HLD",
+    "question": "Where did I put the shoe?",
+    "response": "A) Under the table",
+    "ground_truth": "D"
+  },
+  {
+    "id": 191,
+    "task": "EPM",
+    "question": "where did I put the CPU?",
+    "response": "B) on the table",
+    "ground_truth": "A"
+  },
+  {
+    "id": 378,
+    "task": "HLD",
+    "question": "Where was the glass jar before I picked it?",
+    "response": "A) at the counter",
+    "ground_truth": "B"
+  },
+  {
+    "id": 377,
+    "task": "HLD",
+    "question": "where did i put the jug?",
+    "response": "D) in the sink",
+    "ground_truth": "B"
+  },
+  {
+    "id": 360,
+    "task": "HLD",
+    "question": "Which tool did I take after clamping wood on table?",
+    "response": "C) saw",
+    "ground_truth": "A"
+  },
+  {
+    "id": 361,
+    "task": "HLD",
+    "question": "In what location did I last see the Yellow brush?",
+    "response": "D) on the floor",
+    "ground_truth": "A"
+  },
+  {
+    "id": 319,
+    "task": "HLD",
+    "question": "where was the laptop before I picked it?",
+    "response": "B) on the bed",
+    "ground_truth": "A"
+  },
+  {
+    "id": 320,
+    "task": "HLD",
+    "question": "Where is the luggage?",
+    "response": "B) on the bed",
+    "ground_truth": "A"
+  },
+  {
+    "id": 308,
+    "task": "HLD",
+    "question": "where did I place the trowel?",
+    "response": "C) at the top of the cement frame",
+    "ground_truth": "D"
+  },
+  {
+    "id": 307,
+    "task": "HLD",
+    "question": "Did I move the ruler one last time?",
+    "response": "B) no",
+    "ground_truth": "A"
+  },
+  {
+    "id": 114,
+    "task": "EPM",
+    "question": "What color bottle is on the sink",
+    "response": "A) blue",
+    "ground_truth": "B"
+  },
+  {
+    "id": 115,
+    "task": "EPM",
+    "question": "where is the tissue paper ",
+    "response": "C) inside the good rack",
+    "ground_truth": "B"
+  },
+  {
+    "id": 116,
+    "task": "EPM",
+    "question": "where is the blender",
+    "response": "A) on the table",
+    "ground_truth": "A"
+  },
+  {
+    "id": 326,
+    "task": "HLD",
+    "question": "what did I put in the plastic container?",
+    "response": "C) water",
+    "ground_truth": "A"
+  },
+  {
+    "id": 117,
+    "task": "EPM",
+    "question": "where did i Put the red jug",
+    "response": "A) on the counter",
+    "ground_truth": "B"
+  },
+  {
+    "id": 372,
+    "task": "HLD",
+    "question": "Where was the stand before I moved it?",
+    "response": "B) Unable to answer",
+    "ground_truth": "B"
+  },
+  {
+    "id": 373,
+    "task": "HLD",
+    "question": "Where is the traffic cone",
+    "response": "C) on a wooden plank",
+    "ground_truth": "A"
+  },
+  {
+    "id": 358,
+    "task": "HLD",
+    "question": "where is my phone?",
+    "response": "D) in the hand",
+    "ground_truth": "A"
+  },
+  {
+    "id": 365,
+    "task": "HLD",
+    "question": "where did I walked in the garden",
+    "response": "B) Unable to answer",
+    "ground_truth": "B"
+  },
+  {
+    "id": 142,
+    "task": "EPM",
+    "question": "In what location did I see a carton?",
+    "response": "A) cabinet",
+    "ground_truth": "A"
+  },
+  {
+    "id": 143,
+    "task": "EPM",
+    "question": "Where did I put the cable ties?",
+    "response": "C) top",
+    "ground_truth": "C"
+  },
+  {
+    "id": 141,
+    "task": "EPM",
+    "question": "Where did I put the screwdriver?",
+    "response": "A) left hand",
+    "ground_truth": "B"
+  },
+  {
+    "id": 134,
+    "task": "EPM",
+    "question": "Where is the red pack",
+    "response": "A) at the shelf",
+    "ground_truth": "A"
+  },
+  {
+    "id": 137,
+    "task": "EPM",
+    "question": "Where is the glasses",
+    "response": "C) on the shelf",
+    "ground_truth": "A"
+  },
+  {
+    "id": 135,
+    "task": "EPM",
+    "question": "Where is the toolbox",
+    "response": "A) at the shelf",
+    "ground_truth": "A"
+  },
+  {
+    "id": 136,
+    "task": "EPM",
+    "question": "Where is the bucket",
+    "response": "B) on the floor",
+    "ground_truth": "A"
+  },
+  {
+    "id": 140,
+    "task": "EPM",
+    "question": "Where was the pliers before I picked it?",
+    "response": "C) hanging at the ladder",
+    "ground_truth": "C"
+  },
+  {
+    "id": 331,
+    "task": "HLD",
+    "question": "How many trays did i take out of the oven?",
+    "response": "D) four trays",
+    "ground_truth": "B"
+  },
+  {
+    "id": 332,
+    "task": "HLD",
+    "question": "what colour is the bottle on the sink",
+    "response": "B) blue",
+    "ground_truth": "D"
+  },
+  {
+    "id": 403,
+    "task": "HLD",
+    "question": "Who did I interacted with while shopping?",
+    "response": "D) the man with a cap",
+    "ground_truth": "B"
+  },
+  {
+    "id": 343,
+    "task": "HLD",
+    "question": "Where was the white throw pillow before I picked the jenga box?",
+    "response": "C) on the window sill",
+    "ground_truth": "A"
+  },
+  {
+    "id": 39,
+    "task": "EPM",
+    "question": "How many poker cards did I place on the table?",
+    "response": "A) five",
+    "ground_truth": "C"
+  },
+  {
+    "id": 27,
+    "task": "EPM",
+    "question": "How many cards did I move?",
+    "response": "B) seven",
+    "ground_truth": "A"
+  },
+  {
+    "id": 28,
+    "task": "EPM",
+    "question": "Where was the book after I carried it?",
+    "response": "A) on the table",
+    "ground_truth": "A"
+  },
+  {
+    "id": 29,
+    "task": "EPM",
+    "question": "Where is the book?",
+    "response": "A) on the table",
+    "ground_truth": "A"
+  },
+  {
+    "id": 40,
+    "task": "EPM",
+    "question": "where was the water bottle before I squeezed it?",
+    "response": "B) on the table",
+    "ground_truth": "B"
+  },
+  {
+    "id": 30,
+    "task": "EPM",
+    "question": "How many cards did I place on the table?",
+    "response": "B)",
+    "ground_truth": "A"
+  },
+  {
+    "id": 41,
+    "task": "EPM",
+    "question": "who did I talk to when I was scrolling the phone?",
+    "response": "A) a  man who has tattoo on hands",
+    "ground_truth": "B"
+  },
+  {
+    "id": 42,
+    "task": "EPM",
+    "question": "where did I put my vaping device?",
+    "response": "B) on the table",
+    "ground_truth": "B"
+  },
+  {
+    "id": 62,
+    "task": "EPM",
+    "question": "how many eggs did I pick?",
+    "response": "B) two",
+    "ground_truth": "B"
+  },
+  {
+    "id": 156,
+    "task": "EPM",
+    "question": "Where did I put the ham?",
+    "response": "D) inside the ref",
+    "ground_truth": "D"
+  },
+  {
+    "id": 63,
+    "task": "EPM",
+    "question": "what did I pour  in a bowl?",
+    "response": "D) soy sauce",
+    "ground_truth": "B"
+  },
+  {
+    "id": 157,
+    "task": "EPM",
+    "question": "Where did i put the ceramic bowl?",
+    "response": "D) in plate drainer",
+    "ground_truth": "D"
+  },
+  {
+    "id": 158,
+    "task": "EPM",
+    "question": "What did I put in the Oven",
+    "response": "B) food",
+    "ground_truth": "A"
+  },
+  {
+    "id": 64,
+    "task": "EPM",
+    "question": "what food did I put on a plate?",
+    "response": "B) egg",
+    "ground_truth": "B"
+  },
+  {
+    "id": 65,
+    "task": "EPM",
+    "question": "where were the chopsticks",
+    "response": "D)",
+    "ground_truth": "D"
+  },
+  {
+    "id": 159,
+    "task": "EPM",
+    "question": "What did I put in the Oven?",
+    "response": "D) food",
+    "ground_truth": "D"
+  },
+  {
+    "id": 11,
+    "task": "EPM",
+    "question": "what did I pour in the boiler?",
+    "response": "B) water",
+    "ground_truth": "A"
+  },
+  {
+    "id": 12,
+    "task": "EPM",
+    "question": "where is my packet of milk?",
+    "response": "A) at the top of refrigerator",
+    "ground_truth": "A"
+  },
+  {
+    "id": 13,
+    "task": "EPM",
+    "question": "where did I put the packet of milk?",
+    "response": "A) refrigerator",
+    "ground_truth": "B"
+  },
+  {
+    "id": 14,
+    "task": "EPM",
+    "question": "in what location did I see the boiler?",
+    "response": "D) beside the sofa",
+    "ground_truth": "A"
+  },
+  {
+    "id": 79,
+    "task": "EPM",
+    "question": "Did I close coffee maker?",
+    "response": "A) yes",
+    "ground_truth": "A"
+  },
+  {
+    "id": 78,
+    "task": "EPM",
+    "question": "Did I see a turquoise car?",
+    "response": "B) no",
+    "ground_truth": "A"
+  },
+  {
+    "id": 80,
+    "task": "EPM",
+    "question": "How many magazines were on the table?",
+    "response": "B) 2",
+    "ground_truth": "A"
+  },
+  {
+    "id": 81,
+    "task": "EPM",
+    "question": "In what location did I see remote control?",
+    "response": "B) coffee table",
+    "ground_truth": "A"
+  },
+  {
+    "id": 43,
+    "task": "EPM",
+    "question": "Who did I talk to at the workshop?",
+    "response": "B) a man who wore a jacket",
+    "ground_truth": "B"
+  },
+  {
+    "id": 44,
+    "task": "EPM",
+    "question": "Where did I put the bolt?",
+    "response": "A) working table",
+    "ground_truth": "C"
+  },
+  {
+    "id": 45,
+    "task": "EPM",
+    "question": "Where is the tool?",
+    "response": "A) at the working table",
+    "ground_truth": "B"
+  },
+  {
+    "id": 339,
+    "task": "HLD",
+    "question": "Where is the screwdriver?",
+    "response": "C) at the working table",
+    "ground_truth": "D"
+  },
+  {
+    "id": 46,
+    "task": "EPM",
+    "question": "What tool did I use to tighten the screw?",
+    "response": "A) using a screwdriver",
+    "ground_truth": "A"
+  },
+  {
+    "id": 364,
+    "task": "HLD",
+    "question": "Where did I put the knife",
+    "response": "A) on the chopping board",
+    "ground_truth": "B"
+  },
+  {
+    "id": 363,
+    "task": "HLD",
+    "question": "Did i leave the water running? ",
+    "response": "B) Unable to answer",
+    "ground_truth": "B"
+  },
+  {
+    "id": 349,
+    "task": "HLD",
+    "question": "Where did I put the bottle of water I drank from?",
+    "response": "C) in the van",
+    "ground_truth": "A"
+  },
+  {
+    "id": 348,
+    "task": "HLD",
+    "question": "Where was the pocket knife?",
+    "response": "B) Unable to answer",
+    "ground_truth": "B"
+  },
+  {
+    "id": 89,
+    "task": "EPM",
+    "question": "Where did I put the flour bucket?",
+    "response": "D) On the top of the flour sack",
+    "ground_truth": "D"
+  },
+  {
+    "id": 392,
+    "task": "HLD",
+    "question": "what dough shaper did i push?",
+    "response": "C) dough cutter",
+    "ground_truth": "A"
+  },
+  {
+    "id": 86,
+    "task": "EPM",
+    "question": "In what location did I see the oven brush?",
+    "response": "C) In the dough cabinet",
+    "ground_truth": "A"
+  },
+  {
+    "id": 87,
+    "task": "EPM",
+    "question": "Who did I interact with when carrying a layer of the cooling rack?",
+    "response": "A) A baker man",
+    "ground_truth": "A"
+  },
+  {
+    "id": 88,
+    "task": "EPM",
+    "question": "Where was the dough cutter before I picked it?",
+    "response": "A) Table",
+    "ground_truth": "A"
+  },
+  {
+    "id": 167,
+    "task": "EPM",
+    "question": "Where did I put the chopping board?",
+    "response": "A) side of the sink",
+    "ground_truth": "A"
+  },
+  {
+    "id": 164,
+    "task": "EPM",
+    "question": "What did I put in the washing machine?",
+    "response": "A) cloths",
+    "ground_truth": "B"
+  },
+  {
+    "id": 165,
+    "task": "EPM",
+    "question": "Did I open the curtains?",
+    "response": "B) no",
+    "ground_truth": "A"
+  },
+  {
+    "id": 166,
+    "task": "EPM",
+    "question": "Where was the phone before i picked it?",
+    "response": "B) kitchen counter",
+    "ground_truth": "A"
+  },
+  {
+    "id": 398,
+    "task": "HLD",
+    "question": "How many laptops were in the room",
+    "response": "B) Unable to answer",
+    "ground_truth": "B"
+  },
+  {
+    "id": 409,
+    "task": "HLD",
+    "question": "What tool did I take out?",
+    "response": "C) spanner",
+    "ground_truth": "A"
+  },
+  {
+    "id": 410,
+    "task": "HLD",
+    "question": "in what location did i last see the torch?",
+    "response": "D) under the mower",
+    "ground_truth": "A"
+  },
+  {
+    "id": 305,
+    "task": "HLD",
+    "question": "What bowl did I scrape?",
+    "response": "B) mixing machine bowl",
+    "ground_truth": "A"
+  },
+  {
+    "id": 304,
+    "task": "HLD",
+    "question": "where did i put the tumbler",
+    "response": "C) on the table",
+    "ground_truth": "A"
+  },
+  {
+    "id": 297,
+    "task": "HLD",
+    "question": "what did I put in the black dustbin?",
+    "response": "A) empty water bottles",
+    "ground_truth": "B"
+  },
+  {
+    "id": 298,
+    "task": "HLD",
+    "question": "Where did I put the vacuum cleaner head?",
+    "response": "A) closet",
+    "ground_truth": "B"
+  },
+  {
+    "id": 106,
+    "task": "EPM",
+    "question": "Where was the container after I moved it?",
+    "response": "C) at the ground",
+    "ground_truth": "A"
+  },
+  {
+    "id": 107,
+    "task": "EPM",
+    "question": "How many times did I scoop cement from the container?",
+    "response": "A) three times",
+    "ground_truth": "C"
+  },
+  {
+    "id": 108,
+    "task": "EPM",
+    "question": "What did I put in the container?",
+    "response": "A) cement",
+    "ground_truth": "A"
+  },
+  {
+    "id": 306,
+    "task": "HLD",
+    "question": "where was the plastic shovel before i picked it?",
+    "response": "D) inside the blue bucket",
+    "ground_truth": "B"
+  },
+  {
+    "id": 109,
+    "task": "EPM",
+    "question": "Where was the scraper before I picked it?",
+    "response": "D) in the bucket",
+    "ground_truth": "A"
+  },
+  {
+    "id": 303,
+    "task": "HLD",
+    "question": "Where is the bucket?",
+    "response": "B) on the floor",
+    "ground_truth": "A"
+  },
+  {
+    "id": 302,
+    "task": "HLD",
+    "question": "How many red cups are on the ground?",
+    "response": "C) Unable to answer",
+    "ground_truth": "C"
+  },
+  {
+    "id": 314,
+    "task": "HLD",
+    "question": "where was cooking oil before I pour in the pan?",
+    "response": "B) On the counter top",
+    "ground_truth": "A"
+  },
+  {
+    "id": 313,
+    "task": "HLD",
+    "question": "Did I close the cabinet",
+    "response": "B) no",
+    "ground_truth": "A"
+  },
+  {
+    "id": 126,
+    "task": "EPM",
+    "question": "Where was the towel?",
+    "response": "C) lying",
+    "ground_truth": "A"
+  },
+  {
+    "id": 18,
+    "task": "EPM",
+    "question": "Where was the frypan before I picked it?",
+    "response": "C) stove",
+    "ground_truth": "C"
+  },
+  {
+    "id": 17,
+    "task": "EPM",
+    "question": "What did I put in the pan?",
+    "response": "C) onions",
+    "ground_truth": "A"
+  },
+  {
+    "id": 127,
+    "task": "EPM",
+    "question": "What did I put in the polythene paper?",
+    "response": "B) meat",
+    "ground_truth": "A"
+  },
+  {
+    "id": 16,
+    "task": "EPM",
+    "question": "Where is my towel?",
+    "response": "A) hanging on fridge",
+    "ground_truth": "A"
+  },
+  {
+    "id": 15,
+    "task": "EPM",
+    "question": "Where did I put the bottle of oil?",
+    "response": "A) on the stove",
+    "ground_truth": "D"
+  },
+  {
+    "id": 128,
+    "task": "EPM",
+    "question": "What shape was the meat I put on the pan?",
+    "response": "C) flat",
+    "ground_truth": "C"
+  },
+  {
+    "id": 129,
+    "task": "EPM",
+    "question": "Did I leave the cooker on?",
+    "response": "B) no",
+    "ground_truth": "B"
+  },
+  {
+    "id": 351,
+    "task": "HLD",
+    "question": "In what location did I see the trash can?",
+    "response": "C) at the corner",
+    "ground_truth": "A"
+  },
+  {
+    "id": 350,
+    "task": "HLD",
+    "question": "How many white planks did I carry out of the house?",
+    "response": "D) one",
+    "ground_truth": "B"
+  },
+  {
+    "id": 172,
+    "task": "EPM",
+    "question": "What fruits did i put in the polythene bag?",
+    "response": "B) apples",
+    "ground_truth": "D"
+  },
+  {
+    "id": 173,
+    "task": "EPM",
+    "question": "What did i put in the trolley?",
+    "response": "C) a bag of fruits",
+    "ground_truth": "C"
+  },
+  {
+    "id": 174,
+    "task": "EPM",
+    "question": "How many carrots did i pick?",
+    "response": "B) 14",
+    "ground_truth": "B"
+  },
+  {
+    "id": 175,
+    "task": "EPM",
+    "question": "where did i put the trolley?",
+    "response": "A) near the fruits",
+    "ground_truth": "D"
+  },
+  {
+    "id": 184,
+    "task": "EPM",
+    "question": "what gloves color was the dish washer wearing",
+    "response": "A) orange",
+    "ground_truth": "A"
+  },
+  {
+    "id": 185,
+    "task": "EPM",
+    "question": "where did I pick the plate from",
+    "response": "C) plate drainer",
+    "ground_truth": "C"
+  },
+  {
+    "id": 152,
+    "task": "EPM",
+    "question": "Where did I put the glass cup?",
+    "response": "A) plate drainer",
+    "ground_truth": "A"
+  },
+  {
+    "id": 154,
+    "task": "EPM",
+    "question": "Where was the Kitchen towel before I picked it?",
+    "response": "D) in the plate drainer",
+    "ground_truth": "A"
+  },
+  {
+    "id": 186,
+    "task": "EPM",
+    "question": "Where was the towel before washing it",
+    "response": "B) on the plate drainer",
+    "ground_truth": "D"
+  },
+  {
+    "id": 155,
+    "task": "EPM",
+    "question": "Where was the soap I picked it?",
+    "response": "A) beside the faucet",
+    "ground_truth": "A"
+  },
+  {
+    "id": 187,
+    "task": "EPM",
+    "question": "What did I use to open water tap",
+    "response": "D) a knob",
+    "ground_truth": "A"
+  },
+  {
+    "id": 153,
+    "task": "EPM",
+    "question": "Where did I put the Kitchen towel?",
+    "response": "D) in the plate drainer",
+    "ground_truth": "A"
+  },
+  {
+    "id": 74,
+    "task": "EPM",
+    "question": "where did i put my phone?",
+    "response": "A) kitchen table",
+    "ground_truth": "A"
+  },
+  {
+    "id": 75,
+    "task": "EPM",
+    "question": "In what location did i see the stove?",
+    "response": "C) kitchen",
+    "ground_truth": "C"
+  },
+  {
+    "id": 76,
+    "task": "EPM",
+    "question": "Where did i put the black knife?",
+    "response": "A) chopping board",
+    "ground_truth": "A"
+  },
+  {
+    "id": 77,
+    "task": "EPM",
+    "question": "what did i put in the cooking pot?",
+    "response": "A) carrot",
+    "ground_truth": "B"
+  },
+  {
+    "id": 130,
+    "task": "EPM",
+    "question": "What did I put in the dust bin?",
+    "response": "C) garlic",
+    "ground_truth": "A"
+  },
+  {
+    "id": 131,
+    "task": "EPM",
+    "question": "What did I remove from the plastic bag?",
+    "response": "C) cabbage",
+    "ground_truth": "A"
+  },
+  {
+    "id": 68,
+    "task": "EPM",
+    "question": "Where is the red floor pillow?",
+    "response": "C) in the kitchen",
+    "ground_truth": "A"
+  },
+  {
+    "id": 69,
+    "task": "EPM",
+    "question": "Where was the onion before I picked it?",
+    "response": "C) inside the refrigerator",
+    "ground_truth": "A"
+  },
+  {
+    "id": 67,
+    "task": "EPM",
+    "question": "Where was the plastic wrap before I picked it?",
+    "response": "A) at the door of refrigerator",
+    "ground_truth": "A"
+  },
+  {
+    "id": 66,
+    "task": "EPM",
+    "question": "Where did I put the remaining onions?",
+    "response": "C) inside the refrigerator",
+    "ground_truth": "B"
+  },
+  {
+    "id": 132,
+    "task": "EPM",
+    "question": "What did I put in the fridge?",
+    "response": "A) onion",
+    "ground_truth": "A"
+  },
+  {
+    "id": 133,
+    "task": "EPM",
+    "question": "What did I pick from the drawer?",
+    "response": "C) chopsticks",
+    "ground_truth": "A"
+  },
+  {
+    "id": 384,
+    "task": "HLD",
+    "question": "where is the lamp ",
+    "response": "C) on the cabinet",
+    "ground_truth": "B"
+  },
+  {
+    "id": 390,
+    "task": "HLD",
+    "question": "What did I put in bottle on sink?",
+    "response": "A) oil",
+    "ground_truth": "B"
+  },
+  {
+    "id": 389,
+    "task": "HLD",
+    "question": "Where is the yellow and black hand drill?",
+    "response": "B) on the ground",
+    "ground_truth": "A"
+  },
+  {
+    "id": 406,
+    "task": "HLD",
+    "question": "How many boxes did lady with specks carry?",
+    "response": "C) Unable to answer",
+    "ground_truth": "C"
+  },
+  {
+    "id": 391,
+    "task": "HLD",
+    "question": "Where did I put the black wallet ",
+    "response": "B) counter",
+    "ground_truth": "A"
+  },
+  {
+    "id": 375,
+    "task": "HLD",
+    "question": "Where was the bike seat before I opened it?",
+    "response": "D) on the scooter",
+    "ground_truth": "B"
+  },
+  {
+    "id": 374,
+    "task": "HLD",
+    "question": "How many yellow tuk-tuk are outside",
+    "response": "B) Unable to answer",
+    "ground_truth": "B"
+  },
+  {
+    "id": 397,
+    "task": "HLD",
+    "question": "How many doughs did i roll to shape?",
+    "response": "A) Unable to answer",
+    "ground_truth": "A"
+  },
+  {
+    "id": 396,
+    "task": "HLD",
+    "question": "How many dough portions did I cut?",
+    "response": "B) Unable to answer",
+    "ground_truth": "B"
+  },
+  {
+    "id": 352,
+    "task": "HLD",
+    "question": "What did I plug into the socket?",
+    "response": "D) a tool",
+    "ground_truth": "B"
+  },
+  {
+    "id": 353,
+    "task": "HLD",
+    "question": "in what room did I see the machine?",
+    "response": "B) Unable to answer",
+    "ground_truth": "B"
+  },
+  {
+    "id": 118,
+    "task": "EPM",
+    "question": "who did I talk to at the table ?",
+    "response": "A) 0",
+    "ground_truth": "B"
+  },
+  {
+    "id": 119,
+    "task": "EPM",
+    "question": "who did I interact with while I stood at the table?",
+    "response": "A) 0",
+    "ground_truth": "C"
+  },
+  {
+    "id": 121,
+    "task": "EPM",
+    "question": "where is the stove?",
+    "response": "C) on the table",
+    "ground_truth": "B"
+  },
+  {
+    "id": 120,
+    "task": "EPM",
+    "question": "where is the plastic bag?",
+    "response": "C) on the truck",
+    "ground_truth": "B"
+  },
+  {
+    "id": 318,
+    "task": "HLD",
+    "question": "In what location did I see the insulated bottle?",
+    "response": "C) Inside the pick up track",
+    "ground_truth": "B"
+  },
+  {
+    "id": 180,
+    "task": "EPM",
+    "question": "Where was the blue screwdriver?",
+    "response": "B) inside the drawer",
+    "ground_truth": "B"
+  },
+  {
+    "id": 181,
+    "task": "EPM",
+    "question": "Where did I put the black basin?",
+    "response": "D) under the blue drum",
+    "ground_truth": "A"
+  },
+  {
+    "id": 366,
+    "task": "HLD",
+    "question": "What spanner did I remove from the drawer?",
+    "response": "C) pliers",
+    "ground_truth": "A"
+  },
+  {
+    "id": 182,
+    "task": "EPM",
+    "question": "where was the grey soldering gun before I picked it?",
+    "response": "C) on the toolbox",
+    "ground_truth": "B"
+  },
+  {
+    "id": 183,
+    "task": "EPM",
+    "question": "Where was the wrench before I picked it?",
+    "response": "A) on the toolbox",
+    "ground_truth": "C"
+  },
+  {
+    "id": 405,
+    "task": "HLD",
+    "question": "What chain did I rotate?",
+    "response": "A) Unable to answer",
+    "ground_truth": "A"
+  },
+  {
+    "id": 404,
+    "task": "HLD",
+    "question": "Where is the small grey keg?",
+    "response": "B) floor",
+    "ground_truth": "A"
+  },
+  {
+    "id": 47,
+    "task": "EPM",
+    "question": "Who did I talk to in the living room?",
+    "response": "D) a man with a white shirt",
+    "ground_truth": "B"
+  },
+  {
+    "id": 48,
+    "task": "EPM",
+    "question": "Where is the the phone before I scrolled it?",
+    "response": "A) table",
+    "ground_truth": "B"
+  },
+  {
+    "id": 49,
+    "task": "EPM",
+    "question": "Where did I put the phone",
+    "response": "C) table",
+    "ground_truth": "B"
+  },
+  {
+    "id": 323,
+    "task": "HLD",
+    "question": "Where is my screwdriver?",
+    "response": "B) at the lawnmower",
+    "ground_truth": "A"
+  },
+  {
+    "id": 359,
+    "task": "HLD",
+    "question": "who did I interact with when  I was operating mobile phone?",
+    "response": "B) Unable to answer",
+    "ground_truth": "B"
+  },
+  {
+    "id": 335,
+    "task": "HLD",
+    "question": "who did I talk to in the house?",
+    "response": "B) Unable to answer",
+    "ground_truth": "B"
+  },
+  {
+    "id": 336,
+    "task": "HLD",
+    "question": "What mushroom did i chop",
+    "response": "C) white mushroom",
+    "ground_truth": "A"
+  },
+  {
+    "id": 337,
+    "task": "HLD",
+    "question": "How many tomatoes did I chop?",
+    "response": "C) Three pieces",
+    "ground_truth": "B"
+  },
+  {
+    "id": 344,
+    "task": "HLD",
+    "question": "Where did I put the bag?",
+    "response": "D) on the dining table",
+    "ground_truth": "B"
+  },
+  {
+    "id": 394,
+    "task": "HLD",
+    "question": "Did i press the  switch button?",
+    "response": "B) no",
+    "ground_truth": "A"
+  },
+  {
+    "id": 395,
+    "task": "HLD",
+    "question": "Where was the tray before I removed it from the oven?",
+    "response": "D) rack",
+    "ground_truth": "C"
+  },
+  {
+    "id": 0,
+    "task": "EPM",
+    "question": "Who did I communicate to  when chopping egg plants?",
+    "response": "D) a person with white shirt",
+    "ground_truth": "C"
+  },
+  {
+    "id": 1,
+    "task": "EPM",
+    "question": "What did I drop in the bowl in the sink?",
+    "response": "C) eggplant",
+    "ground_truth": "C"
+  },
+  {
+    "id": 2,
+    "task": "EPM",
+    "question": "Where is the microwave? ",
+    "response": "C) on the counter",
+    "ground_truth": "A"
+  },
+  {
+    "id": 385,
+    "task": "HLD",
+    "question": "Did I close the bottle of oil?",
+    "response": "A) No, I left it open",
+    "ground_truth": "B"
+  },
+  {
+    "id": 3,
+    "task": "EPM",
+    "question": "What food did I chop?",
+    "response": "A) eggplant",
+    "ground_truth": "B"
+  },
+  {
+    "id": 50,
+    "task": "EPM",
+    "question": "What did I sharpen the pencil with?",
+    "response": "A) a blade",
+    "ground_truth": "A"
+  },
+  {
+    "id": 51,
+    "task": "EPM",
+    "question": "What color was the jacket hanged on the wall?",
+    "response": "D) orange",
+    "ground_truth": "A"
+  },
+  {
+    "id": 52,
+    "task": "EPM",
+    "question": "How many wooden sticks did I hold?",
+    "response": "C) four",
+    "ground_truth": "A"
+  },
+  {
+    "id": 354,
+    "task": "HLD",
+    "question": "In what room did I see the hammer last?",
+    "response": "A) kitchen",
+    "ground_truth": "C"
+  },
+  {
+    "id": 53,
+    "task": "EPM",
+    "question": "In what location did I see the drill?",
+    "response": "B) on the table",
+    "ground_truth": "A"
+  },
+  {
+    "id": 144,
+    "task": "EPM",
+    "question": "What color is the car?",
+    "response": "B) white",
+    "ground_truth": "B"
+  },
+  {
+    "id": 145,
+    "task": "EPM",
+    "question": "Where is the dust bin?",
+    "response": "A) beside the door",
+    "ground_truth": "A"
+  },
+  {
+    "id": 147,
+    "task": "EPM",
+    "question": "Where is the tissue paper?",
+    "response": "C) next to the door",
+    "ground_truth": "A"
+  },
+  {
+    "id": 146,
+    "task": "EPM",
+    "question": "What color is my my shirt",
+    "response": "A) black",
+    "ground_truth": "A"
+  },
+  {
+    "id": 368,
+    "task": "HLD",
+    "question": "who did I interact with  when I was shopping?",
+    "response": "A) Unable to answer",
+    "ground_truth": "A"
+  },
+  {
+    "id": 376,
+    "task": "HLD",
+    "question": "Where is the phone?",
+    "response": "C) Unable to answer",
+    "ground_truth": "C"
+  },
+  {
+    "id": 328,
+    "task": "HLD",
+    "question": "What did i put in the dough mixer?",
+    "response": "B) flour",
+    "ground_truth": "A"
+  },
+  {
+    "id": 327,
+    "task": "HLD",
+    "question": "What did I put in the rack",
+    "response": "C) a plastic taper ware",
+    "ground_truth": "A"
+  },
+  {
+    "id": 139,
+    "task": "EPM",
+    "question": "In what location did I see a yellow carrier bag?",
+    "response": "C) coffee table",
+    "ground_truth": "B"
+  },
+  {
+    "id": 138,
+    "task": "EPM",
+    "question": "Where did I put the tablet?",
+    "response": "B) sofa set",
+    "ground_truth": "B"
+  },
+  {
+    "id": 94,
+    "task": "EPM",
+    "question": "Where was the television?",
+    "response": "A) at the top of table",
+    "ground_truth": "A"
+  },
+  {
+    "id": 95,
+    "task": "EPM",
+    "question": "Who did I interact with when I swept the floor?",
+    "response": "D) My roommate",
+    "ground_truth": "C"
+  },
+  {
+    "id": 96,
+    "task": "EPM",
+    "question": "Where was the exercise ball?",
+    "response": "D) on the bench",
+    "ground_truth": "A"
+  },
+  {
+    "id": 97,
+    "task": "EPM",
+    "question": "In what location did i see the jenga game box?",
+    "response": "A) on the table",
+    "ground_truth": "A"
+  },
+  {
+    "id": 239,
+    "task": "EPM",
+    "question": "What is the white object on the wall above the TV?",
+    "response": "C) Air conditioning unit",
+    "ground_truth": "C"
+  },
+  {
+    "id": 244,
+    "task": "EPM",
+    "question": "What color is the staircase railing?",
+    "response": "A) Brown",
+    "ground_truth": "A"
+  },
+  {
+    "id": 240,
+    "task": "EPM",
+    "question": "What is the white object on the wall above the TV?",
+    "response": "D) Air conditioning unit",
+    "ground_truth": "D"
+  },
+  {
+    "id": 262,
+    "task": "EPM",
+    "question": "What should I do to cool down?",
+    "response": "C) Turn on the AC unit",
+    "ground_truth": "C"
+  },
+  {
+    "id": 438,
+    "task": "HLD",
+    "question": "Is the bedroom door open?",
+    "response": "C) The bedroom door is closed.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 473,
+    "task": "HLD",
+    "question": "What is the large, round, and black object on the wall?",
+    "response": "D) A mirror",
+    "ground_truth": "C"
+  },
+  {
+    "id": 255,
+    "task": "EPM",
+    "question": "What is to the left of the mirror?",
+    "response": "D) A black door",
+    "ground_truth": "C"
+  },
+  {
+    "id": 266,
+    "task": "EPM",
+    "question": "What is to the left of the staircase?",
+    "response": "B) A dresser",
+    "ground_truth": "D"
+  },
+  {
+    "id": 474,
+    "task": "HLD",
+    "question": "Is the house doorway open or closed?",
+    "response": "B) The house doorway is closed.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 254,
+    "task": "EPM",
+    "question": "What type of car is in the garage?",
+    "response": "C) Sedan",
+    "ground_truth": "C"
+  },
+  {
+    "id": 414,
+    "task": "HLD",
+    "question": "What is the green object in the left of the garage?",
+    "response": "C) A ladder",
+    "ground_truth": "B"
+  },
+  {
+    "id": 241,
+    "task": "EPM",
+    "question": "What color is the car?",
+    "response": "C) Black",
+    "ground_truth": "A"
+  },
+  {
+    "id": 445,
+    "task": "HLD",
+    "question": "Where is the cartoon cat?",
+    "response": "C) Its drawn on the black photo frame",
+    "ground_truth": "B"
+  },
+  {
+    "id": 454,
+    "task": "HLD",
+    "question": "What shape is the mirror?",
+    "response": "B) Rectangle",
+    "ground_truth": "C"
+  },
+  {
+    "id": 292,
+    "task": "EPM",
+    "question": "Is there space under the bed for storage?",
+    "response": "C) There is space under the bed for storage",
+    "ground_truth": "C"
+  },
+  {
+    "id": 420,
+    "task": "HLD",
+    "question": "What is above the red couch?",
+    "response": "D) A window",
+    "ground_truth": "A"
+  },
+  {
+    "id": 265,
+    "task": "EPM",
+    "question": "What is in the center of the room with the stairs?",
+    "response": "C) A red couch",
+    "ground_truth": "C"
+  },
+  {
+    "id": 251,
+    "task": "EPM",
+    "question": "Is the front door open or closed?",
+    "response": "B) The front door is closed.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 215,
+    "task": "EPM",
+    "question": "Is this home in the suburbs?",
+    "response": "A) No, the home is not in the suburbs.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 200,
+    "task": "EPM",
+    "question": "Is the front door open?",
+    "response": "B) The front door is open.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 274,
+    "task": "EPM",
+    "question": "Is the window in the bedroom open?",
+    "response": "B) The window in the bedroom is open.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 480,
+    "task": "HLD",
+    "question": "What is to the left of the mirror downstairs?",
+    "response": "C) Staircase",
+    "ground_truth": "B"
+  },
+  {
+    "id": 470,
+    "task": "HLD",
+    "question": "What color is the staircase railing?",
+    "response": "C) Grey",
+    "ground_truth": "D"
+  },
+  {
+    "id": 291,
+    "task": "EPM",
+    "question": "Is my backyard safe to let me dog out in?",
+    "response": "A) Yes, it's fenced.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 482,
+    "task": "HLD",
+    "question": "Are the doors downstairs closed?",
+    "response": "A) No, one door downstairs is open.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 238,
+    "task": "EPM",
+    "question": "Where are the books?",
+    "response": "A) On the shelves hanging on the wall",
+    "ground_truth": "A"
+  },
+  {
+    "id": 280,
+    "task": "EPM",
+    "question": "What colors are the stripes on the wall with the books?",
+    "response": "C) Blue, Green, and Red",
+    "ground_truth": "C"
+  },
+  {
+    "id": 209,
+    "task": "EPM",
+    "question": "Where can my kids go to read?",
+    "response": "C) The small blue table downstairs",
+    "ground_truth": "D"
+  },
+  {
+    "id": 272,
+    "task": "EPM",
+    "question": "What color are the flowers on the black table downstairs?",
+    "response": "C) Pink",
+    "ground_truth": "B"
+  },
+  {
+    "id": 293,
+    "task": "EPM",
+    "question": "Where are the clothes?",
+    "response": "A) On the hangars next to the stairway",
+    "ground_truth": "A"
+  },
+  {
+    "id": 270,
+    "task": "EPM",
+    "question": "Where can I put my jacket?",
+    "response": "B) On the cloth hanger rack",
+    "ground_truth": "B"
+  },
+  {
+    "id": 273,
+    "task": "EPM",
+    "question": "What kind of material is the wall on the right side of the staircase?",
+    "response": "A) Exposed stone",
+    "ground_truth": "A"
+  },
+  {
+    "id": 418,
+    "task": "HLD",
+    "question": "How can I cool myself off?",
+    "response": "A) Turn on the air conditioner",
+    "ground_truth": "C"
+  },
+  {
+    "id": 419,
+    "task": "HLD",
+    "question": "What is above the bed?",
+    "response": "A) A mirror and a lamp",
+    "ground_truth": "B"
+  },
+  {
+    "id": 440,
+    "task": "HLD",
+    "question": "What is depicted on the painting above the bed?",
+    "response": "A) A wooden bridge",
+    "ground_truth": "B"
+  },
+  {
+    "id": 286,
+    "task": "EPM",
+    "question": "What does the painting in the bathroom depict?",
+    "response": "A) A pier",
+    "ground_truth": "A"
+  },
+  {
+    "id": 222,
+    "task": "EPM",
+    "question": "Where is the full body mirror?",
+    "response": "A) In the closet by the shoe rack",
+    "ground_truth": "C"
+  },
+  {
+    "id": 284,
+    "task": "EPM",
+    "question": "Where are the orange flowers?",
+    "response": "B) Outside the bedroom, in a vase on the ground",
+    "ground_truth": "B"
+  },
+  {
+    "id": 472,
+    "task": "HLD",
+    "question": "What color pattern is on the pillow on the black couch?",
+    "response": "D) Unable to answer",
+    "ground_truth": "D"
+  },
+  {
+    "id": 233,
+    "task": "EPM",
+    "question": "Where can I put my hat?",
+    "response": "C) On the hat rack",
+    "ground_truth": "C"
+  },
+  {
+    "id": 228,
+    "task": "EPM",
+    "question": "What is leaning in the corner by the coat rack?",
+    "response": "C) An umbrella",
+    "ground_truth": "C"
+  },
+  {
+    "id": 258,
+    "task": "EPM",
+    "question": "What is draped on top of the black couch?",
+    "response": "D) A green blanket",
+    "ground_truth": "B"
+  },
+  {
+    "id": 211,
+    "task": "EPM",
+    "question": "Are the curtains to the patio door open?",
+    "response": "B) The curtains to the patio door are closed.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 227,
+    "task": "EPM",
+    "question": "Is the blue lamp by the couch turned on?",
+    "response": "A) The blue lamp by the couch is turned off.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 263,
+    "task": "EPM",
+    "question": "Where is the black and grey speaker?",
+    "response": "D) On the first shelf of the wooden cabinet",
+    "ground_truth": "D"
+  },
+  {
+    "id": 475,
+    "task": "HLD",
+    "question": "How can I turn off the lamp in the bedroom?",
+    "response": "B) Use the wall switch",
+    "ground_truth": "C"
+  },
+  {
+    "id": 477,
+    "task": "HLD",
+    "question": "Where is the grey bed?",
+    "response": "C) In the bedroom on the left.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 476,
+    "task": "HLD",
+    "question": "After washing my hands in the sink, what should I use to dry my hands?",
+    "response": "B) Use the paper towel",
+    "ground_truth": "A"
+  },
+  {
+    "id": 452,
+    "task": "HLD",
+    "question": "Is there space on the dining table to work on my laptop?",
+    "response": "C) No, the dining table is full of things.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 235,
+    "task": "EPM",
+    "question": "What is above the mirror in the bathroom?",
+    "response": "D) Painting",
+    "ground_truth": "A"
+  },
+  {
+    "id": 223,
+    "task": "EPM",
+    "question": "What animal is shown in the picture in the bedroom?",
+    "response": "D) A dog",
+    "ground_truth": "C"
+  },
+  {
+    "id": 203,
+    "task": "EPM",
+    "question": "What is hanging on the wall near the bottom of the stairs?",
+    "response": "B) A smoke detector",
+    "ground_truth": "B"
+  },
+  {
+    "id": 224,
+    "task": "EPM",
+    "question": "Is the kitchen on the same floor as the bedroom?",
+    "response": "A) Yes, the kitchen and the bedroom are on the same floor.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 451,
+    "task": "HLD",
+    "question": "Is the coat closet in the living room open?",
+    "response": "B) Yes, the coat closet is open.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 268,
+    "task": "EPM",
+    "question": "What color is the smoke detector?",
+    "response": "B) Yellow or off-white",
+    "ground_truth": "B"
+  },
+  {
+    "id": 285,
+    "task": "EPM",
+    "question": "Is this home on the first floor?",
+    "response": "A) Yes, it's on the first floor.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 230,
+    "task": "EPM",
+    "question": "Where can I sit and eat if I don't want to use the dining table?",
+    "response": "A) Use the kitchen bar counter",
+    "ground_truth": "A"
+  },
+  {
+    "id": 199,
+    "task": "EPM",
+    "question": "What is the gold object on the nightstand?",
+    "response": "C) A nightlamp",
+    "ground_truth": "C"
+  },
+  {
+    "id": 433,
+    "task": "HLD",
+    "question": "What is the blue object above the glass doors?",
+    "response": "B) A painting",
+    "ground_truth": "D"
+  },
+  {
+    "id": 479,
+    "task": "HLD",
+    "question": "What color is the trim around the mirror?",
+    "response": "B) White",
+    "ground_truth": "D"
+  },
+  {
+    "id": 458,
+    "task": "HLD",
+    "question": "What kind of numbering does the blue clock use?",
+    "response": "C) Arabic numerals",
+    "ground_truth": "A"
+  },
+  {
+    "id": 457,
+    "task": "HLD",
+    "question": "How many basins does the sink have?",
+    "response": "D) Unable to answer",
+    "ground_truth": "D"
+  },
+  {
+    "id": 431,
+    "task": "HLD",
+    "question": "Where is the microwave?",
+    "response": "C) On the countertop",
+    "ground_truth": "D"
+  },
+  {
+    "id": 234,
+    "task": "EPM",
+    "question": "Are the kitchen bar chairs tucked in?",
+    "response": "A) The kitchen bar chairs are tucked in.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 411,
+    "task": "HLD",
+    "question": "Where can I put my apples?",
+    "response": "B) Use the red basket on the ottoman",
+    "ground_truth": "C"
+  },
+  {
+    "id": 441,
+    "task": "HLD",
+    "question": "What is the picture seen from the kitchen depict?",
+    "response": "C) A picture of a large window with a view of the city skyline.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 281,
+    "task": "EPM",
+    "question": "Is the backyard fenced?",
+    "response": "C) The backyard is fenced.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 261,
+    "task": "EPM",
+    "question": "Where is the red and white checkered rug?",
+    "response": "B) Next to the red ottoman",
+    "ground_truth": "E"
+  },
+  {
+    "id": 267,
+    "task": "EPM",
+    "question": "What is the yellow object hanging on the wall?",
+    "response": "B) A painting depicting a man",
+    "ground_truth": "B"
+  },
+  {
+    "id": 202,
+    "task": "EPM",
+    "question": "What can I use to check my appearance?",
+    "response": "D) The mirror above the wooden table near the kitchen.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 443,
+    "task": "HLD",
+    "question": "What color is the staircase railing?",
+    "response": "A) Black",
+    "ground_truth": "B"
+  },
+  {
+    "id": 210,
+    "task": "EPM",
+    "question": "Where can I dry my shoes when I come into the house?",
+    "response": "D) On the grey rug behind the front door",
+    "ground_truth": "D"
+  },
+  {
+    "id": 468,
+    "task": "HLD",
+    "question": "What is hung along the walls of the staircase?",
+    "response": "D) Paintings",
+    "ground_truth": "B"
+  },
+  {
+    "id": 226,
+    "task": "EPM",
+    "question": "Where is the china cabinet?",
+    "response": "A) To the right of the front door",
+    "ground_truth": "D"
+  },
+  {
+    "id": 197,
+    "task": "EPM",
+    "question": "What is the yellow object on top of the ouch?",
+    "response": "C) A painting",
+    "ground_truth": "D"
+  },
+  {
+    "id": 413,
+    "task": "HLD",
+    "question": "Can this home be used for a large dinner party?",
+    "response": "D) The home has a large living room, but a small dining room.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 453,
+    "task": "HLD",
+    "question": "What color are the air vents below the window?",
+    "response": "B) Black",
+    "ground_truth": "C"
+  },
+  {
+    "id": 435,
+    "task": "HLD",
+    "question": "What is in between the two couches?",
+    "response": "C) Unable to answer",
+    "ground_truth": "C"
+  },
+  {
+    "id": 444,
+    "task": "HLD",
+    "question": "What can I use to entertain my guests with music?",
+    "response": "C) The record player",
+    "ground_truth": "A"
+  },
+  {
+    "id": 219,
+    "task": "EPM",
+    "question": "Is the person who lives here an avid reader?",
+    "response": "C) The person who lives here is an avid reader.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 245,
+    "task": "EPM",
+    "question": "Where can I lay down and read a book?",
+    "response": "A) The couch",
+    "ground_truth": "A"
+  },
+  {
+    "id": 289,
+    "task": "EPM",
+    "question": "Is there natural light in the room?",
+    "response": "A) Yes, there is natural light coming through the windows",
+    "ground_truth": "B"
+  },
+  {
+    "id": 276,
+    "task": "EPM",
+    "question": "What is above the coffee table?",
+    "response": "B) A chandelier",
+    "ground_truth": "B"
+  },
+  {
+    "id": 196,
+    "task": "EPM",
+    "question": "Is the piano keyboard cover open or closed?",
+    "response": "B) The piano keyboard cover is closed.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 287,
+    "task": "EPM",
+    "question": "What is above the piano?",
+    "response": "B) A painting",
+    "ground_truth": "B"
+  },
+  {
+    "id": 461,
+    "task": "HLD",
+    "question": "What is above the wooden table in the living room?",
+    "response": "B) Unable to answer",
+    "ground_truth": "B"
+  },
+  {
+    "id": 442,
+    "task": "HLD",
+    "question": "What is hanging from the oven handle?",
+    "response": "D) Unable to answer",
+    "ground_truth": "D"
+  },
+  {
+    "id": 427,
+    "task": "HLD",
+    "question": "What color is the front door?",
+    "response": "D) White",
+    "ground_truth": "B"
+  },
+  {
+    "id": 463,
+    "task": "HLD",
+    "question": "What color is the front door?",
+    "response": "C) White",
+    "ground_truth": "D"
+  },
+  {
+    "id": 415,
+    "task": "HLD",
+    "question": "What color are the pillows in the kitchen?",
+    "response": "D) Green",
+    "ground_truth": "C"
+  },
+  {
+    "id": 424,
+    "task": "HLD",
+    "question": "Where can I get drinking water in the kitchen?",
+    "response": "B) From the tap in the kitchen",
+    "ground_truth": "C"
+  },
+  {
+    "id": 467,
+    "task": "HLD",
+    "question": "Where can I get drinking water in the kitchen?",
+    "response": "A) From the tap in the kitchen.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 214,
+    "task": "EPM",
+    "question": "What is shown on the painting above the couch?",
+    "response": "C) Abstract art",
+    "ground_truth": "D"
+  },
+  {
+    "id": 469,
+    "task": "HLD",
+    "question": "Where can I warm up?",
+    "response": "C) In the living room",
+    "ground_truth": "B"
+  },
+  {
+    "id": 256,
+    "task": "EPM",
+    "question": "Where can I get recipes for what to cook?",
+    "response": "B) The internet",
+    "ground_truth": "E"
+  },
+  {
+    "id": 242,
+    "task": "EPM",
+    "question": "What is above the wooden table in the living room?",
+    "response": "A) A blue, white, and orange painting",
+    "ground_truth": "A"
+  },
+  {
+    "id": 225,
+    "task": "EPM",
+    "question": "Is the light above the sink turned on?",
+    "response": "B) The light is on.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 283,
+    "task": "EPM",
+    "question": "Is the light above the sink turned on?",
+    "response": "B) The light is on.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 247,
+    "task": "EPM",
+    "question": "What is to the left of the frontdoor?",
+    "response": "A) A living room",
+    "ground_truth": "B"
+  },
+  {
+    "id": 201,
+    "task": "EPM",
+    "question": "What color are the pillows in the kitchen?",
+    "response": "B) Blue",
+    "ground_truth": "B"
+  },
+  {
+    "id": 229,
+    "task": "EPM",
+    "question": "Where can I warm up?",
+    "response": "D) In the kitchen",
+    "ground_truth": "C"
+  },
+  {
+    "id": 465,
+    "task": "HLD",
+    "question": "Where are the brown woven baskets?",
+    "response": "C) (E)Inside the bedroom",
+    "ground_truth": "B"
+  },
+  {
+    "id": 464,
+    "task": "HLD",
+    "question": "What objects are in the black cubby shelf?",
+    "response": "D) Unable to answer",
+    "ground_truth": "D"
+  },
+  {
+    "id": 478,
+    "task": "HLD",
+    "question": "Where is the picture with the red flowers?",
+    "response": "A) Unable to answer",
+    "ground_truth": "A"
+  },
+  {
+    "id": 439,
+    "task": "HLD",
+    "question": "Is the chandelier turned on?",
+    "response": "B) No",
+    "ground_truth": "A"
+  },
+  {
+    "id": 437,
+    "task": "HLD",
+    "question": "What is in between the two bedroom doorways?",
+    "response": "A) Unable to answer",
+    "ground_truth": "A"
+  },
+  {
+    "id": 278,
+    "task": "EPM",
+    "question": "What objects are in the black cubby shelf?",
+    "response": "C) Books",
+    "ground_truth": "C"
+  },
+  {
+    "id": 275,
+    "task": "EPM",
+    "question": "What can be seen outside the bedroom window?",
+    "response": "C) A garden",
+    "ground_truth": "D"
+  },
+  {
+    "id": 249,
+    "task": "EPM",
+    "question": "Where is the picture with the red flowers?",
+    "response": "B) Next to the stairway",
+    "ground_truth": "B"
+  },
+  {
+    "id": 221,
+    "task": "EPM",
+    "question": "Where are the brown woven baskets?",
+    "response": "B) On top of the bookshelf",
+    "ground_truth": "D"
+  },
+  {
+    "id": 213,
+    "task": "EPM",
+    "question": "What color is the chair in the bedroom?",
+    "response": "A) Black",
+    "ground_truth": "A"
+  },
+  {
+    "id": 208,
+    "task": "EPM",
+    "question": "Is the sliding door open or closed?",
+    "response": "B) Open",
+    "ground_truth": "A"
+  },
+  {
+    "id": 248,
+    "task": "EPM",
+    "question": "Is the chandelier turned on?",
+    "response": "A) No",
+    "ground_truth": "B"
+  },
+  {
+    "id": 295,
+    "task": "EPM",
+    "question": "What is in between the two bedroom doorways?",
+    "response": "C) A shelf with books",
+    "ground_truth": "A"
+  },
+  {
+    "id": 450,
+    "task": "HLD",
+    "question": "What room is the orchid in?",
+    "response": "D) The hallway",
+    "ground_truth": "A"
+  },
+  {
+    "id": 459,
+    "task": "HLD",
+    "question": "What color are the window frames?",
+    "response": "A) White",
+    "ground_truth": "B"
+  },
+  {
+    "id": 447,
+    "task": "HLD",
+    "question": "What is the gold object on top of the bureau?",
+    "response": "A) A mirror",
+    "ground_truth": "D"
+  },
+  {
+    "id": 455,
+    "task": "HLD",
+    "question": "What is above the table on the wall you see when exiting the bedroom?",
+    "response": "A) A light",
+    "ground_truth": "B"
+  },
+  {
+    "id": 462,
+    "task": "HLD",
+    "question": "What is the chandelier hanging over?",
+    "response": "A) The closet",
+    "ground_truth": "B"
+  },
+  {
+    "id": 252,
+    "task": "EPM",
+    "question": "Where can I wash my hands on the second story of the house?",
+    "response": "A) The bathroom sink",
+    "ground_truth": "A"
+  },
+  {
+    "id": 220,
+    "task": "EPM",
+    "question": "Is the fireplace lit?",
+    "response": "C) The fireplace is not lit.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 260,
+    "task": "EPM",
+    "question": "What material are the blue pillow's pillowcases made out of?",
+    "response": "B) Velvet",
+    "ground_truth": "B"
+  },
+  {
+    "id": 471,
+    "task": "HLD",
+    "question": "It's too bright in the living room, how can I make it darker?",
+    "response": "C) Close the curtains on the windows.",
+    "ground_truth": "E"
+  },
+  {
+    "id": 417,
+    "task": "HLD",
+    "question": "If I sit in the armchair in the living room, what animal can I touch with my right hand?",
+    "response": "C) A cat",
+    "ground_truth": "B"
+  },
+  {
+    "id": 279,
+    "task": "EPM",
+    "question": "What kind of pants is the man in the mirror wearing?",
+    "response": "A) Jeans",
+    "ground_truth": "A"
+  },
+  {
+    "id": 446,
+    "task": "HLD",
+    "question": "Where is the microwave?",
+    "response": "C) Unable to answer",
+    "ground_truth": "C"
+  },
+  {
+    "id": 246,
+    "task": "EPM",
+    "question": "Where is the pillow with a hexagonal pattern?",
+    "response": "C) On the bed in the first bedroom.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 204,
+    "task": "EPM",
+    "question": "What type of numbers are on the clock?",
+    "response": "C) Roman numerals",
+    "ground_truth": "C"
+  },
+  {
+    "id": 296,
+    "task": "EPM",
+    "question": "Where is the teddy bear?",
+    "response": "A) In the dog bed in the living room.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 253,
+    "task": "EPM",
+    "question": "Where is the wreath?",
+    "response": "D) Hanging on the front door.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 412,
+    "task": "HLD",
+    "question": "Where is the toy car?",
+    "response": "A) Unable to answer",
+    "ground_truth": "A"
+  },
+  {
+    "id": 264,
+    "task": "EPM",
+    "question": "What cartoon character is portrayed in the painting to the right of the television in the first bedroom?",
+    "response": "C) Mickey Mouse",
+    "ground_truth": "D"
+  },
+  {
+    "id": 205,
+    "task": "EPM",
+    "question": "What can I use to clean up a spill on the bathroom counter?",
+    "response": "E) The paper towels",
+    "ground_truth": "C"
+  },
+  {
+    "id": 449,
+    "task": "HLD",
+    "question": "I want to host a dinner party on a summer evening, where should I set the table?",
+    "response": "A) On the table in the living room.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 434,
+    "task": "HLD",
+    "question": "Where is the ceiling fan?",
+    "response": "A) Above the bed in the first bedroom",
+    "ground_truth": "D"
+  },
+  {
+    "id": 456,
+    "task": "HLD",
+    "question": "Is the television turned on or off?",
+    "response": "B) The television is turned off.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 236,
+    "task": "EPM",
+    "question": "What is the grey item on the bed?",
+    "response": "D) A blanket",
+    "ground_truth": "D"
+  },
+  {
+    "id": 432,
+    "task": "HLD",
+    "question": "where can I keep a photo frame?",
+    "response": "D) On the wall next to the front door",
+    "ground_truth": "B"
+  },
+  {
+    "id": 269,
+    "task": "EPM",
+    "question": "is the table in the living room completely clean?",
+    "response": "D) The table is completely clean.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 216,
+    "task": "EPM",
+    "question": "is the fan on or off?",
+    "response": "A) The fan is off.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 288,
+    "task": "EPM",
+    "question": "what color are the numbers written on the wall clock?",
+    "response": "B) Black",
+    "ground_truth": "A"
+  },
+  {
+    "id": 218,
+    "task": "EPM",
+    "question": "how can I clean my hands?",
+    "response": "D) There is a sink in the kitchen.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 277,
+    "task": "EPM",
+    "question": "where is the clock?",
+    "response": "D) in the living room hallway next to the television",
+    "ground_truth": "D"
+  },
+  {
+    "id": 243,
+    "task": "EPM",
+    "question": "what color are the chairs?",
+    "response": "C) Black",
+    "ground_truth": "A"
+  },
+  {
+    "id": 421,
+    "task": "HLD",
+    "question": "how do I go down from the above floor to the below floor?",
+    "response": "A) Unable to answer",
+    "ground_truth": "A"
+  },
+  {
+    "id": 428,
+    "task": "HLD",
+    "question": "is the chair in the above floor pushed in or placed out?",
+    "response": "A) The chair is placed out.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 425,
+    "task": "HLD",
+    "question": "what color is the flower in the bottom floor?",
+    "response": "C) Unable to answer",
+    "ground_truth": "C"
+  },
+  {
+    "id": 271,
+    "task": "EPM",
+    "question": "is the table in the above room infront of the staircase clean ?",
+    "response": "C) The table is clean.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 430,
+    "task": "HLD",
+    "question": "what does the art in the hallway show?",
+    "response": "D) Unable to answer",
+    "ground_truth": "D"
+  },
+  {
+    "id": 259,
+    "task": "EPM",
+    "question": "where can I keep a new ironed shirt?",
+    "response": "D) in the closet with other shirts.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 237,
+    "task": "EPM",
+    "question": "where is artwork?",
+    "response": "A) on the wall on the ground floor",
+    "ground_truth": "C"
+  },
+  {
+    "id": 290,
+    "task": "EPM",
+    "question": "what color are the electric switches in the above floor",
+    "response": "B) White",
+    "ground_truth": "B"
+  },
+  {
+    "id": 282,
+    "task": "EPM",
+    "question": "what is the green thing seen from the window as we walk down the staircase?",
+    "response": "D)",
+    "ground_truth": "D"
+  },
+  {
+    "id": 198,
+    "task": "EPM",
+    "question": "are the electric lamps near the staircase on or off?",
+    "response": "B) The lamps are on.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 206,
+    "task": "EPM",
+    "question": "what is on the wall infront of the staircase",
+    "response": "D) Windows",
+    "ground_truth": "B"
+  },
+  {
+    "id": 481,
+    "task": "HLD",
+    "question": "where is the standing lamp?",
+    "response": "D) In the bathroom, next to the toilet",
+    "ground_truth": "B"
+  },
+  {
+    "id": 416,
+    "task": "HLD",
+    "question": "what is special about the wall in the living room?",
+    "response": "B) There are two doors on the wall.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 422,
+    "task": "HLD",
+    "question": "where can I sit in the living room?",
+    "response": "A) On the chair",
+    "ground_truth": "B"
+  },
+  {
+    "id": 257,
+    "task": "EPM",
+    "question": "what is right next to the chair?",
+    "response": "D) a couch",
+    "ground_truth": "B"
+  },
+  {
+    "id": 231,
+    "task": "EPM",
+    "question": "is the outside door open or closed?",
+    "response": "A) The outside door is closed.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 423,
+    "task": "HLD",
+    "question": "what does the outside weather look like?",
+    "response": "D) Unable to answer",
+    "ground_truth": "D"
+  },
+  {
+    "id": 426,
+    "task": "HLD",
+    "question": "where can I keep the keyboard",
+    "response": "D) on the shelf in the bedroom",
+    "ground_truth": "A"
+  },
+  {
+    "id": 429,
+    "task": "HLD",
+    "question": "is the lamp in the bedroom on or off?",
+    "response": "B) The lamp is off.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 436,
+    "task": "HLD",
+    "question": "is the brown dresser in the bedroom empty?",
+    "response": "B) The brown dresser is empty.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 448,
+    "task": "HLD",
+    "question": "what room is the white table lamp in?",
+    "response": "D) Unable to answer",
+    "ground_truth": "D"
+  },
+  {
+    "id": 466,
+    "task": "HLD",
+    "question": "where can I keep a flower vase in the bedroom?",
+    "response": "A) on the windowsill",
+    "ground_truth": "C"
+  },
+  {
+    "id": 217,
+    "task": "EPM",
+    "question": "are the blinds in the workroom shut or not?",
+    "response": "B) The blinds are shut.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 232,
+    "task": "EPM",
+    "question": "where is the black chair?",
+    "response": "A) In front of the monitor in the work room",
+    "ground_truth": "A"
+  },
+  {
+    "id": 207,
+    "task": "EPM",
+    "question": "what color is the tripod?",
+    "response": "B) Black",
+    "ground_truth": "B"
+  },
+  {
+    "id": 250,
+    "task": "EPM",
+    "question": "what is behind the monitor screen?",
+    "response": "C) Window",
+    "ground_truth": "C"
+  },
+  {
+    "id": 460,
+    "task": "HLD",
+    "question": "what is between the lamp and the side table in the bedroom?",
+    "response": "C) nothing",
+    "ground_truth": "B"
+  },
+  {
+    "id": 294,
+    "task": "EPM",
+    "question": "what is infront of the blackboard on the wall?",
+    "response": "D) a small kids table and chair set",
+    "ground_truth": "D"
+  },
+  {
+    "id": 212,
+    "task": "EPM",
+    "question": "what shape are the decorations above the bed?",
+    "response": "B) Triangle",
+    "ground_truth": "B"
+  },
+  {
+    "id": 506,
+    "task": "ASI",
+    "question": "What does the person do before add ham",
+    "response": "A) add kimchi",
+    "ground_truth": "B"
+  },
+  {
+    "id": 514,
+    "task": "ASI",
+    "question": "What does the person do after dip bread in mixture",
+    "response": "A) put bread in pan",
+    "ground_truth": "A"
+  },
+  {
+    "id": 507,
+    "task": "ASI",
+    "question": "What does the person do after remove bread from pan",
+    "response": "B) top toast",
+    "ground_truth": "B"
+  },
+  {
+    "id": 508,
+    "task": "ASI",
+    "question": "What does the person do before flip steak",
+    "response": "A) taste steak",
+    "ground_truth": "B"
+  },
+  {
+    "id": 512,
+    "task": "ASI",
+    "question": "What does the person do before cut lemon",
+    "response": "A) pour water",
+    "ground_truth": "A"
+  },
+  {
+    "id": 513,
+    "task": "ASI",
+    "question": "What does the person do before add ham",
+    "response": "C) add rice",
+    "ground_truth": "B"
+  },
+  {
+    "id": 505,
+    "task": "ASI",
+    "question": "What does the person do after add spices",
+    "response": "C) add sugar",
+    "ground_truth": "B"
+  },
+  {
+    "id": 499,
+    "task": "ASI",
+    "question": "What does the person do before add taco",
+    "response": "B) stir",
+    "ground_truth": "B"
+  },
+  {
+    "id": 511,
+    "task": "ASI",
+    "question": "What does the person do after tight wheel",
+    "response": "A) jack up",
+    "ground_truth": "D"
+  },
+  {
+    "id": 515,
+    "task": "ASI",
+    "question": "What does the person do before put wheel",
+    "response": "D) jack down",
+    "ground_truth": "C"
+  },
+  {
+    "id": 516,
+    "task": "ASI",
+    "question": "What does the person do after flip bread",
+    "response": "C) dip bread in mixture",
+    "ground_truth": "D"
+  },
+  {
+    "id": 510,
+    "task": "ASI",
+    "question": "What does the person do before add meat",
+    "response": "C) stir",
+    "ground_truth": "B"
+  },
+  {
+    "id": 498,
+    "task": "ASI",
+    "question": "What does the person do after add spices",
+    "response": "C) pour water",
+    "ground_truth": "A"
+  },
+  {
+    "id": 517,
+    "task": "ASI",
+    "question": "What does the person do after flip bread",
+    "response": "C) top toast",
+    "ground_truth": "C"
+  },
+  {
+    "id": 502,
+    "task": "ASI",
+    "question": "What does the person do before pour jello powder",
+    "response": "B) pour alcohol",
+    "ground_truth": "C"
+  },
+  {
+    "id": 509,
+    "task": "ASI",
+    "question": "What does the person do after flip steak",
+    "response": "C) season steak",
+    "ground_truth": "B"
+  },
+  {
+    "id": 500,
+    "task": "ASI",
+    "question": "What does the person do before add sugar",
+    "response": "A) pack cucumbers in jar",
+    "ground_truth": "B"
+  },
+  {
+    "id": 501,
+    "task": "ASI",
+    "question": "What does the person do after put bread in pan",
+    "response": "C) dip bread in mixture",
+    "ground_truth": "B"
+  },
+  {
+    "id": 503,
+    "task": "ASI",
+    "question": "What does the person do after wipe off dipstick",
+    "response": "C) insert dipstick",
+    "ground_truth": "C"
+  },
+  {
+    "id": 504,
+    "task": "ASI",
+    "question": "What does the person do after put wheel",
+    "response": "C) withdraw wheel",
+    "ground_truth": "B"
+  },
+  {
+    "id": 529,
+    "task": "ASI",
+    "question": "What does the person do before cover empty places on leaf",
+    "response": "D) spread leafs on pan",
+    "ground_truth": "D"
+  },
+  {
+    "id": 518,
+    "task": "ASI",
+    "question": "What does the person do after attach pebble piece",
+    "response": "B) merge them",
+    "ground_truth": "C"
+  },
+  {
+    "id": 531,
+    "task": "ASI",
+    "question": "What does the person do before add more wood chips if required",
+    "response": "A) check the filling status of charcoal",
+    "ground_truth": "A"
+  },
+  {
+    "id": 530,
+    "task": "ASI",
+    "question": "What does the person do before put light underneath",
+    "response": "A) get plastic glass table",
+    "ground_truth": "A"
+  },
+  {
+    "id": 536,
+    "task": "ASI",
+    "question": "What does the person do before another clay",
+    "response": "D) remove outer layer of clay",
+    "ground_truth": "A"
+  },
+  {
+    "id": 521,
+    "task": "ASI",
+    "question": "What does the person do before add chopped cease",
+    "response": "A) mix all well",
+    "ground_truth": "D"
+  },
+  {
+    "id": 537,
+    "task": "ASI",
+    "question": "What does the person do after put together flowers and grass",
+    "response": "C) paint the flowers with different colors",
+    "ground_truth": "A"
+  },
+  {
+    "id": 522,
+    "task": "ASI",
+    "question": "What does the person do before flash the garment",
+    "response": "B) cure it",
+    "ground_truth": "D"
+  },
+  {
+    "id": 534,
+    "task": "ASI",
+    "question": "What does the person do after remove air out of system",
+    "response": "C) fill in the refrigerant",
+    "ground_truth": "C"
+  },
+  {
+    "id": 532,
+    "task": "ASI",
+    "question": "What does the person do before fourteen desert are there",
+    "response": "A) snow look so good",
+    "ground_truth": "A"
+  },
+  {
+    "id": 524,
+    "task": "ASI",
+    "question": "What does the person do before add corn starch into mixture",
+    "response": "A) add borax solution into bowl",
+    "ground_truth": "C"
+  },
+  {
+    "id": 519,
+    "task": "ASI",
+    "question": "What does the person do after put wire under",
+    "response": "D) use blade",
+    "ground_truth": "C"
+  },
+  {
+    "id": 527,
+    "task": "ASI",
+    "question": "What does the person do before empty the container",
+    "response": "C) lift the top off",
+    "ground_truth": "C"
+  },
+  {
+    "id": 523,
+    "task": "ASI",
+    "question": "What does the person do before put ices in the jar",
+    "response": "D) pin plastic cover inside the cone",
+    "ground_truth": "D"
+  },
+  {
+    "id": 528,
+    "task": "ASI",
+    "question": "What does the person do before add garlic",
+    "response": "A) sautee the onion",
+    "ground_truth": "A"
+  },
+  {
+    "id": 525,
+    "task": "ASI",
+    "question": "What does the person do before add carrot on pan",
+    "response": "B) add tomato and needed herbs",
+    "ground_truth": "C"
+  },
+  {
+    "id": 535,
+    "task": "ASI",
+    "question": "What does the person do after place on baking sheet",
+    "response": "D) mix it",
+    "ground_truth": "B"
+  },
+  {
+    "id": 533,
+    "task": "ASI",
+    "question": "What does the person do before put logs crisscross on top",
+    "response": "D) put tinder bundle on them",
+    "ground_truth": "B"
+  },
+  {
+    "id": 520,
+    "task": "ASI",
+    "question": "What does the person do after put floral tape",
+    "response": "C) wrap the bouquet",
+    "ground_truth": "C"
+  },
+  {
+    "id": 526,
+    "task": "ASI",
+    "question": "What does the person do before put three inch elastic on side",
+    "response": "A) put stich on back ward direction",
+    "ground_truth": "B"
+  },
+  {
+    "id": 613,
+    "task": "ASI",
+    "question": "What did the person do to the refrigerator before drinking from the cup/glass/bottle?",
+    "response": "A) Opened.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 617,
+    "task": "ASI",
+    "question": "What did the person do to the window before washing the dish?",
+    "response": "D) Closed.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 589,
+    "task": "ASI",
+    "question": "Which object did the person close before they put down the clothes?",
+    "response": "B) The closet/cabinet.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 621,
+    "task": "ASI",
+    "question": "Which object did the person take before they put down the book?",
+    "response": "D) The clothes.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 596,
+    "task": "ASI",
+    "question": "What happened before the person ate the sandwich?",
+    "response": "A) Put down the dish.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 592,
+    "task": "ASI",
+    "question": "What happened before the person ate the medicine?",
+    "response": "B) Lied on the bed.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 601,
+    "task": "ASI",
+    "question": "What happened before the person took the bag?",
+    "response": "C) Put down the phone/camera.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 600,
+    "task": "ASI",
+    "question": "What happened before the person took the blanket?",
+    "response": "D) Sat on the sofa/couch.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 620,
+    "task": "ASI",
+    "question": "What happened before the person took the phone/camera?",
+    "response": "B) Took the clothes.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 607,
+    "task": "ASI",
+    "question": "What did the person do to the towel before opening the door?",
+    "response": "B) Took.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 626,
+    "task": "ASI",
+    "question": "What happened before the person took the cup/glass/bottle?",
+    "response": "C) Lied on the sofa/couch.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 614,
+    "task": "ASI",
+    "question": "What happened before the person sat on the sofa/couch?",
+    "response": "A) Threw the food.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 593,
+    "task": "ASI",
+    "question": "Which object did the person put down before they held the phone/camera?",
+    "response": "B) The shoe.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 619,
+    "task": "ASI",
+    "question": "What did the person do to the box before sitting on the sofa/couch?",
+    "response": "D) Opened.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 628,
+    "task": "ASI",
+    "question": "Which object did the person throw before they held the phone/camera?",
+    "response": "A) The clothes.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 623,
+    "task": "ASI",
+    "question": "Which object did the person sit at before they opened the door?",
+    "response": "A) The laptop.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 618,
+    "task": "ASI",
+    "question": "Which object did the person put down before they held the pillow?",
+    "response": "B) The clothes.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 599,
+    "task": "ASI",
+    "question": "Which object did the person close before they took the cup/glass/bottle?",
+    "response": "B) The refrigerator.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 608,
+    "task": "ASI",
+    "question": "Which object did the person take before they drank from the cup/glass/bottle?",
+    "response": "B) The sandwich.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 627,
+    "task": "ASI",
+    "question": "Which object did the person close before they drank from the cup/glass/bottle?",
+    "response": "A) The book.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 595,
+    "task": "ASI",
+    "question": "What did the person do to the towel before closing the door?",
+    "response": "D) Took.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 616,
+    "task": "ASI",
+    "question": "Which object did the person put down before they drank from the cup/glass/bottle?",
+    "response": "C) The box.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 609,
+    "task": "ASI",
+    "question": "What happened before the person closed the refrigerator?",
+    "response": "A) Put down the food.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 606,
+    "task": "ASI",
+    "question": "What did the person do to the towel before opening the door?",
+    "response": "C) Took.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 604,
+    "task": "ASI",
+    "question": "What did the person do to the broom before taking the box?",
+    "response": "B) Put down.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 598,
+    "task": "ASI",
+    "question": "What did the person do to the bag before drinking from the cup/glass/bottle?",
+    "response": "C) Opened.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 597,
+    "task": "ASI",
+    "question": "Which object did the person sit on before they took the blanket?",
+    "response": "C) The sofa/couch.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 588,
+    "task": "ASI",
+    "question": "What did the person do to the book before opening the door?",
+    "response": "C) Put down.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 612,
+    "task": "ASI",
+    "question": "Which object did the person sit on before they came to the door?",
+    "response": "C) The sofa/couch.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 594,
+    "task": "ASI",
+    "question": "What happened before the person took the pot?",
+    "response": "A) Closed the refrigerator.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 625,
+    "task": "ASI",
+    "question": "What happened before the person closed the closet/cabinet?",
+    "response": "A) Put down the food.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 630,
+    "task": "ASI",
+    "question": "What happened before the person put on the clothes?",
+    "response": "A) Opened the bag.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 610,
+    "task": "ASI",
+    "question": "What happened before the person held the mirror?",
+    "response": "B) Put down the shoe.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 590,
+    "task": "ASI",
+    "question": "What happened before the person put down the clothes?",
+    "response": "C) Took the blanket.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 591,
+    "task": "ASI",
+    "question": "Which object did the person eat before they threw the clothes?",
+    "response": "A) The sandwich.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 615,
+    "task": "ASI",
+    "question": "Which object did the person put down before they sat on the sofa/couch?",
+    "response": "D) The food.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 603,
+    "task": "ASI",
+    "question": "Which object did the person open before they held the food?",
+    "response": "D) The closet/cabinet.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 602,
+    "task": "ASI",
+    "question": "Which object did the person put down before they sat at the table?",
+    "response": "B) The phone/camera.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 629,
+    "task": "ASI",
+    "question": "What did the person do to the shoe before sitting at the table?",
+    "response": "D) Took.",
+    "ground_truth": "A"
+  },
+  {
+    "id": 611,
+    "task": "ASI",
+    "question": "What happened before the person held the dish?",
+    "response": "B) Opened the box.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 624,
+    "task": "ASI",
+    "question": "What did the person do to the pillow before watching outside the window?",
+    "response": "D) Took.",
+    "ground_truth": "D"
+  },
+  {
+    "id": 605,
+    "task": "ASI",
+    "question": "Which object did the person close before they held the phone/camera?",
+    "response": "C) The closet/cabinet.",
+    "ground_truth": "C"
+  },
+  {
+    "id": 622,
+    "task": "ASI",
+    "question": "What happened before the person held the food?",
+    "response": "B) Opened the bag.",
+    "ground_truth": "B"
+  },
+  {
+    "id": 583,
+    "task": "ASI",
+    "question": "What does the person do before add a little bit salt and black pepper to the pot",
+    "response": "A) add garlic paste to the pot",
+    "ground_truth": "D"
+  },
+  {
+    "id": 564,
+    "task": "ASI",
+    "question": "What does the person do before heat some ghee in a pan",
+    "response": "A) add cumin seeds green cardamom cinnamon sticks to a blender",
+    "ground_truth": "A"
+  },
+  {
+    "id": 546,
+    "task": "ASI",
+    "question": "What does the person do before cut the onion into slices",
+    "response": "A) mix paprika and pepper with the meat",
+    "ground_truth": "A"
+  },
+  {
+    "id": 577,
+    "task": "ASI",
+    "question": "What does the person do after when the edge turns brown flip the pancakes",
+    "response": "C) pour batter onto the pan",
+    "ground_truth": "B"
+  },
+  {
+    "id": 574,
+    "task": "ASI",
+    "question": "What does the person do before cut some chicken breast into pieces",
+    "response": "A) chop some red onions red pepper and green pepper into square pieces",
+    "ground_truth": "A"
+  },
+  {
+    "id": 569,
+    "task": "ASI",
+    "question": "What does the person do before roughly chop garlic and peppers and add them to the bowl",
+    "response": "B) pour olive oil on shrimp",
+    "ground_truth": "B"
+  },
+  {
+    "id": 575,
+    "task": "ASI",
+    "question": "What does the person do after mix fried onions with the rice",
+    "response": "D) add oil ginger and garlic to a pot",
+    "ground_truth": "C"
+  },
+  {
+    "id": 543,
+    "task": "ASI",
+    "question": "What does the person do after add the mashed chick peas and the whole chick peas to the pan and stir",
+    "response": "C) add grated onion to the pan and stir",
+    "ground_truth": "A"
+  },
+  {
+    "id": 562,
+    "task": "ASI",
+    "question": "What does the person do before cover the pork in plastic wrap and pound",
+    "response": "A) cut the pork into slices",
+    "ground_truth": "A"
+  },
+  {
+    "id": 540,
+    "task": "ASI",
+    "question": "What does the person do before mash the boiled potatos with butter salt and pepper",
+    "response": "D) transfer the meat mixutre to a dish",
+    "ground_truth": "A"
+  },
+  {
+    "id": 549,
+    "task": "ASI",
+    "question": "What does the person do before add a little black pepper",
+    "response": "C) take out mint from peas and add butter and salt then mash",
+    "ground_truth": "D"
+  },
+  {
+    "id": 541,
+    "task": "ASI",
+    "question": "What does the person do after add chicken salt coriander leaves and garam masala powder and mix well",
+    "response": "B) add grated onion and cook until the onion turns brown",
+    "ground_truth": "C"
+  },
+  {
+    "id": 565,
+    "task": "ASI",
+    "question": "What does the person do before place the strained rice on a plate",
+    "response": "B) cover the pot with a lid",
+    "ground_truth": "D"
+  },
+  {
+    "id": 576,
+    "task": "ASI",
+    "question": "What does the person do before drain the pasta",
+    "response": "D) pour in the vodka and tomato sauce",
+    "ground_truth": "D"
+  },
+  {
+    "id": 580,
+    "task": "ASI",
+    "question": "What does the person do after now add the rolls into the hot oil and cook for 6- 8minutes until they are light golden brown",
+    "response": "C) once the rolls turn brown remove and place them on a plate with paper",
+    "ground_truth": "C"
+  },
+  {
+    "id": 560,
+    "task": "ASI",
+    "question": "What does the person do before mix together an egg butter and butter milk",
+    "response": "B) mix together flour baking powder baking soda salt and sugar",
+    "ground_truth": "B"
+  },
+  {
+    "id": 548,
+    "task": "ASI",
+    "question": "What does the person do before cut the beef into thin long slices",
+    "response": "B) add pepper to the marinade mixture",
+    "ground_truth": "D"
+  },
+  {
+    "id": 563,
+    "task": "ASI",
+    "question": "What does the person do after boil the wrapped pierogies in boiling salted water",
+    "response": "A) fry the boiled pierogies with a little oil in a pan and",
+    "ground_truth": "A"
+  },
+  {
+    "id": 568,
+    "task": "ASI",
+    "question": "What does the person do after add milk to the onions and stir",
+    "response": "A) add salt pepper and flour to the onions",
+    "ground_truth": "C"
+  },
+  {
+    "id": 587,
+    "task": "ASI",
+    "question": "What does the person do before place the fillings on one end of the rice paper and roll",
+    "response": "B) wipe the rice paper with a damp cloth",
+    "ground_truth": "B"
+  },
+  {
+    "id": 578,
+    "task": "ASI",
+    "question": "What does the person do after mix in sour cream",
+    "response": "D) stir in half and half garlic powder salt pepper and paprika",
+    "ground_truth": "A"
+  },
+  {
+    "id": 567,
+    "task": "ASI",
+    "question": "What does the person do before add some salt and ground pepper and process",
+    "response": "A) add the yogurt lemon juice worcestershire sauce tabasco the may",
+    "ground_truth": "A"
+  },
+  {
+    "id": 542,
+    "task": "ASI",
+    "question": "What does the person do after add some water to the vegetables and add stock cube and black pepper",
+    "response": "C) fry some sausage on a pan",
+    "ground_truth": "A"
+  },
+  {
+    "id": 539,
+    "task": "ASI",
+    "question": "What does the person do before make 8 meat balls out of the mixture prepared",
+    "response": "C) add 3/4 pound of ground beef and mix well to incorporate",
+    "ground_truth": "C"
+  },
+  {
+    "id": 566,
+    "task": "ASI",
+    "question": "What does the person do before prepare some water in a large bowl and add some rock salt",
+    "response": "D) cut a cabbage into quarters and remove the stem",
+    "ground_truth": "D"
+  },
+  {
+    "id": 545,
+    "task": "ASI",
+    "question": "What does the person do before add tomato puree and cook until it starts to lose oil",
+    "response": "D) add onion and cook until golden brown",
+    "ground_truth": "D"
+  },
+  {
+    "id": 552,
+    "task": "ASI",
+    "question": "What does the person do after pour the sauce in the pan and add the lentil and red kidney beans to the pot and mix them well",
+    "response": "A) heat a pan add butter oil cumin seeds coriander seeds and",
+    "ground_truth": "D"
+  },
+  {
+    "id": 579,
+    "task": "ASI",
+    "question": "What does the person do before add ground beef an egg ketchup and milk to a bowl",
+    "response": "B) add mustard and worcestershire sauce and stir",
+    "ground_truth": "B"
+  },
+  {
+    "id": 561,
+    "task": "ASI",
+    "question": "What does the person do after add in the flour and mix and form the dough",
+    "response": "B) mix flour sugar salt olive oil and the yeast mixture",
+    "ground_truth": "A"
+  },
+  {
+    "id": 551,
+    "task": "ASI",
+    "question": "What does the person do after transfer the meat to a bowl top with a layer of mashed potatoes and grate some cheese",
+    "response": "A) heat oil in a pan add the lamb and season it with salt and",
+    "ground_truth": "C"
+  },
+  {
+    "id": 550,
+    "task": "ASI",
+    "question": "What does the person do after cut into two halves and roll one half into a cone",
+    "response": "B) add stuffing to cone and use some water to seal the top edges",
+    "ground_truth": "B"
+  },
+  {
+    "id": 582,
+    "task": "ASI",
+    "question": "What does the person do after add bean sprouts to the pan and stir",
+    "response": "A) add bean sprouts to the pan and stir",
+    "ground_truth": "C"
+  },
+  {
+    "id": 553,
+    "task": "ASI",
+    "question": "What does the person do after cover it with another piece of tortilla",
+    "response": "D) pour the mixture on it and top with shredded cheese",
+    "ground_truth": "C"
+  },
+  {
+    "id": 585,
+    "task": "ASI",
+    "question": "What does the person do after add the tuna mix on top and season with some sesame seeds",
+    "response": "D) spread some cooked rice on seaweed sushi wrapper",
+    "ground_truth": "B"
+  },
+  {
+    "id": 586,
+    "task": "ASI",
+    "question": "What does the person do before divide the dough into smaller balls",
+    "response": "B) mash the potatoes with butter and cheese",
+    "ground_truth": "B"
+  },
+  {
+    "id": 558,
+    "task": "ASI",
+    "question": "What does the person do before mix sea salt pepper and spices",
+    "response": "C) wipe the foie gras",
+    "ground_truth": "C"
+  },
+  {
+    "id": 570,
+    "task": "ASI",
+    "question": "What does the person do after add garlic ginger brown sugar and chopped onion and mix it well",
+    "response": "A) put the pork in a large bowl and add chili paste",
+    "ground_truth": "C"
+  },
+  {
+    "id": 559,
+    "task": "ASI",
+    "question": "What does the person do after coat the meat in the flour eggs and bread crumbs",
+    "response": "B) chop up the red onion and add it to the bowl",
+    "ground_truth": "A"
+  },
+  {
+    "id": 556,
+    "task": "ASI",
+    "question": "What does the person do before cut the potato into wedges",
+    "response": "B) pour beer into the flour mixture and stir",
+    "ground_truth": "B"
+  },
+  {
+    "id": 544,
+    "task": "ASI",
+    "question": "What does the person do before pour water into the bowl while mixing",
+    "response": "B) add flour oil and salt in a bowl and mix",
+    "ground_truth": "B"
+  },
+  {
+    "id": 572,
+    "task": "ASI",
+    "question": "What does the person do before saute minced garlic until translucent",
+    "response": "A) drain and rinse cannellini beans and set aside",
+    "ground_truth": "A"
+  },
+  {
+    "id": 571,
+    "task": "ASI",
+    "question": "What does the person do before spread some mayo between two buns",
+    "response": "B) cook the marinated beef in a pan",
+    "ground_truth": "B"
+  },
+  {
+    "id": 538,
+    "task": "ASI",
+    "question": "What does the person do after cover up and cook for 6 to 8 minutes",
+    "response": "C) add more garam masala powder",
+    "ground_truth": "C"
+  },
+  {
+    "id": 547,
+    "task": "ASI",
+    "question": "What does the person do after add ground black pepper to the wok",
+    "response": "C) add fish balls to the wok and stir",
+    "ground_truth": "B"
+  },
+  {
+    "id": 554,
+    "task": "ASI",
+    "question": "What does the person do before add paneer cashews walnuts tomatoes and little yogurt and mix it evenly",
+    "response": "D) cover it with lid and let it cook until the veggies are the done",
+    "ground_truth": "D"
+  },
+  {
+    "id": 581,
+    "task": "ASI",
+    "question": "What does the person do after add corn starch",
+    "response": "D) add soy sauce corn starch and sesame oil and mix",
+    "ground_truth": "B"
+  },
+  {
+    "id": 557,
+    "task": "ASI",
+    "question": "What does the person do after add the noodles and stir",
+    "response": "B) add the carrots green onion and chicken to the wok",
+    "ground_truth": "C"
+  },
+  {
+    "id": 573,
+    "task": "ASI",
+    "question": "What does the person do after pour the meat into an oven safe container",
+    "response": "C) add salt black pepper and italian seasoning to the meat",
+    "ground_truth": "A"
+  },
+  {
+    "id": 555,
+    "task": "ASI",
+    "question": "What does the person do before add noodles and vegetable broth and stir",
+    "response": "B) add a pinch of salt and vinegar and stir",
+    "ground_truth": "B"
+  },
+  {
+    "id": 584,
+    "task": "ASI",
+    "question": "What does the person do before take the shrimp and cut it into two halves",
+    "response": "C) mix 2 tbsp of chili garlic sauce with the hoisin and keep",
+    "ground_truth": "C"
+  }
+]
