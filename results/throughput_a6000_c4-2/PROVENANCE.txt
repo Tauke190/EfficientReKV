@@ -1,0 +1,11 @@
+job=361947  host=c4-2  gpu=NVIDIA RTX A6000  model=llava_ov_7b  frames=400  sample_fps=2  videos=0,1,2
+All seven arms (baseline, rlt 0.25/0.5/0.6/0.7/0.8/0.9) measured back-to-back on ONE GPU.
+This is the directory to quote a speedup curve from: numerator and denominator share hardware.
+
+Submitted as a baseline-only tie-point; --export=ALL,THRESHOLDS="" set an empty value and
+the script's ${THRESHOLDS:-default} substitutes on empty as well as unset, so the full
+sweep re-ran. The accident is what made this directory the self-consistent one.
+
+Measured against the c2-2 arms in results/throughput/, c4-2 runs ~5% faster:
+    baseline 7.68 -> 8.06 (+4.9%)   rlt0.25 12.45 -> 13.05 (+4.8%)   rlt0.5 22.14 -> 23.79 (+7.5%)
+which is why the mixed table (c2-2 baseline vs c4-2 high arms) overstated the ratios.

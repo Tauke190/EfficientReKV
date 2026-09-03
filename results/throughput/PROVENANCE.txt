@@ -1,0 +1,3 @@
+2026-08-30T15:46 job=360659 host=c2-2 gpu=<ampere 48G, not recorded at run time> models=llava_ov_0.5b,llava_ov_7b thresholds=0.25,0.5 frames=400  # reconstructed from sacct, see measure_throughput.slurm
+2026-09-02T16:51:16-04:00 job=361943 host=andy(c1-7) gpu=NVIDIA TITAN Xp  # CANCELLED before any encode -- 12 GB Pascal, cannot hold the 7b. WROTE NO CSVs. Kept as the record of why -C "ampere&gmem32" is required.
+2026-09-02T17:01:16-04:00 job=361944 host=c4-2 gpu=NVIDIA RTX A6000 models=llava_ov_7b thresholds=0.25 0.5 0.6 0.7 0.8 0.9 frames=400

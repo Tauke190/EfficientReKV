@@ -1,4 +1,5 @@
 import os
+import sys
 import argparse
 import subprocess
 import multiprocessing
@@ -420,6 +421,92 @@ def eval_ovobench(args, mode):
     score(args, f"python video_qa/eval/eval_ovobench.py --save_dir {save_dir}")
 
 
+def eval_streamingbench(args, subset):
+    """StreamingBench, one subset at a time (real / omni / context / sqa).
+
+    Same streaming contract as OVO-Bench -- a query at `time_stamp` t sees only frames in
+    [0, t] -- so it runs on the same incremental solver, subclassed only for Sequential
+    QA's carried conversation history (video_qa/rekv_streamingbench_vqa.py). Run
+    video_qa/convert_streamingbench.py first to produce the annotation file, which in turn
+    needs scripts/setup_streamingbench.py to have unpacked the videos.
+
+    Proactive Output is not wired up: it is scored on *when* the model speaks against a
+    ground-truth timestamp, not on a letter, and needs its own solver and metric.
+
+    `--blind` swaps in video_qa/blind_vqa.py, which answers every query with no video at
+    all -- the floor any real score has to be read against, since StreamingBench's options
+    are written by the same annotators who wrote the questions. It works here unchanged
+    because that solver reads `gt_index`, which convert_streamingbench.py decides at
+    conversion time. Not offered for `sqa`: blind_vqa has no --sqa_context, so a blind SQA
+    run would be answering a different question set than the sighted one it is supposed to
+    be the control for. eval_streamingbench.py scores a blind CSV normally -- n_frames_seen
+    is 0, which satisfies the no-leak invariant rather than bypassing it.
+    """
+    num_chunks = args.num_chunks
+    # Same '-blind' convention as odvbench/ovobench: the control lives in its own directory
+    # so it can never overwrite the sighted run it exists to be compared against, and the
+    # pairing stays a plain suffix (64-1.0 <-> 64-1.0-blind) rather than a lookup.
+    blind_tag = "-blind" if args.blind else ""
+    save_dir = f"results/{args.model}/streamingbench_{subset}/{args.retrieve_size}-{args.sample_fps}{reduction_tag(args)}{blind_tag}"
+    solver = "blind_vqa" if args.blind else "rekv_streamingbench_vqa"
+    anno_path = f"data/StreamingBench/{subset}.json"
+    # SQA's five questions are one conversation: the reference runner prepends the earlier
+    # questions and their gold answers. Default it on for that subset alone -- running SQA
+    # without it measures a harder, different task -- and let --no_sqa_context say so
+    # explicitly rather than by omission.
+    # `and not args.blind`: blind_vqa does not register --sqa_context, so passing it
+    # would abort the worker on an unrecognised flag. Unreachable while sqa is kept out
+    # of BLIND_DATASETS, but the two guards are in different files -- this one keeps the
+    # command construction correct on its own.
+    sqa_context = (subset == 'sqa') and not args.no_sqa_context and not args.blind
+    if not args.only_eval:
+        # QA
+        processes = []
+        for idx in range(0, num_chunks):
+            cmd = ["python", f"video_qa/{solver}.py",
+                    "--model", args.model,
+                    "--sample_fps", str(args.sample_fps),
+                    "--n_local", str(args.n_local),
+                    "--retrieve_size", str(args.retrieve_size),
+                    "--save_dir", save_dir,
+                    "--anno_path", anno_path,
+                    "--debug", args.debug,
+                    "--num_chunks", str(num_chunks),
+                    "--chunk_idx", str(idx)] + (["--sqa_context"] if sqa_context else []) \
+                    + reduction_args(args) + stream_args(args)
+            p = multiprocessing.Process(target=exec, args=(cmd, True, f'{4*idx},{4*idx+1},{4*idx+2},,{4*idx+3}' if args.model=='llava_ov_72b' else str(idx)))  # llava_ov_72b needs 4x 80GB GPUs
+            processes.append(p)
+            p.start()
+        for p in processes:
+            p.join()
+        # merge results
+        exec(f"> {save_dir}/results.csv")
+        for idx in range(num_chunks):
+            if idx == 0:
+                exec(f"head -n 1 {save_dir}/{num_chunks}_{idx}.csv > {save_dir}/results.csv")
+            exec(f"tail -n +2 {save_dir}/{num_chunks}_{idx}.csv >> {save_dir}/results.csv")
+            exec(f"rm {save_dir}/{num_chunks}_{idx}.csv")
+    # eval: StreamingBench's headline is a micro-average over questions, OVO-Bench's is an
+    # unweighted mean of per-task accuracies, so they cannot share a scorer.
+    score(args, f"python video_qa/eval/eval_streamingbench.py --save_dir {save_dir}")
+
+
+def eval_streamingbench_real(args):
+    eval_streamingbench(args, 'real')
+
+
+def eval_streamingbench_omni(args):
+    eval_streamingbench(args, 'omni')
+
+
+def eval_streamingbench_context(args):
+    eval_streamingbench(args, 'context')
+
+
+def eval_streamingbench_sqa(args):
+    eval_streamingbench(args, 'sqa')
+
+
 def eval_ovobench_realtime(args):
     eval_ovobench(args, 'realtime')
 
@@ -606,10 +693,149 @@ def eval_odvbench(args):
     score(args, f"python video_qa/eval/eval_odvbench.py --save_dir {save_dir}")
 
 
+def eval_ovbench(args):
+    """OVBench -- online video understanding, questioned mid-stream.
+
+    Streaming, like ovobench and odvbench: each question carries a
+    `middle_frame_timestamp` and may only be answered from frames up to it, so the video
+    is ingested incrementally and questioned in between. It shares OVO-Bench's solver
+    outright (video_qa/rekv_ovobench_vqa.py) -- that file's contract is
+    end_time/gt_index/question_id/choices and nothing OVO-specific, which
+    video_qa/convert_ovbench.py emits directly.
+
+    The time limit is the benchmark. 2797 of the 7090 questions -- all of Past Memory and
+    Future Prediction -- ask about something that is not on screen at the timestamp, so an
+    offline pass answers Future Prediction from the very frames it is meant to predict.
+    eval_ovbench.py refuses to score a CSV that shows any sign of it.
+
+    Two call-site consequences. This is the largest streaming set here by far: 1463 videos
+    and 78 hours of ingestion at 1 fps, against odvbench's 6348 questions over short
+    clips, so budget accordingly and use --num_chunks. And the sources are heterogeneous
+    in a way the others are not -- the three container sources are full-length videos
+    where a timestamp can sit 1000 s in (AVA_RAW), while the seven transcoded sources are
+    tens of seconds long. sample_fps therefore trades very differently across them; 1 fps
+    matches the OVO-Bench and StreamingBench runs and is the value to keep for
+    comparability.
+
+    `--blind` swaps in video_qa/blind_vqa.py, which answers every question with no video
+    at all. Worth running once before trusting any number here: 1774 questions are binary
+    and they concentrate in Temporal Hallucination Verification, so the language-prior
+    floor is high and very uneven across sub-tasks (~31.3% pooled chance, but far higher
+    for that group).
+
+    Run scripts/prepare_ovbench.sh first to unpack the videos and write the annotation.
+    """
+    num_chunks = args.num_chunks
+    # The '-blind' suffix keeps the control in its own directory, so it can never
+    # overwrite the sighted run it exists to be compared against.
+    blind_tag = "-blind" if args.blind else ""
+    save_dir = f"results/{args.model}/ovbench/{args.retrieve_size}-{args.sample_fps}{reduction_tag(args)}{blind_tag}"
+    solver = "blind_vqa" if args.blind else "rekv_ovobench_vqa"
+    anno_path = args.anno_path or "data/OVBench/full_mc.json"
+    if not args.only_eval:
+        # QA
+        processes = []
+        for idx in range(0, num_chunks):
+            cmd = ["python", f"video_qa/{solver}.py",
+                    "--model", args.model,
+                    "--sample_fps", str(args.sample_fps),
+                    "--n_local", str(args.n_local),
+                    "--retrieve_size", str(args.retrieve_size),
+                    "--save_dir", save_dir,
+                    "--anno_path", anno_path,
+                    "--debug", args.debug,
+                    "--num_chunks", str(num_chunks),
+                    "--chunk_idx", str(idx)] + reduction_args(args) + stream_args(args)
+            p = multiprocessing.Process(target=exec, args=(cmd, True, f'{4*idx},{4*idx+1},{4*idx+2},,{4*idx+3}' if args.model=='llava_ov_72b' else str(idx)))  # llava_ov_72b needs 4x 80GB GPUs
+            processes.append(p)
+            p.start()
+        for p in processes:
+            p.join()
+        # merge results
+        exec(f"> {save_dir}/results.csv")
+        for idx in range(num_chunks):
+            if idx == 0:
+                exec(f"head -n 1 {save_dir}/{num_chunks}_{idx}.csv > {save_dir}/results.csv")
+            exec(f"tail -n +2 {save_dir}/{num_chunks}_{idx}.csv >> {save_dir}/results.csv")
+            exec(f"rm {save_dir}/{num_chunks}_{idx}.csv")
+    # eval: the pooled mean in eval_multiple_choice.py would be dominated by Procedure
+    # Recall / Step Verification (2141 of 7090) and, more importantly, would not check
+    # that the streaming time limit was honoured. eval_ovbench.py does both.
+    score(args, f"python video_qa/eval/eval_ovbench.py --save_dir {save_dir}")
+
+
+def eval_streambench(args):
+    """StreamBench -- streaming video QA with free-form answers, scored by an LLM judge.
+
+    The only benchmark here that is both streaming and open-ended. Each breakpoint carries
+    a `time` past which the model may not see (like ovobench/odvbench/ovbench), but the
+    references are sentences, so there is no letter to match and an LLM decides whether the
+    prediction means the same thing (like rvs_ego/rvs_movie). Solver:
+    video_qa/rekv_streambench_vqa.py, a thin subclass of the rvs_* streaming solver that
+    adds the question class and the leak-audit columns.
+
+    THE JUDGE IS PINNED TO UPSTREAM'S. StreamChat scores StreamBench with
+    eval_ego_streaming_with_llama3.py and meta-llama/Meta-Llama-3-8B-Instruct, and
+    judges.StreamBenchLlamaJudge reproduces that prompt byte-for-byte. Judge-to-judge gaps
+    dominate the noise in open-ended numbers, so `--judge_preset` defaults to 'streambench'
+    here rather than to the repo-wide prometheus default; pass it explicitly to override,
+    and expect the result not to be comparable with published StreamBench figures.
+
+    Two things to know when reading the output. KG (Knowledge-based QA) is 298 of the 1838
+    questions and is pure world knowledge -- answerable with the video off -- so it lifts
+    any pooled figure for reasons unrelated to streaming; eval_streambench.py prints a
+    macro-average excluding it. And the six classes are near-evenly balanced by design, so
+    the macro-average is the honest headline.
+
+    `--blind` swaps in video_qa/blind_vqa.py. Worth running once: it should leave KG almost
+    unchanged while the memory and search classes collapse, and a class that does not
+    collapse is one the video was not contributing to.
+
+    Run scripts/prepare_streambench.sh first to write the annotation.
+    """
+    num_chunks = args.num_chunks
+    blind_tag = "-blind" if args.blind else ""
+    save_dir = f"results/{args.model}/streambench/{args.retrieve_size}-{args.sample_fps}{reduction_tag(args)}{blind_tag}"
+    solver = "blind_vqa" if args.blind else "rekv_streambench_vqa"
+    anno_path = args.anno_path or "data/streambench/full_oe.json"
+    if not args.only_eval:
+        # QA
+        processes = []
+        for idx in range(0, num_chunks):
+            cmd = ["python", f"video_qa/{solver}.py",
+                    "--model", args.model,
+                    "--sample_fps", str(args.sample_fps),
+                    "--n_local", str(args.n_local),
+                    "--retrieve_size", str(args.retrieve_size),
+                    "--save_dir", save_dir,
+                    "--anno_path", anno_path,
+                    "--debug", args.debug,
+                    "--num_chunks", str(num_chunks),
+                    "--chunk_idx", str(idx)] + reduction_args(args) + stream_args(args)
+            p = multiprocessing.Process(target=exec, args=(cmd, True, f'{4*idx},{4*idx+1},{4*idx+2},,{4*idx+3}' if args.model=='llava_ov_72b' else str(idx)))  # llava_ov_72b needs 4x 80GB GPUs
+            processes.append(p)
+            p.start()
+        for p in processes:
+            p.join()
+        # merge results
+        exec(f"> {save_dir}/results.csv")
+        for idx in range(num_chunks):
+            if idx == 0:
+                exec(f"head -n 1 {save_dir}/{num_chunks}_{idx}.csv > {save_dir}/results.csv")
+            exec(f"tail -n +2 {save_dir}/{num_chunks}_{idx}.csv >> {save_dir}/results.csv")
+            exec(f"rm {save_dir}/{num_chunks}_{idx}.csv")
+    # eval, in two steps. First the judge, which grades every row -- that is the only way
+    # a free-form answer gets a verdict at all. Then the breakdown, which rejoins those
+    # verdicts to the class/source columns and checks the streaming time limit was
+    # honoured; neither is something the judge's pooled accuracy can tell you.
+    score(args, open_ended_cmd(args, save_dir))
+    score(args, f"python video_qa/eval/eval_streambench.py --save_dir {save_dir}")
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", type=str, default="llava_ov_7b", choices=['llava_ov_0.5b', 'llava_ov_7b', 'llava_ov_72b', 'video_llava_7b', 'longva_7b'])
-    parser.add_argument("--dataset", type=str, default=None, choices=['mlvu', 'mlvu_test', 'qaego4d', 'egoschema', 'activitynet_qa', 'rvs_ego', 'rvs_movie', 'cgbench', 'odvbench', 'ovobench_realtime', 'ovobench_backward', 'fpsbench_stream'])
+    parser.add_argument("--dataset", type=str, default=None, choices=['mlvu', 'mlvu_test', 'qaego4d', 'egoschema', 'activitynet_qa', 'rvs_ego', 'rvs_movie', 'cgbench', 'odvbench', 'ovbench', 'streambench', 'ovobench_realtime', 'ovobench_backward', 'streamingbench_real', 'streamingbench_omni', 'streamingbench_context', 'streamingbench_sqa', 'fpsbench_stream'])
     parser.add_argument("--num_chunks", type=int, default=1)
     parser.add_argument("--blind", action="store_true",
                         help="Blind control: answer every question with no video at all "
@@ -680,13 +906,21 @@ if __name__ == "__main__":
                              "latency_seconds, so take the headline latency from a run "
                              "without it.")
     parser.add_argument("--decode_window", type=int, default=256,
-                        help="Streaming datasets (fpsbench_stream, ovobench_*, odvbench): "
+                        help="Streaming datasets (fpsbench_stream, ovobench_*, "
+                             "streamingbench_*, odvbench): "
                              "slots decoded at a time, 0 = the whole video up front. "
                              "Frames are held at source resolution, so a whole-video decode "
                              "is sample_fps x seconds x MB-per-frame per worker -- fine on "
                              "a short clip, 85 GB per worker for a 600 s stream at 32 fps. "
                              "Windowing decodes each block exactly once, so it changes "
                              "residency, not the frames or the results.")
+    parser.add_argument("--no_sqa_context", action="store_true",
+                        help="streamingbench_sqa only: ask its five questions "
+                             "independently instead of prepending the earlier ones and "
+                             "their gold answers, as src/benchmark/StreamingBenchSQA.py "
+                             "does. That is a harder, different task -- the questions are "
+                             "written as a conversation -- so its numbers are not "
+                             "comparable to published Sequential-QA scores.")
     parser.add_argument("--anno_path", type=str, default=None,
                         help="fpsbench_stream: annotation file to "
                              "run against, overriding the dataset default. For a subset "
@@ -713,7 +947,13 @@ if __name__ == "__main__":
     os.environ.setdefault('REKV_DECORD_THREADS',
                           str(max(1, _cpus // max(1, args.num_chunks))))
 
-    BLIND_DATASETS = {'odvbench', 'ovobench_realtime', 'ovobench_backward'}
+    # streamingbench_sqa is deliberately absent: its sighted run prepends the earlier
+    # questions and their gold answers (StreamingBenchSQA.py), and blind_vqa does not,
+    # so a blind SQA number would not be the floor for the run it sits next to.
+    BLIND_DATASETS = {'odvbench', 'ovbench', 'streambench',
+                      'ovobench_realtime', 'ovobench_backward',
+                      'streamingbench_real', 'streamingbench_omni',
+                      'streamingbench_context'}
     if args.blind:
         if args.dataset not in BLIND_DATASETS:
             parser.error(f"--blind is not wired up for {args.dataset!r}; "
@@ -727,6 +967,12 @@ if __name__ == "__main__":
             parser.error("--blind ingests no frames, so the reduction stages have nothing "
                          "to act on; drop the --vision_*/--prune_* flags.")
 
+    # StreamBench publishes its numbers under a specific judge (Meta-Llama-3-8B-Instruct,
+    # see judges.StreamBenchLlamaJudge). Default to it so a run is comparable out of the
+    # box, while leaving an explicit --judge_preset in charge.
+    if args.dataset == 'streambench' and '--judge_preset' not in sys.argv:
+        args.judge_preset = 'streambench'
+
     func_dic = {
         'mlvu': eval_mlvu,
         'mlvu_test': eval_mlvu_test,
@@ -737,8 +983,14 @@ if __name__ == "__main__":
         'rvs_movie': eval_rvs_movie,
         'cgbench': eval_cgbench,
         'odvbench': eval_odvbench,
+        'ovbench': eval_ovbench,
+        'streambench': eval_streambench,
         'ovobench_realtime': eval_ovobench_realtime,
         'ovobench_backward': eval_ovobench_backward,
+        'streamingbench_real': eval_streamingbench_real,
+        'streamingbench_omni': eval_streamingbench_omni,
+        'streamingbench_context': eval_streamingbench_context,
+        'streamingbench_sqa': eval_streamingbench_sqa,
         'fpsbench_stream': eval_fpsbench_stream,
     }
     if args.dataset in func_dic:

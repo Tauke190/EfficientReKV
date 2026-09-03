@@ -56,11 +56,15 @@ NUM_CHUNKS=4
 MODEL=llava_ov_7b
 
 # Supported dataset: qaego4d egoschema cgbench mlvu activitynet_qa rvs_ego rvs_movie
-# ovobench_realtime / ovobench_backward / fpsbench_stream / odvbench are valid --dataset
-# values too, but each needs its annotation built first (video_qa/convert_ovobench.py,
-# video_qa/convert_fpsbench_stream.py, scripts/setup_odvbench.py) and a sample_fps of its
-# own. --trigger is a knob below; --anno_path is not, so add it to the run_eval call if a
+# ovobench_realtime / ovobench_backward / fpsbench_stream / odvbench / ovbench are valid
+# --dataset values too, but each needs its annotation built first
+# (video_qa/convert_ovobench.py, video_qa/convert_fpsbench_stream.py,
+# scripts/setup_odvbench.py, scripts/prepare_ovbench.sh) and a sample_fps of its own.
+# --trigger is a knob below; --anno_path is not, so add it to the run_eval call if a
 # subset run needs it.
+# ovbench is much the largest of them -- 7090 questions over 1463 videos, ~78 h of video
+# at 1 fps -- so prefer scripts/eval_ovbench.slurm, which sweeps the arms and splits by
+# model, over listing it here beside a short dataset.
 # Space-separated: each dataset is evaluated in turn.
 DATASETS="rvs_ego rvs_movie"
 

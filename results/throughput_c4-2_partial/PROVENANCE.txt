@@ -1,0 +1,5 @@
+job=361944  host=c4-2  gpu=NVIDIA RTX A6000  model=llava_ov_7b  frames=400  sample_fps=2  videos=0,1,2
+Arms rlt 0.6/0.7/0.8/0.9 only. Originally written into results/throughput/, which holds
+c2-2 arms -- that made one directory span two GPUs and inflated its speedup ratios ~5%.
+Moved here to keep results/throughput/ pure c2-2. Superseded by
+results/throughput_a6000_c4-2/, which has these same arms plus a matching c4-2 baseline.

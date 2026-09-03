@@ -1,0 +1,1 @@
+2026-09-02T16:51:11-04:00 job=361940 host=c5-2 gpu=NVIDIA A100 80GB PCIe models=llava_ov_7b thresholds=0.6,0.7,0.8,0.9 frames=400  # NOT comparable to results/throughput (48G ampere); moved here

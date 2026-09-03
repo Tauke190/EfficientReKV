@@ -238,11 +238,81 @@ class PrometheusJudge(JudgeStyle):
         return {'pred': 'yes' if score >= self.yes_threshold else 'no', 'score': score}
 
 
-STYLES = {cls.name: cls for cls in (QwenJudge, PrometheusJudge)}
+class StreamBenchLlamaJudge(QwenJudge):
+    """StreamBench's own judge, reproduced from upstream so numbers are comparable.
+
+    StreamChat (arXiv 2501.13468, github.com/hmxiong/StreamChat) scores StreamBench with
+    `eval_ego_streaming_with_llama3.py`, and its README pins the checkpoint:
+    meta-llama/Meta-Llama-3-8B-Instruct. Its prompt is the same Video-ChatGPT lineage as
+    QwenJudge's -- the SYSTEM text is byte-identical -- with exactly one difference: the
+    dict key it asks for is `llama_pred`, not `pred`, and the worked example uses that
+    key too.
+
+    That one word is why this is a separate style rather than a checkpoint swap. Asking a
+    model for `llama_pred` and parsing `pred` would drop every verdict, and a judge that
+    silently returns nothing looks identical to a model that answered badly. Inheriting
+    `parse` is enough because QwenJudge's regex path keys on the literal name -- so the
+    parser below is overridden to accept upstream's key first, then fall back to the
+    generic one for a model that ignores the instruction.
+
+    Scale note: upstream's example shows `'score': 4.8` while the instruction says
+    INTEGER, so the parser rounds, exactly as QwenJudge does. Their aggregation counts
+    yes/no for accuracy and means the score separately; ours does the same in
+    `eval_open_ended_local.aggregate`, so the two are directly comparable.
+    """
+
+    name = 'streambench'
+    default_model = 'meta-llama/Meta-Llama-3-8B-Instruct'
+    default_max_new_tokens = 64
+    score_range = '0-5'
+
+    # Byte-identical to upstream eval_ego_streaming_with_llama3.py. Do not reword: the
+    # gap between two judges' prompts is already larger than most effects being measured.
+    USER = (
+        "Please evaluate the following video-based question-answer pair:\n\n"
+        "Question: {question}\n"
+        "Correct Answer: {answer}\n"
+        "Predicted Answer: {pred}\n\n"
+        "Provide your evaluation only as a yes/no and score where the score is an integer value between 0 and 5, with 5 indicating the highest meaningful match. "
+        "Please generate the response in the form of a Python dictionary string with keys 'llama_pred' and 'score', where value of 'llama_pred' is  a string of 'yes' or 'no' and value of 'score' is in INTEGER, not STRING."
+        "DO NOT PROVIDE ANY OTHER OUTPUT TEXT OR EXPLANATION. Only provide the Python dictionary string. "
+        "For example, your response should look like this: {{'llama_pred': 'yes', 'score': 4.8}}."
+    )
+
+    def parse(self, text):
+        import ast
+
+        match = re.search(r'\{[^{}]*\}', text, re.DOTALL)
+        if match:
+            try:
+                d = ast.literal_eval(match.group(0))
+                if isinstance(d, dict) and 'score' in d:
+                    # upstream's key first, then the generic one
+                    raw = d.get('llama_pred', d.get('pred'))
+                    if raw is not None:
+                        pred = str(raw).strip().lower()
+                        if 'yes' in pred or 'no' in pred:
+                            return {'pred': 'yes' if 'yes' in pred else 'no',
+                                    'score': int(round(float(d['score'])))}
+            except (ValueError, SyntaxError, TypeError):
+                pass
+
+        pred_m = re.search(r"['\"]?(?:llama_pred|pred)['\"]?\s*[:=]\s*['\"]?(yes|no)\b",
+                           text, re.IGNORECASE)
+        score_m = re.search(r"['\"]?score['\"]?\s*[:=]\s*['\"]?(\d+(?:\.\d+)?)",
+                            text, re.IGNORECASE)
+        if pred_m and score_m:
+            return {'pred': pred_m.group(1).lower(),
+                    'score': int(round(float(score_m.group(1))))}
+        return None
+
+
+STYLES = {cls.name: cls for cls in (QwenJudge, PrometheusJudge, StreamBenchLlamaJudge)}
 
 #: Substring of a checkpoint name -> style, for `--judge_style auto`.
 _AUTODETECT = (
     ('prometheus', 'prometheus'),
+    ('meta-llama-3', 'streambench'),
 )
 
 DEFAULT_STYLE = 'prometheus'
@@ -262,6 +332,8 @@ PRESETS = {
     'prometheus8x7b': ('prometheus', 'prometheus-eval/prometheus-8x7b-v2.0', '_prometheus8x7b'),
     'qwen':           ('qwen', 'Qwen/Qwen2.5-32B-Instruct', ''),
     'qwen7b':         ('qwen', 'Qwen/Qwen2.5-7B-Instruct', '_qwen7b'),
+    # StreamBench's official judge -- see StreamBenchLlamaJudge.
+    'streambench':    ('streambench', 'meta-llama/Meta-Llama-3-8B-Instruct', '_streambench'),
 }
 
 DEFAULT_PRESET = 'prometheus'
