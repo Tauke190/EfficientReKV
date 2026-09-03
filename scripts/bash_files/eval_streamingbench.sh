@@ -5,51 +5,25 @@
 # speaks against a ground-truth timestamp, not on a letter, and needs its own solver.
 #
 #   streamingbench_real     2500 q / 500 videos / 10 tasks
-#   streamingbench_omni     1000 q / 200 videos /  4 tasks  <- audio tasks, see below
-#   streamingbench_context   500 q / 100 videos /  2 tasks
-#   streamingbench_sqa       250 q /  50 videos /  1 task   <- carries its own context
 #
-# On omni: Omni-Source Understanding asks about sound (Emotion Recognition, Source
-# Discrimination) and about whether audio and video agree (Multimodal Alignment). ReKV is
-# vision-only, so these run but are answering from pictures alone. Report them as a
-# vision-only ablation, never against the leaderboard's omni column.
+#  Omni-Source Understanding task is not supported because Rekv vision only and that requires audio also
 
 num_chunks=1  # must equal the number of visible GPUs; one worker per GPU
 # llava_ov_0.5b exists for smoke tests; its StreamingBench numbers are not worth reporting.
 model=llava_ov_7b
 
 # Space-separated. Overridable:  DATASETS="streamingbench_real" scripts/eval_streamingbench.sh
-datasets=${DATASETS:-"streamingbench_real streamingbench_context streamingbench_sqa"}
+datasets=${DATASETS:-"streamingbench_real"}
 
-# 1 FPS, matching scripts/eval_ovobench_baseline.slurm. StreamingBench's queries key on fine detail
-# (Text-Rich Understanding, Counting) that a 2-second stride drops. The cost is real: each
-# video is streamed only as far as its last query, and even so `real` alone is 70 h of
-# video -- ~252k frames at 1 fps x 196 tokens. Per subset, ingested hours / frames @1fps:
-#     real 70.0 h / 251994    omni 17.7 h / 63544
-#     context 9.2 h / 33185   sqa  6.2 h / 22214
 sample_fps=1
 
 # --- stage 2: token pruning (model/token_pruning.py) ---------------------------------
-# Empty PRUNE_THRESHOLDS = the untouched baseline. Set a space-separated list to sweep:
-#
-#     PRUNE_THRESHOLDS="0.1 0.2 0.3" scripts/eval_streamingbench.sh
-#
-# Each threshold writes to its own directory (run_eval.reduction_tag appends e.g.
-# '-rlt0.2cosine'), so a sweep never overwrites the baseline or the previous arm.
-#
-# Do not transplant the 0.25/0.5 from scripts/measure_speed.sh -- those were calibrated on
-# RVS-Ego at 0.5 fps, and frames one second apart are far more alike than frames two
-# seconds apart, so the same threshold prunes considerably harder here. See the measured
-# keep-rate table in scripts/eval_ovobench_baseline.slurm, then read the achieved rate off the summary
-# below rather than assuming the threshold got you what you wanted.
+
 PRUNE_METHOD=${PRUNE_METHOD:-rlt}
 PRUNE_METRIC=${PRUNE_METRIC:-cosine}
 PRUNE_REFRESH_EVERY=${PRUNE_REFRESH_EVERY:-0}
 PRUNE_THRESHOLDS=${PRUNE_THRESHOLDS:-""}
 
-# What the threshold actually did. A threshold is an input, not a result -- redundancy
-# varies enormously between videos, so the same value gives different keep rates on
-# different footage, and an accuracy delta is unreadable without the rate it came with.
 summarize_reduction () {
   python - "$1" <<'PYEOF'
 import sys, os, pandas as pd

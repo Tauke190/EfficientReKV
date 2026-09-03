@@ -3,11 +3,10 @@
 #SBATCH --output=/home/av354855/EfficientReKV/slurmlogs/rekv_ovbench-%j.out
 #SBATCH --gres-flags=enforce-binding
 #SBATCH -p gpu
-#SBATCH -C gmem48
-#SBATCH --gres=gpu:4
+#SBATCH -C gmem80
+#SBATCH --gres=gpu:2
 #SBATCH --mem-per-cpu=8G
 #SBATCH --cpus-per-gpu=8
-#SBATCH --time=48:00:00
 
 # OVBench: the streaming sweep on both models.
 #
@@ -15,19 +14,9 @@
 #   models   llava_ov_0.5b, llava_ov_7b
 #   arms     blind, baseline (no pruning at all), rlt 0.25 0.5 0.6 0.7 0.8 0.9
 #
-# 16 arms, run sequentially. Each writes its own results directory (run_eval.reduction_tag
-# appends e.g. '-rlt0.6cosine', --blind appends '-blind'), so nothing overwrites anything
-# and an interrupted job can be resumed by rerunning with the finished arms removed from
-# ARMS.
-#
-# Arm order is deliberate: blind first, then baseline, then rising thresholds. Blind costs
-# little and gives the floor immediately, which matters more here than on the other sets --
-# 1774 of the 7090 questions are binary and they pile up in Temporal Hallucination
-# Verification, so parts of this benchmark have a language-prior floor near 50%.
-#
 # SIZE WARNING. This is much the largest streaming set in the repo: 78 hours of video at
 # 1 fps, ~281k frames, against odvbench's short clips. One arm of the 7b is a long run even
-# across 4 GPUs, and 16 arms will not fit in 48 h. Split it -- one model or a few arms per
+# across 2 GPUs, and 16 arms will not fit in 48 h. Split it -- one model or a few arms per
 # job:
 #     sbatch --export=ALL,MODELS="llava_ov_7b",ARMS="none:0 rlt:0.5" scripts/eval_ovbench.slurm
 #
@@ -45,14 +34,6 @@ conda activate Rekv
 
 LOGDIR=/home/av354855/EfficientReKV/slurmlogs
 
-# A full home quota kills the batch step in ~1s with ExitCode 0:53 and no .out file, before
-# this script runs at all. This guard only catches the quota filling later; a job that
-# vanishes leaving no log is a quota problem, not a code problem.
-if ! touch "${LOGDIR}/.writetest" 2>/dev/null; then
-    echo "FATAL: ${LOGDIR} not writable -- home quota is full. Free space and resubmit." >&2
-    exit 1
-fi
-rm -f "${LOGDIR}/.writetest"
 
 export MPLBACKEND=Agg
 export TQDM_MININTERVAL=60
@@ -64,9 +45,8 @@ cd /home/av354855/EfficientReKV
 export PYTHONPATH="$(pwd)${PYTHONPATH:+:${PYTHONPATH}}"
 
 # Must match #SBATCH --gres=gpu:N -- run_eval.py starts one worker per chunk, each pinned
-# to its own GPU. Chunking splits the *video* list, so each GPU owns a disjoint set of
-# videos and no video is ingested twice.
-NUM_CHUNKS=${NUM_CHUNKS:-4}
+
+NUM_CHUNKS=${NUM_CHUNKS:-2}
 
 DATASET=ovbench
 MODELS=${MODELS:-"llava_ov_0.5b llava_ov_7b"}
@@ -81,7 +61,6 @@ RETRIEVE_SIZE=${RETRIEVE_SIZE:-64}
 PRUNE_METRIC=cosine
 PRUNE_REFRESH_EVERY=0
 
-# Overridable so a smoke test can point at a cut-down annotation.
 ANNO=${ANNO:-data/OVBench/full_mc.json}
 ANNO_ARGS=""
 [ "${ANNO}" != "data/OVBench/full_mc.json" ] && ANNO_ARGS="--anno_path ${ANNO}"

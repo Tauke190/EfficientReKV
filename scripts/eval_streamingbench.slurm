@@ -1,10 +1,10 @@
 #!/bin/bash
-#SBATCH --job-name=rekv_sb_real
+#SBATCH --job-name=sb_real_rekv
 #SBATCH --output=/home/av354855/EfficientReKV/slurmlogs/rekv_sb_real-%j.out
 #SBATCH --gres-flags=enforce-binding
 #SBATCH -p gpu
 #SBATCH -C gmem48
-#SBATCH --gres=gpu:4
+#SBATCH --gres=gpu:2
 #SBATCH --mem-per-cpu=8G
 #SBATCH --cpus-per-gpu=8
 
@@ -59,7 +59,7 @@ export PYTHONPATH="$(pwd)${PYTHONPATH:+:${PYTHONPATH}}"
 # Must match #SBATCH --gres=gpu:N -- run_eval.py starts one worker per chunk, each pinned
 # to its own GPU. Chunking splits the *video* list, so each GPU owns a disjoint set of
 # videos and no video is ingested twice.
-NUM_CHUNKS=4
+NUM_CHUNKS=2
 
 DATASET=${DATASET:-streamingbench_real}
 
@@ -74,7 +74,7 @@ ARMS=${ARMS:-"blind:0 none:0 rlt:0.25 rlt:0.5 rlt:0.6 rlt:0.7 rlt:0.8 rlt:0.9"}
 # 1 FPS, matching the OVO-Bench runs. StreamingBench's queries key on fine detail
 # (Text-Rich Understanding, Counting) that a 2-second stride drops. The cost is real: each
 # video is streamed only as far as its last query, and even so `real` is 70 h of video --
-# ~252k frames at 1 fps x 196 tokens, or ~63k frames per GPU at NUM_CHUNKS=4.
+# ~252k frames at 1 fps x 196 tokens, or ~126k frames per GPU at NUM_CHUNKS=2.
 SAMPLE_FPS=1
 N_LOCAL=15000
 RETRIEVE_SIZE=64
