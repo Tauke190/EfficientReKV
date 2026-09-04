@@ -1,0 +1,46 @@
+{
+  "strict_letter": {
+    "Object Perception": 70.44,
+    "Action Perception": 61.65,
+    "Attribute Perception": 68.48,
+    "Text-Rich Understanding": 65.47,
+    "Clips Summarize": 84.62,
+    "Spatial Understanding": 46.81,
+    "Counting": 18.08,
+    "Event Understanding": 63.01,
+    "Causal Reasoning": 60.5,
+    "Prospective Reasoning": 57.14,
+    "overall": 56.16,
+    "macro": 59.62
+  },
+  "first_char": {
+    "Object Perception": 70.44,
+    "Action Perception": 61.65,
+    "Attribute Perception": 68.48,
+    "Text-Rich Understanding": 65.47,
+    "Clips Summarize": 84.62,
+    "Spatial Understanding": 46.81,
+    "Counting": 18.08,
+    "Event Understanding": 63.01,
+    "Causal Reasoning": 60.5,
+    "Prospective Reasoning": 57.14,
+    "overall": 56.16,
+    "macro": 59.62
+  },
+  "substring": {
+    "Object Perception": 73.58,
+    "Action Perception": 65.53,
+    "Attribute Perception": 73.91,
+    "Text-Rich Understanding": 69.78,
+    "Clips Summarize": 87.18,
+    "Spatial Understanding": 51.06,
+    "Counting": 18.08,
+    "Event Understanding": 64.38,
+    "Causal Reasoning": 71.43,
+    "Prospective Reasoning": 60.0,
+    "overall": 60.0,
+    "macro": 63.5
+  },
+  "n_queries": 1250,
+  "unparseable": 0
+}

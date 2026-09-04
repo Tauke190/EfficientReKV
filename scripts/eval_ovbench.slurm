@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=rekv_ovbench
+#SBATCH --job-name=ovbench_rekv
 #SBATCH --output=/home/av354855/EfficientReKV/slurmlogs/rekv_ovbench-%j.out
 #SBATCH --gres-flags=enforce-binding
 #SBATCH -p gpu
