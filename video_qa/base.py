@@ -143,10 +143,23 @@ class _RetryingVideoReader:
     for every good one.
 
     Hence: attempt the threaded decode, and on a DECORDError reopen single-threaded and
-    retry once. The downgrade sticks for the life of the reader, so a windowed
-    FrameStream that decodes block after block pays the detection cost once rather than
-    per block.
+    try again, up to `max_attempts` times. The downgrade sticks for the life of the
+    reader, so a windowed FrameStream that decodes block after block pays the detection
+    cost once rather than per block.
+
+    Retrying more than once is worth it because a reopen clears decoder state as well as
+    dropping the thread count -- decord keeps its FFmpeg context on the reader, and a
+    fresh one occasionally gets past a fault the old one cannot. What it will not fix is a
+    damaged file: `StreamingBench Real-Time Visual Understanding/sample_332` has 10,835 of
+    its 18,220 access units broken upstream, and fails identically on every attempt. Past
+    `max_attempts` the error propagates, and `BaseVQA.analyze` skips that video and moves
+    on rather than losing the chunk.
     """
+
+    # Each failed attempt on a long video costs the better part of a minute, and no
+    # observed fault has ever cleared on a third try -- so three is the point past which
+    # the file is bad rather than unlucky.
+    max_attempts = 3
 
     def __init__(self, video_path, num_threads):
         self._path = video_path
@@ -163,18 +176,22 @@ class _RetryingVideoReader:
         return self._vr[idx]
 
     def get_batch(self, indices):
-        try:
-            return self._vr.get_batch(indices)
-        except DECORDError:
-            if self._num_threads == 1:
-                raise  # already serial: a real decode failure, not the threading fault
-            logger.warning(
-                f'{os.path.basename(self._path)}: decord failed at '
-                f'num_threads={self._num_threads}; reopening single-threaded. Decode will '
-                f'be slower for this video.')
-            self._num_threads = 1
-            self._vr = VideoReader(self._path, ctx=cpu(0), num_threads=1)
-            return self._vr.get_batch(indices)
+        name = os.path.basename(self._path)
+        for attempt in range(1, self.max_attempts + 1):
+            try:
+                return self._vr.get_batch(indices)
+            except DECORDError:
+                if attempt == self.max_attempts:
+                    logger.warning(
+                        f'{name}: decode failed on all {self.max_attempts} attempts; '
+                        f'giving up on this video.')
+                    raise
+                logger.warning(
+                    f'{name}: decord failed at num_threads={self._num_threads} '
+                    f'(attempt {attempt}/{self.max_attempts}); reopening single-threaded. '
+                    f'Decode will be slower for this video.')
+                self._num_threads = 1
+                self._vr = VideoReader(self._path, ctx=cpu(0), num_threads=1)
 
 
 def open_video_reader(video_path):
@@ -353,20 +370,83 @@ class BaseVQA:
     def analyze_a_video(self, video_sample):
         pass
 
-    def analyze(self, debug=False):
-        video_annos = self.anno[:1] if debug else self.anno
-        for video_sample in tqdm(video_annos):
-            logger.debug(f'video_id: {video_sample["video_id"]}')
-            self.analyze_a_video(video_sample)
+    # Videos are checkpointed to disk this often. Small enough that a killed worker loses
+    # minutes rather than hours, large enough that the write is lost in the noise next to
+    # ingesting a video.
+    checkpoint_every = 10
 
+    # A chunk skips source files it cannot decode, but a run where decoding fails wholesale
+    # is a broken environment, not a handful of bad files. Past this many failures the
+    # chunk aborts instead of writing a mostly-empty CSV that looks like a finished run.
+    max_decode_failures = 20
+
+    def results_path(self):
+        return f'{self.save_dir}/{self.num_chunks}_{self.chunk_idx}.csv'
+
+    def write_results(self):
+        """Persist everything recorded so far to this chunk's CSV.
+
+        Written via a temp file and os.replace so the merge step in run_eval.py can never
+        read a half-flushed CSV, and called periodically rather than once at the end:
+        writing only after the loop meant a single unreadable video 81 videos in discarded
+        all 81, and the merge then produced an empty results.csv that still looked like a
+        finished run.
+        """
         dfs = []
         for (retrieve_size, chunk_size), dict_list in self.record.items():
+            if not dict_list:
+                continue
             df = pd.DataFrame(dict_list)
             df['retrieve_size'] = retrieve_size
             df['chunk_size'] = chunk_size
             dfs.append(df)
-        final_df = pd.concat(dfs, ignore_index=True)
-        final_df.to_csv(f'{self.save_dir}/{self.num_chunks}_{self.chunk_idx}.csv', index=False)
+        if not dfs:
+            return
+        path = self.results_path()
+        tmp = f'{path}.tmp'
+        pd.concat(dfs, ignore_index=True).to_csv(tmp, index=False)
+        os.replace(tmp, path)
+
+    def analyze(self, debug=False):
+        video_annos = self.anno[:1] if debug else self.anno
+        skipped = []
+        try:
+            for done, video_sample in enumerate(tqdm(video_annos), start=1):
+                video_id = video_sample['video_id']
+                logger.debug(f'video_id: {video_id}')
+                try:
+                    self.analyze_a_video(video_sample)
+                except (DECORDError, OSError) as e:
+                    # Decode-layer failures only -- a damaged container, a missing or
+                    # unreadable file, a .npy that will not load. Deliberately narrow: a
+                    # CUDA OOM or a model bug raises RuntimeError and must still abort the
+                    # run loudly rather than be recorded as 500 skipped videos.
+                    skipped.append(video_id)
+                    logger.error(
+                        f'{video_id}: skipping, source could not be decoded '
+                        f'({type(e).__name__}: {str(e).splitlines()[0][:200]})')
+                    if len(skipped) > self.max_decode_failures:
+                        raise RuntimeError(
+                            f'{len(skipped)} videos failed to decode in chunk '
+                            f'{self.chunk_idx}; aborting rather than reporting a run this '
+                            f'incomplete. Last failure: {video_id}') from e
+                if done % self.checkpoint_every == 0:
+                    self.write_results()
+        finally:
+            # Runs on the exception path too, so an abort still leaves finished videos on
+            # disk instead of throwing the whole chunk away.
+            self.write_results()
+
+        if skipped:
+            # Loud and machine-readable: a partial chunk that merges into a plausible-looking
+            # results.csv is the failure mode this whole path exists to prevent.
+            with open(f'{self.save_dir}/skipped_{self.num_chunks}_{self.chunk_idx}.json', 'w') as f:
+                json.dump({'chunk_idx': self.chunk_idx, 'num_chunks': self.num_chunks,
+                           'n_expected': len(video_annos), 'n_skipped': len(skipped),
+                           'skipped': skipped}, f, indent=2)
+            logger.error(
+                f'chunk {self.chunk_idx}: {len(skipped)}/{len(video_annos)} videos SKIPPED '
+                f'(undecodable): {", ".join(skipped)}')
 
 
 def pruning_enabled(args):

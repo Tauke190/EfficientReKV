@@ -1,11 +1,65 @@
 import os
 import sys
+import json
 import argparse
 import subprocess
 import multiprocessing
 
+import pandas as pd
+
 from video_qa.reduction_args import add_reduction_args
 from video_qa.eval import judges
+
+
+def merge_chunks(save_dir, num_chunks):
+    """Concatenate the per-chunk CSVs into results.csv, reporting anything missing.
+
+    A chunk file that is absent means that worker died without recording a single video.
+    The shell `head`/`tail` pipeline this replaces noted that only as a stderr line from
+    `head` before going on to write a results.csv anyway -- empty when every chunk died,
+    and, worse, silently half-sized when only one did. Either way the run looked finished.
+    So: merge what exists, and say plainly what does not.
+
+    Returns True when the merge is complete, False when videos are missing.
+    """
+    frames, missing = [], []
+    for idx in range(num_chunks):
+        path = f'{save_dir}/{num_chunks}_{idx}.csv'
+        if not os.path.exists(path) or os.path.getsize(path) == 0:
+            missing.append(idx)
+            continue
+        frames.append(pd.read_csv(path))
+
+    out = f'{save_dir}/results.csv'
+    if frames:
+        pd.concat(frames, ignore_index=True).to_csv(out, index=False)
+    else:
+        open(out, 'w').close()
+    for idx in range(num_chunks):
+        path = f'{save_dir}/{num_chunks}_{idx}.csv'
+        if os.path.exists(path):
+            os.remove(path)
+
+    # Written by BaseVQA.analyze for videos whose source would not decode.
+    skipped = []
+    for idx in range(num_chunks):
+        sidecar = f'{save_dir}/skipped_{num_chunks}_{idx}.json'
+        if os.path.exists(sidecar):
+            with open(sidecar) as f:
+                skipped += json.load(f)['skipped']
+
+    if missing or skipped:
+        print(f'*** INCOMPLETE RUN: {save_dir}', file=sys.stderr)
+        if missing:
+            print(f'***   chunk(s) {missing} recorded nothing -- their videos are absent '
+                  f'from results.csv', file=sys.stderr)
+        if skipped:
+            print(f'***   {len(skipped)} video(s) skipped as undecodable: '
+                  f'{", ".join(skipped)}', file=sys.stderr)
+        print('*** Scores below are computed on a subset. Do not report them as-is.',
+              file=sys.stderr)
+        return False
+    return True
 
 
 def exec(cmd, sub=False, device=None):
@@ -154,12 +208,7 @@ def eval_mlvu(args):
         for p in processes:
             p.join()
         # merge results
-        exec(f"> {save_dir}/results.csv")
-        for idx in range(num_chunks):
-            if idx == 0:
-                exec(f"head -n 1 {save_dir}/{num_chunks}_{idx}.csv > {save_dir}/results.csv")
-            exec(f"tail -n +2 {save_dir}/{num_chunks}_{idx}.csv >> {save_dir}/results.csv")
-            exec(f"rm {save_dir}/{num_chunks}_{idx}.csv")
+        merge_chunks(save_dir, num_chunks)
     # eval
     score(args, f"python video_qa/eval/eval_multiple_choice.py --save_dir {save_dir}")
 
@@ -187,12 +236,7 @@ def eval_mlvu_test(args):
         for p in processes:
             p.join()
         # merge results
-        exec(f"> {save_dir}/results.csv")
-        for idx in range(num_chunks):
-            if idx == 0:
-                exec(f"head -n 1 {save_dir}/{num_chunks}_{idx}.csv > {save_dir}/results.csv")
-            exec(f"tail -n +2 {save_dir}/{num_chunks}_{idx}.csv >> {save_dir}/results.csv")
-            exec(f"rm {save_dir}/{num_chunks}_{idx}.csv")
+        merge_chunks(save_dir, num_chunks)
     # eval
     score(args, f"python video_qa/eval/eval_multiple_choice.py --save_dir {save_dir}")
 
@@ -220,12 +264,7 @@ def eval_qaego4d(args):
         for p in processes:
             p.join()
         # merge results
-        exec(f"> {save_dir}/results.csv")
-        for idx in range(num_chunks):
-            if idx == 0:
-                exec(f"head -n 1 {save_dir}/{num_chunks}_{idx}.csv > {save_dir}/results.csv")
-            exec(f"tail -n +2 {save_dir}/{num_chunks}_{idx}.csv >> {save_dir}/results.csv")
-            exec(f"rm {save_dir}/{num_chunks}_{idx}.csv")
+        merge_chunks(save_dir, num_chunks)
     # eval
     score(args, f"python video_qa/eval/eval_multiple_choice.py --save_dir {save_dir}")
 
@@ -253,12 +292,7 @@ def eval_egoschema(args):
         for p in processes:
             p.join()
         # merge results
-        exec(f"> {save_dir}/results.csv")
-        for idx in range(num_chunks):
-            if idx == 0:
-                exec(f"head -n 1 {save_dir}/{num_chunks}_{idx}.csv > {save_dir}/results.csv")
-            exec(f"tail -n +2 {save_dir}/{num_chunks}_{idx}.csv >> {save_dir}/results.csv")
-            exec(f"rm {save_dir}/{num_chunks}_{idx}.csv")
+        merge_chunks(save_dir, num_chunks)
     # eval
     score(args, f"python video_qa/eval/eval_egoschema.py --save_dir {save_dir}")
 
@@ -286,13 +320,8 @@ def eval_activitynet_qa(args):
         for p in processes:
             p.join()
         # merge results
-        exec(f"> {save_dir}/results.csv")
         exec(f"rm -rf {save_dir}/tmp")
-        for idx in range(num_chunks):
-            if idx == 0:
-                exec(f"head -n 1 {save_dir}/{num_chunks}_{idx}.csv > {save_dir}/results.csv")
-            exec(f"tail -n +2 {save_dir}/{num_chunks}_{idx}.csv >> {save_dir}/results.csv")
-            exec(f"rm {save_dir}/{num_chunks}_{idx}.csv")
+        merge_chunks(save_dir, num_chunks)
     # eval
     score(args, open_ended_cmd(args, save_dir))
 
@@ -320,13 +349,8 @@ def eval_rvs_ego(args):
         for p in processes:
             p.join()
         # merge results
-        exec(f"> {save_dir}/results.csv")
         exec(f"rm -rf {save_dir}/tmp")
-        for idx in range(num_chunks):
-            if idx == 0:
-                exec(f"head -n 1 {save_dir}/{num_chunks}_{idx}.csv > {save_dir}/results.csv")
-            exec(f"tail -n +2 {save_dir}/{num_chunks}_{idx}.csv >> {save_dir}/results.csv")
-            exec(f"rm {save_dir}/{num_chunks}_{idx}.csv")
+        merge_chunks(save_dir, num_chunks)
     # eval
     score(args, open_ended_cmd(args, save_dir))
 
@@ -354,13 +378,8 @@ def eval_rvs_movie(args):
         for p in processes:
             p.join()
         # merge results
-        exec(f"> {save_dir}/results.csv")
         exec(f"rm -rf {save_dir}/tmp")
-        for idx in range(num_chunks):
-            if idx == 0:
-                exec(f"head -n 1 {save_dir}/{num_chunks}_{idx}.csv > {save_dir}/results.csv")
-            exec(f"tail -n +2 {save_dir}/{num_chunks}_{idx}.csv >> {save_dir}/results.csv")
-            exec(f"rm {save_dir}/{num_chunks}_{idx}.csv")
+        merge_chunks(save_dir, num_chunks)
     # eval
     score(args, open_ended_cmd(args, save_dir))
 
@@ -410,12 +429,7 @@ def eval_ovobench(args, mode):
         for p in processes:
             p.join()
         # merge results
-        exec(f"> {save_dir}/results.csv")
-        for idx in range(num_chunks):
-            if idx == 0:
-                exec(f"head -n 1 {save_dir}/{num_chunks}_{idx}.csv > {save_dir}/results.csv")
-            exec(f"tail -n +2 {save_dir}/{num_chunks}_{idx}.csv >> {save_dir}/results.csv")
-            exec(f"rm {save_dir}/{num_chunks}_{idx}.csv")
+        merge_chunks(save_dir, num_chunks)
     # eval: OVO-Bench averages per-task accuracies within a mode, so it needs its own
     # scorer rather than eval_multiple_choice.py's pooled mean.
     score(args, f"python video_qa/eval/eval_ovobench.py --save_dir {save_dir}")
@@ -480,12 +494,7 @@ def eval_streamingbench(args, subset):
         for p in processes:
             p.join()
         # merge results
-        exec(f"> {save_dir}/results.csv")
-        for idx in range(num_chunks):
-            if idx == 0:
-                exec(f"head -n 1 {save_dir}/{num_chunks}_{idx}.csv > {save_dir}/results.csv")
-            exec(f"tail -n +2 {save_dir}/{num_chunks}_{idx}.csv >> {save_dir}/results.csv")
-            exec(f"rm {save_dir}/{num_chunks}_{idx}.csv")
+        merge_chunks(save_dir, num_chunks)
     # eval: StreamingBench's headline is a micro-average over questions, OVO-Bench's is an
     # unweighted mean of per-task accuracies, so they cannot share a scorer.
     score(args, f"python video_qa/eval/eval_streamingbench.py --save_dir {save_dir}")
@@ -579,12 +588,7 @@ def eval_fpsbench_stream(args):
         for p in processes:
             p.join()
         # merge results
-        exec(f"> {save_dir}/results.csv")
-        for idx in range(num_chunks):
-            if idx == 0:
-                exec(f"head -n 1 {save_dir}/{num_chunks}_{idx}.csv > {save_dir}/results.csv")
-            exec(f"tail -n +2 {save_dir}/{num_chunks}_{idx}.csv >> {save_dir}/results.csv")
-            exec(f"rm {save_dir}/{num_chunks}_{idx}.csv")
+        merge_chunks(save_dir, num_chunks)
     # There is an answer key here, so this scores. The streaming audit is the same one the
     # short-clip arm runs -- both write the same no-lookahead columns.
     score(args, f"python video_qa/eval/eval_fpsbench_stream.py --save_dir {save_dir}")
@@ -614,12 +618,7 @@ def eval_cgbench(args):
         for p in processes:
             p.join()
         # merge results
-        exec(f"> {save_dir}/results.csv")
-        for idx in range(num_chunks):
-            if idx == 0:
-                exec(f"head -n 1 {save_dir}/{num_chunks}_{idx}.csv > {save_dir}/results.csv")
-            exec(f"tail -n +2 {save_dir}/{num_chunks}_{idx}.csv >> {save_dir}/results.csv")
-            exec(f"rm {save_dir}/{num_chunks}_{idx}.csv")
+        merge_chunks(save_dir, num_chunks)
     # eval
     score(args, f"python video_qa/eval/eval_multiple_choice.py --save_dir {save_dir}")
 
@@ -681,12 +680,7 @@ def eval_odvbench(args):
         for p in processes:
             p.join()
         # merge results
-        exec(f"> {save_dir}/results.csv")
-        for idx in range(num_chunks):
-            if idx == 0:
-                exec(f"head -n 1 {save_dir}/{num_chunks}_{idx}.csv > {save_dir}/results.csv")
-            exec(f"tail -n +2 {save_dir}/{num_chunks}_{idx}.csv >> {save_dir}/results.csv")
-            exec(f"rm {save_dir}/{num_chunks}_{idx}.csv")
+        merge_chunks(save_dir, num_chunks)
     # eval: the pooled mean in eval_multiple_choice.py would be dominated by Distance
     # Prediction (1488 of 6348) and, more importantly, would not check that the streaming
     # time limit was honoured. eval_odvbench.py does both.
@@ -752,12 +746,7 @@ def eval_ovbench(args):
         for p in processes:
             p.join()
         # merge results
-        exec(f"> {save_dir}/results.csv")
-        for idx in range(num_chunks):
-            if idx == 0:
-                exec(f"head -n 1 {save_dir}/{num_chunks}_{idx}.csv > {save_dir}/results.csv")
-            exec(f"tail -n +2 {save_dir}/{num_chunks}_{idx}.csv >> {save_dir}/results.csv")
-            exec(f"rm {save_dir}/{num_chunks}_{idx}.csv")
+        merge_chunks(save_dir, num_chunks)
     # eval: the pooled mean in eval_multiple_choice.py would be dominated by Procedure
     # Recall / Step Verification (2141 of 7090) and, more importantly, would not check
     # that the streaming time limit was honoured. eval_ovbench.py does both.
@@ -818,12 +807,7 @@ def eval_streambench(args):
         for p in processes:
             p.join()
         # merge results
-        exec(f"> {save_dir}/results.csv")
-        for idx in range(num_chunks):
-            if idx == 0:
-                exec(f"head -n 1 {save_dir}/{num_chunks}_{idx}.csv > {save_dir}/results.csv")
-            exec(f"tail -n +2 {save_dir}/{num_chunks}_{idx}.csv >> {save_dir}/results.csv")
-            exec(f"rm {save_dir}/{num_chunks}_{idx}.csv")
+        merge_chunks(save_dir, num_chunks)
     # eval, in two steps. First the judge, which grades every row -- that is the only way
     # a free-form answer gets a verdict at all. Then the breakdown, which rejoins those
     # verdicts to the class/source columns and checks the streaming time limit was

@@ -4,9 +4,27 @@
 #SBATCH --gres-flags=enforce-binding
 #SBATCH -p gpu
 #SBATCH -C gmem48
-#SBATCH --gres=gpu:2
-#SBATCH --mem-per-cpu=8G
+#SBATCH --gres=gpu:4
+#SBATCH --mem=360G
 #SBATCH --cpus-per-gpu=8
+
+# Memory is the constraint here, not a preference. The old 8G/cpu x 16 cpus = 128 GiB died
+# OUT_OF_MEMORY (job 362087, MaxRSS pinned at exactly 128.0 GiB), and an earlier silent
+# oom_kill took out one worker of the 7b baseline arm leaving no traceback at all: a
+# SIGKILL loses the stdout buffer, so it merely looked like the run stopped. Only
+# StreamingBench and OVBench provoke it -- their videos reach ~190k tokens of KV against
+# ~4k on ODV-Bench and OVO-Bench, and pin_memory=True makes that cache unswappable host
+# RAM, one copy per worker. So what matters is memory per worker, not memory per job.
+#
+# Slurm picks the QOS from the GPU count, and the per-job memory cap rides along with it:
+# group3-1 (1 GPU) 90G, group3-2 (2 GPUs) 190G, group3-3 (3 GPUs) 280G. At 4 GPUs there is
+# no group3-4, so the job lands in plain `group3`, which caps nodes but not memory -- hence
+# 360G here. That is bounded by the hardware instead: 360 GiB fits c5-2 (386000 MB), c4-2
+# (385600 MB) and c4-3 (772650 MB), while 380G would fit only c4-3. At NUM_CHUNKS=4 it
+# gives each worker 90 GiB, against the 64 GiB that died.
+#
+# Note `group3` allows 4 GPUs per *user*, so a stray interactive session holding a GPU will
+# keep this job pending on QOSMaxGRESPerUser until it is released.
 
 # StreamingBench / Real-Time Visual Understanding: the full stage-2 sweep on both models.
 #
@@ -59,17 +77,17 @@ export PYTHONPATH="$(pwd)${PYTHONPATH:+:${PYTHONPATH}}"
 # Must match #SBATCH --gres=gpu:N -- run_eval.py starts one worker per chunk, each pinned
 # to its own GPU. Chunking splits the *video* list, so each GPU owns a disjoint set of
 # videos and no video is ingested twice.
-NUM_CHUNKS=2
+NUM_CHUNKS=4
 
 DATASET=${DATASET:-streamingbench_real}
 
 # Overridable so the sweep can be split across jobs or resumed:
 #     sbatch --export=ALL,MODELS="llava_ov_7b",ARMS="rlt:0.7 rlt:0.8 rlt:0.9" \
 #            scripts/eval_streamingbench.slurm
-MODELS=${MODELS:-"llava_ov_0.5b llava_ov_7b"}
+MODELS=${MODELS:-"llava_ov_7b"}
 # method:threshold. 'blind' ingests nothing; 'none' is ReKV untouched, the reference every
 # pruned arm is measured against.
-ARMS=${ARMS:-"blind:0 none:0 rlt:0.25 rlt:0.5 rlt:0.6 rlt:0.7 rlt:0.8 rlt:0.9"}
+ARMS=${ARMS:-"none:0 rlt:0.25 rlt:0.5 rlt:0.6 rlt:0.7 rlt:0.8 rlt:0.9"}
 
 # 1 FPS, matching the OVO-Bench runs. StreamingBench's queries key on fine detail
 # (Text-Rich Understanding, Counting) that a 2-second stride drops. The cost is real: each

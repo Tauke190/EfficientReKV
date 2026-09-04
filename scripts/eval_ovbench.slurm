@@ -5,8 +5,23 @@
 #SBATCH -p gpu
 #SBATCH -C gmem80
 #SBATCH --gres=gpu:2
-#SBATCH --mem-per-cpu=8G
+#SBATCH --mem=190G
 #SBATCH --cpus-per-gpu=8
+
+# The old 8G/cpu x 16 cpus = 128 GiB was not enough: job 362087 died OUT_OF_MEMORY
+# with MaxRSS pinned at exactly 128.0 GiB, and an earlier silent oom_kill took out
+# one worker of the 7b baseline arm leaving no traceback at all -- a SIGKILL loses
+# the stdout buffer, so it just looked like the run stopped. Only StreamingBench and
+# OVBench provoke it: their videos reach ~190k tokens of KV against ~4k on ODV-Bench
+# and OVO-Bench, and pin_memory=True makes that cache unswappable host RAM, one copy
+# per worker.
+#
+# 190G is the ceiling, not a preference: slurm assigns the QOS from the GPU count,
+# and group3-2 (2 GPUs) caps a job at cpu=24,mem=190G. Asking for more does not
+# queue, it is refused. So this is the most memory two workers can be given --
+# 95 GiB each, against the 64 GiB that died. Note the cap does scale with GPUs:
+# group3-1 is 90G, group3-2 190G, group3-3 280G. Three GPUs running NUM_CHUNKS=2
+# would leave one idle but give each worker 140 GiB; see NUM_CHUNKS below.
 
 # OVBench: the streaming sweep on both models.
 #
@@ -49,10 +64,10 @@ export PYTHONPATH="$(pwd)${PYTHONPATH:+:${PYTHONPATH}}"
 NUM_CHUNKS=${NUM_CHUNKS:-2}
 
 DATASET=ovbench
-MODELS=${MODELS:-"llava_ov_0.5b llava_ov_7b"}
+MODELS=${MODELS:-"llava_ov_7b"}
 # method:threshold. 'blind' ingests nothing; 'none' is ReKV untouched, the reference every
 # pruned arm is measured against.
-ARMS=${ARMS:-"blind:0 none:0 rlt:0.25 rlt:0.5 rlt:0.6 rlt:0.7 rlt:0.8 rlt:0.9"}
+ARMS=${ARMS:-"none:0 rlt:0.25 rlt:0.5 rlt:0.6 rlt:0.7 rlt:0.8 rlt:0.9"}
 
 SAMPLE_FPS=${SAMPLE_FPS:-1}
 N_LOCAL=${N_LOCAL:-15000}
