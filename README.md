@@ -1,7 +1,6 @@
 # EfficientReKV
 
-Casual Streaming Token reduction for ReKV streaming video QA. Two experiments: an **accuracy eval**
-(`video_qa/run_eval.py`) and a **speed benchmark** (`video_qa/measure_encoding_fps.py`).
+Casual Streaming Token reduction for ReKV streaming video QA.
 
 
 ## Eval
@@ -13,26 +12,26 @@ python -m video_qa.run_eval \
     --prune_method rlt --prune_threshold 0.5
 ```
 
-Or edit the variables at the top of `scripts/eval.sh` (direct) / `scripts/eval.slurm`
-(sbatch twin), or copy a purpose-built sweep like `scripts/eval_0.5b_pareto.slurm`.
-
 ### Datasets
 
 | `--dataset` | Build annotation with |
 |---|---|
 | `ovobench_realtime`, `ovobench_backward` | `python video_qa/convert_ovobench.py` |
-| `odvbench` | `python scripts/setup_odvbench.py` |
+| `odvbench` | `python scripts/dataset_prep/setup_odvbench.py` |
 | `fpsbench_stream` | `python video_qa/convert_fpsbench_stream.py` |
-| `mlvu`, `egoschema`, `cgbench`, `qaego4d` | shipped |
-| `rvs_ego`, `rvs_movie`, `activitynet_qa` | shipped, free-form |
+| `streamingbench_real` | `scripts/dataset_prep/prepare_streamingbench.sh` |
+| `ovbench` | `scripts/dataset_prep/prepare_ovbench.sh` |
+| `streambench` | `scripts/dataset_prep/prepare_streambench.sh` |
+| `rvs_ego`, `rvs_movie`, | shipped, free-form |
 
-`ovobench_*`, `odvbench`, `fpsbench_stream` are **streaming**: each question sees only
-frames up to its own timestamp. Notes:
+`ovobench_*`, `odvbench`, `fpsbench_stream`, `streamingbench_*`, `ovbench` and
+`streambench` are **streaming**: each question sees only frames up to its own timestamp.
 
-- `odvbench` clips are 5–90 s, so use `--sample_fps 2` or more; no clip nears `n_local`,
-  so retrieval never fires there.
-- `fpsbench_stream` only: `--trigger query` (default, realtime perception) vs `--trigger
-  end` (retrieval, the published protocol). Separate results dirs.
+
+Notes:
+- `streambench` is the only benchmark here that is both streaming and open-ended, so it
+  needs a judge. `--judge_preset` defaults to `streambench` (upstream's Llama-3-8B-Instruct
+  prompt, reproduced byte-for-byte) instead of the repo-wide `prometheus`; override it and
 - Free-form (`rvs_*`, `qaego4d`, `activitynet_qa`): pass `--skip_scoring`, then score with
   `scripts/score_open_ended.sh` (local) or `score_llmjudge_gpt.sh` (needs `OPENAI_API_KEY`).
   Score a whole sweep with one judge — local scores aren't comparable to published ones.
@@ -41,9 +40,8 @@ frames up to its own timestamp. Notes:
 
 ### Pruning
 
-
-- **`--prune_method rlt`** (stage 2, memory-side) — drops tokens before the LM prefill
-  (~84% of encode cost); shrinks throughput, KV RAM and retrieval together. This is the
+- **`--prune_method rlt`** — drops tokens before the LM prefill
+  shrinks throughput, KV RAM and retrieval together. This is the
   one that matters. Flags: `--prune_threshold`, `--prune_metric cosine|l2`,
   `--prune_refresh_every`.
 
@@ -54,7 +52,8 @@ ovobench_realtime @ 1 fps: 0.25 → 72% kept, 0.5 → 22% kept. Thresholds do no
 ### Results
 
 `results/<model>/<dataset>/<retrieve_size>-<sample_fps><tag>/results.csv`, where `<tag>` is
-`` (baseline), `-blind`, or `-rlt0.5cosine`.
+`` (baseline), `-blind`, or `-rlt0.5cosine`. StreamingBench writes one directory per
+subset (`streamingbench_real`, …).
 
 Keep rates are already in `results.csv` when a pruner is attached: `tokens_kept`,
 `tokens_seen`, `token_keep_rate`, `kv_cache_bytes` and more, per question. **Baseline runs

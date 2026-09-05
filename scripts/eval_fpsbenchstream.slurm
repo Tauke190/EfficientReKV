@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=rekv_fpsbench
+#SBATCH --job-name=fpsbench_rekv
 #SBATCH --output=/home/av354855/EfficientReKV/slurmlogs/rekv_fpsbench-%j.out
 #SBATCH --gres-flags=enforce-binding
 #SBATCH -p gpu
@@ -9,47 +9,27 @@
 #SBATCH --cpus-per-gpu=8
 
 # FPS-Bench-Stream frame-rate sweep: the same 990-stream (or subset) benchmark run at
-# 1/2/4/8/16/32 fps, so accuracy can be read against the sampling rate.
+# 1/2/4 fps, so accuracy can be read against the sampling rate.
 #
 
 
 # Two ceilings bound the top of the sweep, and both are real:
 #
-# * **The source rate.** The assembled streams are 24-60 fps (25: 502, 30: 372, 24: 101,
-#   the rest a handful), and the solver samples on the exact grid, taking the most recent
-#   source frame for slot k. Above the source rate that repeats frames: at 32 fps on a
-#   25 fps stream, 7 slots in every 32 carry no new pixels but still cost a vision-tower
-#   pass and 196 KV tokens each. 32 fps is therefore a control point -- it should look
-#   like 25ish fps with a third more compute -- not a higher-information arm. 16 fps is
-#   under every stream's native rate and is the highest arm that is genuinely 16 fps.
+# * **The source rate.** Streams are 24-60 fps (25: 502, 30: 372, 24: 101), and the solver
+#   samples on the exact grid, so an arm above the source rate repeats frames at full cost
+#   (vision pass + 196 KV tokens). 16 fps is the highest genuinely-16 fps arm; 32 fps is a
+#   control point -- 25ish fps with a third more compute -- not more information.
 #
-# * **CPU RAM.** ReKV offloads the whole KV-Cache to pinned host memory and holds it for
-#   the length of the stream, and run_eval.py runs one worker per chunk on one node -- so
-#   the node pays that times NUM_CHUNKS. Measured on this node with llava_ov_0.5b (peak
-#   RSS of one worker, `scripts/`-adjacent probes, 600 s streams):
-#       1 fps (600 frames)   ~26 GB      8 fps (4800)   ~41 GB
-#       4 fps (2400)         ~32 GB     32 fps (19200)  ~91 GB (extrapolated)
-#   Note the intercept: even a 1 fps worker sits at ~25 GB, far above the ~1.4 GB the KV
-#   tensors themselves need, because the pinned-block pool and the host allocator do not
-#   give the memory back. It plateaus rather than climbing -- across ten streams a worker
-#   stayed at ~23 GB resident / 41 GB peak -- so the model below is an intercept plus a
-#   per-frame slope, not a pure per-frame cost. MEM_* are those two constants;
-#   llava_ov_7b's are the same measurement scaled by its 4.7x larger per-token KV and are
-#   an estimate, not a measurement. The loop sizes each arm's chunk count to fit
-#   MEM_BUDGET_GB rather than letting a 16 fps 7b arm take the node down eight hours in,
-#   and skips an arm that cannot fit even one worker. This is why the full sweep is a
-#   0.5b run: llava_ov_7b fits to about 4 fps on this node and no further.
+# * **CPU RAM.** ReKV holds the whole KV-Cache in pinned host memory for the length of the
+#   stream, times one worker per chunk on the node. Cost is a large intercept plus a small
+#   per-frame slope (0.5b measured: ~26 GB at 1 fps, ~32 at 4, ~41 at 8), because the
+#   pinned pool never returns memory; MEM_* below are those two constants, with 7b scaled
+#   by its 4.7x per-token KV -- an estimate. The loop sizes chunks to MEM_BUDGET_GB and
+#   skips an arm that cannot fit one worker, so llava_ov_7b runs to ~4 fps here and stops.
 #
-# Decoded pixels used to be a third ceiling -- FrameStream read the whole video up front,
-# which at source resolution (a median 4.6 MB/frame here) is 85 GB per worker at 32 fps.
-# It now decodes --decode_window slots at a time; the frames are identical, only residency
-# changes. Do not set DECODE_WINDOW=0 (whole-video decode) above ~2 fps.
+
 #
-# Runtime is the other reason this defaults to a subset: cost is linear in fps, so the six
-# arms together cost 63x a single 1 fps arm. Measured on one A6000 with llava_ov_0.5b, the
-# solver sustains ~6-7 frames/s end to end (9-10 frames/s of pure encode, the rest decode
-# and QA), so on 4 GPUs over the 135-stream subset with TRIGGER=query (which ingests to
-# query_time_sec, a mean 305 s of each stream):
+
 #     1 fps ~0.5 h   2 fps ~1 h   4 fps ~2 h   8 fps ~3.5 h   16 fps ~9 h   32 fps ~28 h
 # i.e. ~44 h for the whole sweep, and about twice that with TRIGGER=end. The top two arms
 # are superlinear because they also give up GPUs to the memory guard below (16 fps runs on
@@ -57,8 +37,6 @@
 # this; the arms are independent and each writes its own directory, so
 # FPS_LIST="1 2 4 8" and FPS_LIST="16" and FPS_LIST="32" as three jobs is the same sweep.
 #
-# scripts/eval.slurm is the general-purpose twin; this one exists because the fps loop,
-# the per-fps chunk sizing and the subset are all specific to this benchmark.
 
 module load anaconda3
 module load cuda
@@ -81,14 +59,14 @@ export PYTHONPATH="$(pwd)${PYTHONPATH:+:${PYTHONPATH}}"
 
 DATASET=fpsbench_stream
 
-# llava_ov_0.5b sweeps the whole range; llava_ov_7b is capped by host RAM (see above) and
+#llava_ov_7b is capped by host RAM (see above) and
 # will skip its top arms rather than run them.
 MODEL=llava_ov_7b
 
 # The sweep. Space-separated, and each value writes to its own results directory
 # (results/<model>/fpsbench_stream/<retrieve_size>-<fps>...), so arms never overwrite
 # each other and the list can be run in pieces across jobs.
-FPS_LIST="1 2 4 8"
+FPS_LIST="1 2 4"
 
 # The query is trigged at the end of evidence window
 TRIGGER=query
@@ -112,8 +90,7 @@ PRUNE_REFRESH_EVERY=0
 GPUS=4
 # Host RAM all workers together may occupy. The job is allocated --mem-per-cpu x
 # --cpus-per-gpu x GPUS = 256G on a 257G node, so this leaves ~56G of headroom for the
-# decode windows (one --decode_window block of source-resolution pixels per worker, up to
-# ~1.6 GB) and for whatever else is resident.
+# decode windows 
 MEM_BUDGET_GB=200
 
 # Peak host memory of one worker: MEM_FIXED_GB + MEM_GB_PER_FRAME x frames. Both measured
@@ -137,12 +114,7 @@ if [ ! -f data/fpsbench_stream/test_mc.json ]; then
     echo "  python video_qa/convert_fpsbench_stream.py --out data/fpsbench_stream/test_mc.json" >&2
     exit 1
 fi
-if [ -n "${ANNO}" ] && [ ! -f "${ANNO}" ]; then
-    echo "=== ${ANNO} missing; building it ==="
-    python scripts/make_fpsbench_subset.py --per_cell 5 --out "${ANNO}" || exit 1
-fi
-ANNO_ARGS=""
-[ -n "${ANNO}" ] && ANNO_ARGS="--anno_path ${ANNO}"
+
 
 for FPS in ${FPS_LIST}; do
   # Peak host memory of one worker at this frame rate, and how many of them fit.

@@ -522,6 +522,28 @@ def eval_ovobench_realtime(args):
 def eval_ovobench_backward(args):
     eval_ovobench(args, 'backward')
 
+def split_multi_fps(bundle_dir, fps_list, dir_for_fps):
+    """Fan a bundled multi-rate results.csv out into the one-directory-per-rate layout.
+
+    A bundled run records one row per (video, rate), each carrying its own `sample_fps`,
+    so the split is a groupby. What lands on disk afterwards is what three separate runs
+    would have written -- which is the point: video_qa/eval/eval_fpsbench_stream.py, the
+    no-lookahead audit and scripts/collect_fpsbench_sweep.py all keep working without
+    knowing this mode exists.
+    """
+    df = pd.read_csv(f'{bundle_dir}/results.csv')
+    for fps in fps_list:
+        rows = df[df['sample_fps'] == fps]
+        assert len(rows), (
+            f'{bundle_dir}/results.csv has no rows at {fps} fps -- the bundled run did '
+            f'not cover every rate it was asked for, so splitting it would write a '
+            f'directory that looks like a finished arm but is empty')
+        out = dir_for_fps(fps)
+        os.makedirs(out, exist_ok=True)
+        rows.to_csv(f'{out}/results.csv', index=False)
+        print(f'  {fps} fps -> {out}/results.csv ({len(rows)} rows)')
+
+
 def eval_fpsbench_stream(args):
     """FPS-Bench-Stream: the FPSBench clip hidden in a 600 s haystack.
 
@@ -551,8 +573,21 @@ def eval_fpsbench_stream(args):
     # be indistinguishable afterwards.
     subset_tag = "" if args.anno_path is None \
         else f"-{os.path.splitext(os.path.basename(anno_path))[0]}"
-    save_dir = (f"results/{args.model}/fpsbench_stream/{args.retrieve_size}-{args.sample_fps}"
+    def dir_for_fps(fps):
+        return (f"results/{args.model}/fpsbench_stream/{args.retrieve_size}-{fps}"
                 f"{trigger_tag}{subset_tag}{reduction_tag(args)}")
+
+    fps_list = ([float(x) for x in args.sample_fps_list.split(',')]
+                if args.sample_fps_list else None)
+    if fps_list:
+        # The bundled run is scratch: it is split into the per-rate directories below, and
+        # those are what gets scored and collected. Named so it cannot collide with a
+        # single-rate arm's directory.
+        save_dir = (f"results/{args.model}/fpsbench_stream/{args.retrieve_size}"
+                    f"-multi{'+'.join(str(f) for f in fps_list)}"
+                    f"{trigger_tag}{subset_tag}{reduction_tag(args)}")
+    else:
+        save_dir = dir_for_fps(args.sample_fps)
     solver = "rekv_fpsbench_stream_vqa"
     prompt_args = ["--max_new_tokens", str(args.max_new_tokens),
                    "--choice_seed", str(args.choice_seed),
@@ -567,6 +602,9 @@ def eval_fpsbench_stream(args):
         prompt_args.append("--force_answer_length")
     if args.retrieval_breakdown:
         prompt_args.append("--retrieval_breakdown")
+    if fps_list:
+        prompt_args += ["--sample_fps_list", args.sample_fps_list,
+                        "--decode_hold_gb", str(args.decode_hold_gb)]
     prompt_args += stream_args(args)
     if not args.only_eval:
         # QA
@@ -589,10 +627,15 @@ def eval_fpsbench_stream(args):
             p.join()
         # merge results
         merge_chunks(save_dir, num_chunks)
+        if fps_list:
+            print(f'splitting {save_dir}/results.csv by sample_fps:')
+            split_multi_fps(save_dir, fps_list, dir_for_fps)
     # There is an answer key here, so this scores. The streaming audit is the same one the
-    # short-clip arm runs -- both write the same no-lookahead columns.
-    score(args, f"python video_qa/eval/eval_fpsbench_stream.py --save_dir {save_dir}")
-    exec(f"python video_qa/eval/check_fpsbench_stream.py --save_dir {save_dir}")
+    # short-clip arm runs -- both write the same no-lookahead columns. A bundled run scores
+    # each rate's own directory, so its output is indistinguishable from separate runs.
+    for d in ([dir_for_fps(f) for f in fps_list] if fps_list else [save_dir]):
+        score(args, f"python video_qa/eval/eval_fpsbench_stream.py --save_dir {d}")
+        exec(f"python video_qa/eval/check_fpsbench_stream.py --save_dir {d}")
 
 def eval_cgbench(args):
     num_chunks = args.num_chunks
@@ -859,6 +902,23 @@ if __name__ == "__main__":
     parser.add_argument("--judge_batch_size", type=int, default=16,
                         help="--judge local only: prompts per forward pass.")
     parser.add_argument("--sample_fps", type=float, default=1)
+    parser.add_argument("--sample_fps_list", type=str, default=None,
+                        help="fpsbench_stream only: run these comma-separated rates "
+                             "(e.g. '1,2,4') in one pass, decoding each video once at the "
+                             "highest rate and reading the lower rates as strided views of "
+                             "that decode. The grids nest exactly, so the frames -- and the "
+                             "results -- are identical to running the rates separately; "
+                             "results are split back into the per-rate directories at the "
+                             "end. Size --num_chunks for the HIGHEST rate: one process now "
+                             "holds the top rate's KV-Cache, so a memory-limited model pays "
+                             "that worker count for every rate, which can cost more than "
+                             "the shared decode saves. Worth it when every rate would get "
+                             "the same worker count anyway.")
+    parser.add_argument("--decode_hold_gb", type=float, default=6.0,
+                        help="--sample_fps_list only: cap on the decoded pixels one video "
+                             "may hold. Videos over it fall back to one decode per rate "
+                             "(same results, no sharing) instead of taking the worker "
+                             "down -- the release spans 0.23 to 14.75 MB per frame.")
     parser.add_argument("--n_local", type=int, default=15000)
     parser.add_argument("--retrieve_size", type=int, default=64)
     parser.add_argument("--debug", type=str, default='false')

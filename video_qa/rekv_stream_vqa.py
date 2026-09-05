@@ -68,6 +68,9 @@ class FrameStream:
         self.sample_fps = sample_fps
         n_src = len(vr)
         src_fps = round(vr.get_avg_fps())
+        # Kept so StridedStream can size a lower-rate view with the same formula below,
+        # instead of dividing len(self) and rounding differently at the tail.
+        self.n_src, self.src_fps = n_src, src_fps
         if exact:
             n_slots = max(1, int(round(n_src / src_fps * sample_fps)))
             self._index = [min(n_src - 1, int(t * src_fps / sample_fps))
@@ -125,6 +128,49 @@ class FrameStream:
     def frames(self, start, end):
         """Yield slots [start, end) as (1, H, W, 3) uint8 tensors, in arrival order."""
         for k in range(max(0, start), min(end, len(self._index))):
+            yield self.get(k)
+
+
+class StridedStream:
+    """A lower-rate view of a FrameStream that has already been decoded.
+
+    The exact grids nest. FrameStream puts slot t at source frame
+    `int(t * src_fps / rate)`, so at rate F = n * f, slot n*t lands on
+    `int(n*t * src_fps / (n*f))` = `int(t * src_fps / f)` -- bit-for-bit the frame rate f
+    would have put at slot t. A view therefore delivers exactly the frames a FrameStream
+    opened at rate f would deliver, and the only thing it skips is decoding the file
+    again. Verified for every source rate in FPS-Bench-Stream (24/25/30/60).
+
+    The tail is the one place the two can disagree: each rate rounds its own slot count
+    off `n_src / src_fps * rate`, so `n // step` can be one over. The count is recomputed
+    here with the same expression rather than derived, and the view is clipped to it.
+
+    Only useful over an eagerly-decoded base (`window=0`). Over a windowed one every pass
+    re-decodes, which is the cost this exists to avoid.
+    """
+
+    def __init__(self, base, sample_fps):
+        step = base.sample_fps / sample_fps
+        assert step == int(step) and step >= 1, (
+            f'{sample_fps} fps is not a whole-number divisor of the decoded '
+            f'{base.sample_fps} fps; the grids do not nest and a view would silently '
+            f'deliver different frames than a direct run')
+        self.base = base
+        self.step = int(step)
+        self.sample_fps = sample_fps
+        own = max(1, int(round(base.n_src / base.src_fps * sample_fps)))
+        self.n_available = own
+        self._n = min(own, -(-len(base) // self.step))
+
+    def __len__(self):
+        return self._n
+
+    def get(self, k):
+        return self.base.get(k * self.step)
+
+    def frames(self, start, end):
+        """Yield slots [start, end) as (1, H, W, 3) uint8 tensors, in arrival order."""
+        for k in range(max(0, start), min(end, self._n)):
             yield self.get(k)
 
 

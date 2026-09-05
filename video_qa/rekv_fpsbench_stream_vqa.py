@@ -72,9 +72,9 @@ import torch
 from logzero import logger
 from decord import VideoReader, cpu
 
-from video_qa.base import BaseVQA, work
+from video_qa.base import BaseVQA, work, open_video_reader
 from video_qa.fpsbench_prompt import build_prompt, parse_letter
-from video_qa.rekv_stream_vqa import FrameStream
+from video_qa.rekv_stream_vqa import FrameStream, StridedStream
 
 
 def add_timing_args(parser):
@@ -118,6 +118,29 @@ def add_args(parser):
                              "(= the certificate end), where the needle is the most recent "
                              "content in the cache -- the control arm for how much of any "
                              "gap is retrieval rather than perception.")
+    parser.add_argument("--sample_fps_list", type=str, default=None,
+                        help="Comma-separated frame rates to run in one pass over each "
+                             "video, e.g. '1,2,4', overriding --sample_fps. The video is "
+                             "decoded once at the highest rate and the lower rates are "
+                             "strided views of that decode (StridedStream), which deliver "
+                             "bit-identical frames to separate runs because the exact "
+                             "grids nest. Every rate must divide the highest exactly. "
+                             "Rows carry their own sample_fps, so one CSV holds all rates; "
+                             "split it with scripts/split_fpsbench_by_fps.py to get the "
+                             "per-rate layout the scorer expects. Worth it only when the "
+                             "rates would each get the same worker count anyway: this mode "
+                             "holds the highest rate's KV-Cache, so a memory-limited run "
+                             "pays the top rate's worker count for every rate.")
+    parser.add_argument("--decode_hold_gb", type=float, default=6.0,
+                        help="--sample_fps_list only: most decoded pixels one video may "
+                             "hold. Sharing a decode means holding it, at source "
+                             "resolution, for the whole video -- and the release is not "
+                             "one resolution: 470 of 990 streams are 720x540 or smaller "
+                             "(2.8 GB at 4 fps) but the 1920x8xx ones are 4.6 MB a frame "
+                             "(11 GB), and the largest is 35 GB. A single unbudgeted "
+                             "video would take the worker down, so any video whose shared "
+                             "decode would exceed this falls back to one windowed decode "
+                             "per rate -- slower for that video, identical results.")
     add_timing_args(parser)
 
 
@@ -142,6 +165,15 @@ class ReKVFPSBenchStreamVQA(BaseVQA):
         self.choice_seed = args.choice_seed
         self.force_answer_length = args.force_answer_length
         self.retrieval_breakdown = args.retrieval_breakdown
+        self.fps_list = None
+        if getattr(args, 'sample_fps_list', None):
+            self.fps_list = sorted(float(x) for x in args.sample_fps_list.split(','))
+            # self.sample_fps still drives every seconds<->slot conversion in this file;
+            # analyze_a_video rebinds it per rate. Start it at the first rate so anything
+            # read before the loop (the save path, logging) sees a member of the list.
+            self.sample_fps = self.fps_list[0]
+        self.decode_hold_gb = getattr(args, 'decode_hold_gb', 6.0)
+        self.n_shared, self.n_fallback = 0, 0
 
     # --- ingestion ------------------------------------------------------------------
 
@@ -149,8 +181,39 @@ class ReKVFPSBenchStreamVQA(BaseVQA):
         # exact=True regardless of --exact_fps, for the reason in the module docstring:
         # the stride grid does not put slot k at t = k / sample_fps, and every conversion
         # in this file assumes it does.
+        if self.fps_list:
+            # Decoded once at the highest rate; every lower rate reads it through a
+            # StridedStream. Eager (window=0) rather than windowed: each rate is its own
+            # pass over the same slots, and a windowed base would re-decode every block
+            # once per pass, which is exactly the cost this mode exists to remove.
+            #
+            # That means holding the decode at source resolution, and the release spans
+            # 0.23 to 14.75 MB a frame -- so the hold is budgeted per video rather than
+            # assumed affordable. Over budget, this video runs one windowed decode per
+            # rate: slower for that video, bit-identical results either way.
+            top = max(self.fps_list)
+            gb = self._shared_decode_gb(video_sample['video_path'], top)
+            if gb <= self.decode_hold_gb:
+                self.n_shared += 1
+                return FrameStream(video_sample['video_path'], top, exact=True, window=0)
+            self.n_fallback += 1
+            logger.debug(f"{video_sample['video_id']}: shared decode would hold "
+                         f'{gb:.1f} GB > {self.decode_hold_gb} GB; one decode per rate')
+            return None
         return FrameStream(video_sample['video_path'], self.sample_fps, exact=True,
                            window=self.decode_window)
+
+    def _shared_decode_gb(self, video_path, top_fps):
+        """Pixels a shared decode at `top_fps` would hold, in GB.
+
+        Reads one frame for its shape rather than trusting the annotation: the release
+        normalizes to several resolutions and a wrong guess here is an OOM, not a slow
+        video. One frame off a container that is about to be decoded in full is noise.
+        """
+        vr = open_video_reader(video_path)
+        h, w, c = vr.get_batch([0]).asnumpy().shape[-3:]
+        n_slots = max(1, int(round(len(vr) / round(vr.get_avg_fps()) * top_fps)))
+        return n_slots * h * w * c / 1e9
 
     def ingest(self, stream, start, end):
         """Encode slots [start, end) as they arrive, one forward pass each.
@@ -366,7 +429,36 @@ class ReKVFPSBenchStreamVQA(BaseVQA):
 
     @torch.inference_mode()
     def analyze_a_video(self, video_sample):
-        stream = self.open_stream(video_sample)
+        """One video, at every requested rate, over a single decode.
+
+        Rates run ascending so the run reaches its peak KV-Cache (the highest rate) last,
+        with every cheaper rate's cache already released -- the peak is one rate's, not
+        the sum. `self.sample_fps` is rebound per rate because every seconds-to-slot
+        conversion in this file reads it; it is restored afterwards so a failure mid-video
+        cannot leave the next video running at the wrong rate.
+        """
+        base = self.open_stream(video_sample)
+        if not self.fps_list:
+            self._run_one_rate(video_sample, base)
+            return
+
+        original = self.sample_fps
+        try:
+            for fps in self.fps_list:
+                self.sample_fps = fps
+                if base is None:
+                    # Over the hold budget: this video pays its own windowed decode per
+                    # rate, exactly as a single-rate run would.
+                    view = FrameStream(video_sample['video_path'], fps, exact=True,
+                                       window=self.decode_window)
+                else:
+                    view = base if fps == base.sample_fps else StridedStream(base, fps)
+                self._run_one_rate(video_sample, view)
+        finally:
+            self.sample_fps = original
+
+    @torch.inference_mode()
+    def _run_one_rate(self, video_sample, stream):
         n_loaded = len(stream)
 
         self.qa_model.clear_cache()
