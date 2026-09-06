@@ -333,18 +333,258 @@ def answer_one(model, question, args, breakdown, supports_min_tokens):
 
 
 @torch.inference_mode()
-def encode_frames(model, stream, start, end, records=None, chunk_size=1, pbar=None):
+class FrameFlops:
+    """Arithmetic actually issued per frame, measured -- because no one counter sees it all.
+
+    `FlopCounterMode` is a `__torch_dispatch__` mode, so it sees every aten op: the vision
+    tower, the projector, and the LM's q/k/v/o projections and MLP, which together are the
+    bulk of the cost and the whole of what stage-2 pruning shrinks. It does not see ReKV's
+    attention. With `fattn=True` -- what every model/*_rekv.py sets -- the LM attends
+    through a Triton kernel (model/attention/dot_production_attention/triton_impl.py) that
+    never reaches the dispatcher, and the counter reports zero for it without complaint.
+    Torch's own `scaled_dot_product_attention` is invisible to it here as well: measured on
+    this install, a 4-head 128x128x64 call counted 0 against an expected 16.8 MFLOP.
+
+    So attention is counted where it is issued: `append(q, k, v)` on the attention class,
+    the one choke point both backends share. 4 * B * H * Lq * Lk * D per call -- QK^T and
+    A.V -- read off the real tensors, so the context length is whatever the local window
+    and retrieval actually produced rather than an assumed n_local.
+
+    Two things this deliberately does not do:
+
+    * **No double counting.** The Torch backend's attention is plain `torch.matmul`, which
+      the dispatcher does see. When that backend is in use the hook's total is reported
+      separately and not added. Only the Triton backend's total is added.
+    * **No credit for masking.** `append` computes the dense product and then masks it, so
+      the dense count is what the Torch backend really executes. A Triton flash kernel can
+      skip fully-masked blocks, so on that backend the attention figure is an upper bound
+      for sliding-window calls. It is the algorithmic FLOP count either way, which is the
+      quantity a cost table is comparing.
+    """
+
+    def __init__(self):
+        from model.attention.dot_production_attention import (
+            get_multi_stage_dot_production_attention)
+        # The same class the model built, resolved the same way -- llava_onevision_rekv
+        # passes fattn=True, and this returns whether that request was actually honoured.
+        self.attn_cls, self.is_triton = get_multi_stage_dot_production_attention(True)
+        self.attn_flops = 0
+        self.op_flops = 0
+        self.frames = 0
+        self.tokens = None      # visual tokens the measured frames contributed
+        self._orig = None
+        self._counter = None
+        self._stride = None
+        self._seen = 0
+
+    def eligible(self, remaining, budget):
+        """Should this steady-state chunk be measured?
+
+        Frames are taken on a stride across the steady region, not as the first `budget`
+        in a row. Under pruning a frame's token count is a property of its content -- a
+        static stretch contributes almost nothing, a moving one contributes most of its
+        196 -- so a run of consecutive frames samples one scene and reports its keep rate,
+        not the stream's. Measured that way on FPS-Bench-Stream, 8 consecutive frames put
+        rlt@0.4 below rlt@0.5 and made rlt@0.1 identical to the baseline; the ordering is
+        an artifact of which frames the window happened to land on.
+
+        The stride is fixed the first time this is asked, from the frames still to come,
+        so the budget spreads over the whole steady region.
+        """
+        if self.frames >= budget:
+            return False
+        if self._stride is None:
+            self._stride = max(1, remaining // max(budget, 1))
+        take = (self._seen % self._stride == 0)
+        self._seen += 1
+        return take
+
+    def _patched_append(self):
+        orig = self.attn_cls.append
+        meter = self
+
+        def append(self, q, k, v, *args, **kwargs):
+            # (B, H, Lq, D) and (B, H_kv, Lk, D); GQA is expanded to H inside, so q's head
+            # count is the one that multiplies.
+            meter.attn_flops += 4 * q.size(0) * q.size(1) * q.size(-2) * k.size(-2) * q.size(-1)
+            return orig(self, q, k, v, *args, **kwargs)
+
+        return orig, append
+
+    def measure(self, fn, n_frames, pruner=None):
+        """Run `fn` under both counters and attribute it to `n_frames` frames.
+
+        `pruner` is read for the tokens these particular frames contributed. Without it
+        the GFLOPs figure cannot be checked against anything: it is measured on a sample
+        of the steady region, and that sample's keep rate need not equal the run's, so a
+        row pairing measured GFLOPs with the run-wide keep rate would be quietly
+        describing two different sets of frames.
+        """
+        from torch.utils.flop_counter import FlopCounterMode
+
+        self._orig, patched = self._patched_append()
+        self.attn_cls.append = patched
+        before_attn = self.attn_flops
+        before_kept = pruner.n_kept if pruner is not None else None
+        if before_kept is not None and self.tokens is None:
+            self.tokens = 0
+        try:
+            with FlopCounterMode(display=False) as counter:
+                fn()
+            self.op_flops += counter.get_total_flops()
+        finally:
+            self.attn_cls.append = self._orig
+        self.frames += n_frames
+        if before_kept is not None:
+            self.tokens += pruner.n_kept - before_kept
+        return self.attn_flops - before_attn
+
+    def totals(self):
+        """(gflops/frame total, matmul part, attention part) -- None if nothing measured."""
+        if not self.frames:
+            return None
+        op = self.op_flops / self.frames / 1e9
+        at = self.attn_flops / self.frames / 1e9
+        # Torch backend: the dispatcher already counted those matmuls.
+        return (op + at if self.is_triton else op), op, at
+
+
+def encode_frames_span(model, stream, start, end, span, chunk_size=1, pbar=None,
+                       flops=None, flops_budget=0):
+    """Encode frames [start, end) timing the run as two spans, not as a sum of chunks.
+
+    Why this exists. The per-chunk protocol below syncs the GPU before and after every
+    chunk, and at --encode_chunk_size 1 that is one sync pair per frame -- 600 of them
+    over a 600 s stream at 1 FPS. Each one drains the queue, so the CPU cannot run the
+    next frame's preprocessing (37-57 ms on the HF processor, and inside the timed region)
+    while the GPU finishes the current frame. A live stream has no such barrier. The
+    per-chunk figure is therefore a lower bound on streaming throughput, and the gap is
+    measurement overhead rather than anything about the system.
+
+    This mode syncs three times in total: once at the start, once when the local window
+    fills, once at the end. That yields a pre-steady and a steady span, which is the same
+    split `summarize()` makes, without paying a barrier per frame. It gives up per-chunk
+    resolution to get it, so both modes are kept and --timing chooses.
+
+    The split point is read off `model._n_tokens_fed`, a plain Python int, so locating it
+    costs no sync of its own. It lands one chunk later than the per-chunk path's: there a
+    chunk is 'steady' if the window was full when it finished, so the chunk that crosses
+    the boundary is counted steady, while here the sync can only be taken after that chunk
+    is already encoded, so it is counted pre-steady. Matching the convention exactly would
+    mean knowing which chunk will cross before encoding it, which is not predictable under
+    pruning. The difference is one chunk in the run -- 0.17% of a 600-frame stream, well
+    under run-to-run noise -- and it makes the steady figure conservative, never flattering.
+
+    Frame fetch is timed separately and subtracted. `stream.get` is a view into the
+    already-decoded video here, so this is microseconds against ~135 ms of compute, but
+    subtracting it keeps the exclusion of decode cost exactly as strict as the per-chunk
+    path's `# untimed`.
+    """
+    fetch_seconds = 0.0
+    flops_seconds = 0.0       # time spent under the FLOP counter, subtracted from the span
+    flops_frames = 0          # frames it consumed, subtracted from the span's frame count
+    steady_at = None          # frame index where the local window filled
+    t_steady = None
+
+    torch.cuda.synchronize()
+    t0 = time.perf_counter()
+
+    i = start
+    while i < end:
+        n = min(chunk_size, end - i)
+
+        f0 = time.perf_counter()
+        chunk = stream.get(i) if n == 1 else torch.cat(
+            [stream.get(j) for j in range(i, i + n)], dim=0)
+        fetch_seconds += time.perf_counter() - f0
+
+        if (flops is not None and t_steady is not None
+                and model._n_tokens_fed > model.n_local
+                and flops.eligible(end - i, flops_budget)):
+            # Measured chunks are excluded from the span the same way they are excluded
+            # from the per-chunk records: the counter's overhead is charged to
+            # `flops_seconds` and subtracted, so the steady span stays a clean clock.
+            fl0 = time.perf_counter()
+            flops.measure(lambda: model._encode_video_chunk(chunk), n,
+                          model.token_pruner)
+            torch.cuda.synchronize()
+            flops_seconds += time.perf_counter() - fl0
+            flops_frames += n
+            i += n
+            if pbar is not None:
+                pbar.update(n)
+            continue
+
+        model._encode_video_chunk(chunk)
+        i += n
+
+        # First chunk after the window filled: close the pre-steady span. Reading
+        # _n_tokens_fed is free; the sync is the only cost, and it happens once.
+        if t_steady is None and model._n_tokens_fed > model.n_local:
+            torch.cuda.synchronize()
+            t_steady = time.perf_counter()
+            steady_at = i
+
+        if pbar is not None:
+            pbar.update(n)
+
+    torch.cuda.synchronize()
+    t1 = time.perf_counter()
+
+    total = (t1 - t0) - fetch_seconds - flops_seconds
+    span['total_seconds'] = total
+    span['total_frames'] = (end - start) - flops_frames
+    span['fetch_seconds'] = fetch_seconds
+    span['flops_seconds'] = flops_seconds
+    span['flops_frames'] = flops_frames
+    span['steady_frame'] = steady_at
+    if t_steady is not None:
+        # The fetch time inside each span is not separated; it is bounded by the total
+        # above, which is already negligible, so it is charged to the pre-steady span
+        # where it can only make the steady figure conservative.
+        span['pre_seconds'] = max((t_steady - t0) - fetch_seconds, 0.0)
+        span['steady_seconds'] = (t1 - t_steady) - flops_seconds
+        span['steady_frames'] = (end - steady_at) - flops_frames
+    else:
+        span['pre_seconds'] = total
+        span['steady_seconds'] = None
+        span['steady_frames'] = 0
+    return span
+
+
+def encode_frames(model, stream, start, end, records=None, chunk_size=1, pbar=None,
+                  flops=None, flops_budget=0):
     """Encode frames [start, end) one chunk at a time, timing each chunk.
 
     Only the ingestion loop is reproduced here (it is not overridden by any model);
     `_encode_video_chunk` itself is called through, since each Video-LLM overrides it.
 
     `pbar` is advanced by the frames encoded; updating it is outside every timer.
+
+    Syncs once per chunk, which is what gives the per-frame resolution the records carry
+    and also what makes the figure a lower bound at chunk size 1; `encode_frames_span`
+    is the same work measured with three syncs instead. Default, so previously recorded
+    numbers stay comparable.
     """
     i = start
     while i < end:
         n = min(chunk_size, end - i)
         chunk = torch.cat([stream.get(j) for j in range(i, i + n)], dim=0)  # untimed
+
+        # A chunk measured for FLOPs is not timed: FlopCounterMode intercepts every op,
+        # which costs far more than the work itself, so a timing record from it would
+        # poison the throughput figure. Those chunks are simply absent from `records`.
+        # Only steady-state chunks are eligible -- the attention term depends on how much
+        # context is live, and before the window fills there is less of it than the stream
+        # will actually run with.
+        if (flops is not None and model._n_tokens_fed > model.n_local
+                and flops.eligible(end - i, flops_budget)):
+            flops.measure(lambda: model._encode_video_chunk(chunk), n,
+                          model.token_pruner)
+            i += n
+            if pbar is not None:
+                pbar.update(n)
+            continue
 
         torch.cuda.synchronize()
         t0 = time.perf_counter()
@@ -417,6 +657,26 @@ def main():
                              "the model says. Either way, report n_generated_tokens alongside "
                              "the latency; without it the number cannot be compared to anyone "
                              "else's.")
+    parser.add_argument("--flops_frames", type=int, default=0,
+                        help="Measure the arithmetic of this many steady-state frames and "
+                             "report GFLOPs/frame. Measured, not derived from the config: "
+                             "aten ops via FlopCounterMode plus the LM's attention from "
+                             "the shapes it is actually called with, since ReKV attends "
+                             "through a Triton kernel the dispatcher cannot see. The "
+                             "counter's overhead is large, so those frames are excluded "
+                             "from the throughput clock; 8 is plenty (frames in steady "
+                             "state differ only in keep rate). 0 = skip.")
+    parser.add_argument("--timing", type=str, default='per_chunk',
+                        choices=['per_chunk', 'span'],
+                        help="How the encode clock is read. 'per_chunk' (default) syncs "
+                             "around every chunk, giving per-frame records and the figure "
+                             "every previous run here reported; at --encode_chunk_size 1 "
+                             "that is a sync pair per frame, which serializes CPU "
+                             "preprocessing against GPU compute and makes the result a "
+                             "lower bound. 'span' syncs three times total (start, window "
+                             "full, end) and reports the steady-state span directly -- no "
+                             "per-frame records, no per-frame barrier. Run both: the gap "
+                             "between them is measurement overhead, not system behaviour.")
     parser.add_argument("--encode_chunk_size", type=int, default=64,
                         help="Frames per forward pass. 1 is what the streaming eval runs "
                              "(one arriving frame, one pass) and is ~2x slower here, "
@@ -535,6 +795,8 @@ def main():
         with make_bar(n_warmup + bool(schedule), "warm-up", 0, "step") as bar:
             encode_frames(model, stream, 0, n_warmup,
                           chunk_size=args.encode_chunk_size, pbar=bar)
+            # Warm-up is always per-chunk: it is thrown away, and its only job is to get
+            # the kernels compiled and the allocator warm.
             if schedule:
                 bar.set_postfix_str("warm-up question", refresh=True)
                 answer_one(model, schedule[0][1], args, breakdown, supports_min_tokens)
@@ -550,6 +812,8 @@ def main():
     torch.cuda.reset_peak_memory_stats()
 
     records = []
+    spans, span = [], {}
+    flops = FrameFlops() if args.flops_frames else None
     qa_records = []
     next_q = 0
     frame = 0
@@ -564,8 +828,19 @@ def main():
             stop = schedule[next_q][0] if next_q < len(schedule) else n_frames
             stop = min(stop, n_frames)
             if stop > frame:
-                encode_frames(model, stream, frame, stop, records, args.encode_chunk_size,
-                              pbar=enc_bar)
+                if args.timing == 'span':
+                    # One call covers the whole stream when QA is off, which is the only
+                    # shape this mode is meant for: a question mid-stream would split the
+                    # run into spans that each restart the clock and each pay their own
+                    # syncs, which is the overhead this mode exists to avoid.
+                    encode_frames_span(model, stream, frame, stop, span,
+                                       args.encode_chunk_size, pbar=enc_bar,
+                                       flops=flops, flops_budget=args.flops_frames)
+                    spans.append(dict(span))
+                else:
+                    encode_frames(model, stream, frame, stop, records,
+                                  args.encode_chunk_size, pbar=enc_bar,
+                                  flops=flops, flops_budget=args.flops_frames)
                 frame = stop
 
             while next_q < len(schedule) and schedule[next_q][0] <= frame:
@@ -598,7 +873,57 @@ def main():
     kv_bytes = model.calc_memory_usage()
     gpu_video = max(gpu_peak - gpu_weights, 0)
 
+    if args.timing == 'span':
+        # Collapse each span into the two-row shape the CSV and `summarize` already
+        # expect: one row for the frames before the local window filled, one for the
+        # frames after. The rows are spans, not chunks, and `num_frames` says so -- every
+        # aggregate below comes out identical to reading the spans directly, and only the
+        # per-chunk resolution is absent. Doing it here rather than teaching `summarize`
+        # about spans keeps one code path for the summary, the printing and the CSV.
+        records = []
+        for sp in spans:
+            n_steady_f = sp['steady_frames']
+            n_pre_f = sp['total_frames'] - n_steady_f
+            if n_pre_f > 0 and sp['pre_seconds'] > 0:
+                records.append({'frame_idx': 0, 'num_frames': n_pre_f,
+                                'seconds': sp['pre_seconds'],
+                                'fps': n_pre_f / sp['pre_seconds'],
+                                'local_window_full': False})
+            if n_steady_f > 0 and sp['steady_seconds']:
+                records.append({'frame_idx': sp['steady_frame'], 'num_frames': n_steady_f,
+                                'seconds': sp['steady_seconds'],
+                                'fps': n_steady_f / sp['steady_seconds'],
+                                'local_window_full': True})
+        assert records, 'span timing produced no usable span'
+
+    measured_flops = flops.totals() if flops is not None else None
+
     df = pd.DataFrame(records)
+    # Provenance. A results file that cannot say which video it came from is not
+    # comparable to another one: two sweeps differing only in --video_idx look identical
+    # in every other column, and the run log that would have said so is usually gone by
+    # the time anyone asks.
+    df['video_id'] = video_sample['video_id']
+    df['anno_path'] = args.anno_path
+    df['timing'] = args.timing
+    # Visual tokens actually handed to the LM over the run. This -- not
+    # `kv_cache_bytes` -- is what the KV growth rate should be read off:
+    # `calc_memory_usage()` reports only blocks that were *offloaded*, so a run whose
+    # whole cache still fits in the n_local window reports 0 GB however many tokens it
+    # stored. Multiplied by the config's exact bytes-per-token it gives the KV the stream
+    # really produced, measured, at any keep rate.
+    df['n_tokens_fed'] = model._n_tokens_fed
+    df['flops_frames'] = flops.frames if flops is not None else 0
+    # Keep rate of the sampled frames alone. Equal to `keep_rate` only if the sample is
+    # representative; the gap is how much to trust the GFLOPs row against its own arm.
+    df['flops_keep_rate'] = (
+        (flops.tokens / (flops.frames * model.n_frame_tokens))
+        if (flops is not None and flops.tokens is not None and flops.frames) else None)
+    df['gflops_per_frame'] = measured_flops[0] if measured_flops else None
+    df['gflops_matmul_per_frame'] = measured_flops[1] if measured_flops else None
+    df['gflops_attn_per_frame'] = measured_flops[2] if measured_flops else None
+    df['flops_attn_backend'] = (
+        ('triton' if flops.is_triton else 'torch') if flops is not None else None)
     df['model'] = args.model
     df['n_local'] = args.n_local
     df['sample_fps'] = args.sample_fps
@@ -618,12 +943,30 @@ def main():
 
     # Per hour of *video*, not of wall-clock: that is the axis memory actually scales on,
     # and it makes runs of different lengths comparable.
-    video_hours = total_frames / args.sample_fps / 3600.0
+    #
+    # `total_frames` counts the *timed* frames only, and --flops_frames deliberately keeps
+    # its frames out of the timing records. Those frames were still encoded and their
+    # tokens are still in the cache, so leaving them out of the denominator inflates every
+    # per-hour figure by exactly the fraction that was measured instead of timed (11.9% at
+    # 64 of 600). Both counts have to cover the same frames.
+    video_hours = (total_frames + (flops.frames if flops is not None else 0)) \
+        / args.sample_fps / 3600.0
     df['video_hours'] = video_hours
     df['kv_cache_bytes'] = kv_bytes
     df['gpu_weights_bytes'] = gpu_weights
     df['gpu_peak_bytes'] = gpu_peak
     qa_df = pd.DataFrame(qa_records) if qa_records else None
+
+    if measured_flops:
+        total, op, at = measured_flops
+        backend = 'triton' if flops.is_triton else 'torch'
+        print(f"\n  arithmetic        : {total:.1f} GFLOPs/frame over {flops.frames} "
+              f"steady-state frames")
+        print(f"    dispatcher      : {op:.1f}  (vision tower, projector, LM projections "
+              f"and MLP)")
+        print(f"    attention       : {at:.1f}  (from append() shapes, {backend} backend"
+              + ("" if flops.is_triton else "; already in the dispatcher total, not added")
+              + ")")
 
     gpu = torch.cuda.get_device_name(0) if torch.cuda.is_available() else "cpu"
     print("\n" + "=" * 70)

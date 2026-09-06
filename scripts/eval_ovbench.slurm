@@ -4,8 +4,8 @@
 #SBATCH --gres-flags=enforce-binding
 #SBATCH -p gpu
 #SBATCH -C gmem80
-#SBATCH --gres=gpu:2
-#SBATCH --mem=190G
+#SBATCH --gres=gpu:4
+#SBATCH --mem=360G
 #SBATCH --cpus-per-gpu=8
 
 # The old 8G/cpu x 16 cpus = 128 GiB was not enough: job 362087 died OUT_OF_MEMORY
@@ -61,7 +61,7 @@ export PYTHONPATH="$(pwd)${PYTHONPATH:+:${PYTHONPATH}}"
 
 # Must match #SBATCH --gres=gpu:N -- run_eval.py starts one worker per chunk, each pinned
 
-NUM_CHUNKS=${NUM_CHUNKS:-2}
+NUM_CHUNKS=${NUM_CHUNKS:-4}
 
 DATASET=ovbench
 MODELS=${MODELS:-"llava_ov_7b"}
