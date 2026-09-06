@@ -6,13 +6,16 @@ from longva.model import LlavaQwenForCausalLM
 
 from model.patch import patch_hf
 from model.abstract_rekv import Abstract_ReKV
+from model.token_pruning import build_pruner
 
 
 class LongVA_ReKV(LlavaQwenForCausalLM, Abstract_ReKV):
-    def __init__(self, config, n_frame_tokens, init_prompt_ids, n_local, topk, chunk_size):
+    def __init__(self, config, n_frame_tokens, init_prompt_ids, n_local, topk, chunk_size,
+                 token_pruner=None):
         LlavaQwenForCausalLM.__init__(self, config)
         processor = self.get_model().get_vision_tower().image_processor
-        Abstract_ReKV.__init__(self, processor, n_frame_tokens, init_prompt_ids, n_local, topk, chunk_size)
+        Abstract_ReKV.__init__(self, processor, n_frame_tokens, init_prompt_ids, n_local, topk, chunk_size,
+                               token_pruner=token_pruner)
 
     def get_prompt(self, query, mc=False):
         prompt =  f"\n{query}<|im_end|>\n<|im_start|>assistant\n"
@@ -27,13 +30,16 @@ class LongVA_ReKV(LlavaQwenForCausalLM, Abstract_ReKV):
         video_features = video_features.flatten(0, 1).unsqueeze(0)  # (1, Nv*144, 3584)
         return video_features
 
+    @torch.inference_mode()
     def _encode_video_chunk(self, video_chunk):  # (Nv, H, W, 3)
+        # Overridden only for the preprocessing call: LongVA's vision tower carries a plain
+        # image processor (`preprocess(...).pixel_values`), not the video processor the base
+        # class uses. Ingestion itself goes through `_ingest_video_features` exactly as every
+        # other backend does, which is what puts stage-2 pruning and its block-alignment
+        # buffering on this path.
         pixel_values_videos = self.processor.preprocess(video_chunk, return_tensors="pt").pixel_values.to(self.device, self.dtype)  # (Nv, 3, H, W)
         video_features = self._get_video_features(pixel_values_videos)  # (1, Nv*144, D)
-        assert self.n_local >= video_features.shape[1], f'n_local: {self.n_local}, video_features: {video_features.shape[1]}'
-
-        output = self.language_model(inputs_embeds=video_features, past_key_values=self.kv_cache, use_cache=True, return_dict=True)
-        self.kv_cache = output.past_key_values
+        self._ingest_video_features(video_features, n_frames=video_chunk.shape[0])
 
     @torch.inference_mode()
     def question_answering(self, input_text, max_new_tokens=128, retrieved_indices=None):
@@ -115,10 +121,41 @@ class LongVA_ReKV(LlavaQwenForCausalLM, Abstract_ReKV):
 
 
 def load_model(model_path='model_zoo/LongVA-7B',
-               n_init=None, n_local=8000, topk=32, chunk_size=1):
+               n_init=None, n_local=8000, topk=32, chunk_size=1,
+               prune_method=None, prune_threshold=None, prune_metric='cosine',
+               prune_refresh_every=0, prune_log_percentiles=False):
+    """Load LongVA with ReKV, and optionally stage-2 (memory-side) token pruning.
+
+    Stage 2 only. Stage 1 (model/vision_reduction.py) is a SigLIP implementation and does
+    not apply to LongVA's CLIP ViT-L tower.
+
+    Note that `prune_threshold` is a distance in feature space, and this feature space is
+    not LLaVA-OneVision's -- different tower, projector and pooling, and 144 tokens per
+    frame rather than 196. A threshold carried over from an llava_ov run will not give the
+    same keep rate here; calibrate with --prune_log_percentiles.
+    """
     n_frame_tokens = 144
     tokenizer = AutoTokenizer.from_pretrained(model_path, use_fast=False)
-    
+
+    # Off by default: with no method selected the encode path is byte-for-byte the
+    # baseline (every frame contributes exactly n_frame_tokens, so one block is one frame
+    # and nothing is ever buffered).
+    if prune_method in (None, 'none') and prune_threshold is not None:
+        prune_method = 'rlt'  # back-compat: --prune_threshold alone used to mean RLT
+
+    token_pruner = None
+    if prune_method not in (None, 'none'):
+        if prune_method == 'rlt':
+            assert prune_threshold is not None, "'rlt' pruning requires --prune_threshold"
+            kwargs = dict(threshold=prune_threshold, metric=prune_metric,
+                          refresh_every=prune_refresh_every,
+                          log_percentiles=prune_log_percentiles)
+        else:
+            kwargs = {}
+        token_pruner = build_pruner(prune_method, **kwargs)
+        logger.info(f'token pruning: method={prune_method} '
+                    + ' '.join(f'{k}={v}' for k, v in kwargs.items()))
+
     init_prompt = '<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n<|im_start|>user\n'
     init_prompt_ids = tokenizer(init_prompt).input_ids
     inf_llm_config = {
@@ -142,6 +179,7 @@ def load_model(model_path='model_zoo/LongVA-7B',
         n_local=n_local,
         topk=topk,
         chunk_size=chunk_size,
+        token_pruner=token_pruner,
     )
     vision_tower = model.get_vision_tower()
     if not vision_tower.is_loaded:

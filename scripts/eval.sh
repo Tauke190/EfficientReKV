@@ -18,7 +18,7 @@ export PYTHONPATH="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)${PYTHONPATH:
 num_chunks=1
 
 # Supported model: llava_ov_0.5b llava_ov_7b llava_ov_72b video_llava_7b longva_7b
-model=llava_ov_0.5b
+model=longva_7b
 
 # Supported dataset: qaego4d egoschema cgbench mlvu activitynet_qa rvs_ego rvs_movie
 # ovobench_realtime / ovobench_backward / fpsbench_stream / odvbench / ovbench are valid

@@ -464,8 +464,8 @@ def pruning_load_kwargs(args):
     """
     if not pruning_enabled(args):
         return {}
-    assert args.model.startswith('llava_ov'), \
-        f'token pruning is only implemented for llava_ov_* backends, not {args.model}'
+    assert args.model.startswith('llava_ov') or args.model == 'longva_7b', \
+        f'token pruning is only implemented for llava_ov_* and longva_7b, not {args.model}'
     return dict(
         prune_method=getattr(args, 'prune_method', 'none'),
         prune_threshold=args.prune_threshold,
