@@ -1,17 +1,20 @@
 import torch
 from logzero import logger
 
-from transformers import AutoTokenizer
+from transformers import AutoConfig, AutoTokenizer
 from flash_vstream import VStreamLlamaForCausalLM
 
 from model.patch import patch_hf
 from model.abstract_rekv import Abstract_ReKV
+from model.token_pruning import build_pruner
 
 
 class FlashVStream_ReKV(VStreamLlamaForCausalLM, Abstract_ReKV):
-    def __init__(self, config, n_frame_tokens, init_prompt_ids, n_local, topk, chunk_size):
+    def __init__(self, config, n_frame_tokens, init_prompt_ids, n_local, topk, chunk_size,
+                 token_pruner=None):
         VStreamLlamaForCausalLM.__init__(self, config)
-        Abstract_ReKV.__init__(self, None, n_frame_tokens, init_prompt_ids, n_local, topk, chunk_size)
+        Abstract_ReKV.__init__(self, None, n_frame_tokens, init_prompt_ids, n_local, topk, chunk_size,
+                               token_pruner=token_pruner)
 
     def get_prompt(self, query, mc=False):
         prompt =  f"\n{query}ASSISTANT:"
@@ -29,10 +32,17 @@ class FlashVStream_ReKV(VStreamLlamaForCausalLM, Abstract_ReKV):
     def _encode_video_chunk(self, video_chunk):  # (Nv, H, W, 3)
         pixel_values_videos = self.processor.preprocess(video_chunk, return_tensors="pt").pixel_values.to(self.device, self.dtype)  # (Nv, 3, H, W)
         video_features = self._get_video_features(pixel_values_videos)  # (1, Nv*64, D)
-        assert self.n_local >= video_features.shape[1], f'n_local: {self.n_local}, video_features: {video_features.shape[1]}'
-
-        output = self.language_model(inputs_embeds=video_features, past_key_values=self.kv_cache, use_cache=True, return_dict=True)
-        self.kv_cache = output.past_key_values
+        # Goes through _ingest_video_features rather than calling the LM directly, which is
+        # what puts stage-2 pruning and its block-alignment buffering on this path -- the
+        # same route llava_ov, longva and video_llava take. The n_local assertion that used
+        # to sit here now lives in _forward_features, and fires on the same condition.
+        #
+        # Note this prunes the 64 tokens/frame that survive `compress_spatial_features`,
+        # i.e. it composes with Flash-VStream's own spatial compression rather than
+        # replacing it: 256 patch tokens are pooled to 64 by the backbone, and stage 2 then
+        # drops whole frames' worth of those 64 across time. The two reductions are on
+        # different axes, so the keep rate reported here is a fraction of 64, not of 256.
+        self._ingest_video_features(video_features, n_frames=video_chunk.shape[0])
 
     @torch.inference_mode()
     def encode_video(self, video, encode_chunk_size=16):  # video: (Nv, H, W, 3)
@@ -144,10 +154,56 @@ class FlashVStream_ReKV(VStreamLlamaForCausalLM, Abstract_ReKV):
     #         self.question_answering(prompt)
 
 
-def load_model(model_path='/home/shangzhedi/shangzhedi/Flash-VStream-Base/checkpoints-finetune/base-7b-finetune-uniform-16/checkpoint-5900',
-               n_init=None, n_local=4000, topk=16, chunk_size=1):
+def load_model(model_path='model_zoo/Flash-VStream-7b',
+               n_init=None, n_local=3648, topk=16, chunk_size=1,
+               prune_method=None, prune_threshold=None, prune_metric='cosine',
+               prune_refresh_every=0, prune_log_percentiles=False):
+    """Load Flash-VStream with ReKV, and optionally stage-2 (memory-side) token pruning.
+
+    Stage 2 only. Stage 1 (model/vision_reduction.py) is a SigLIP implementation and this
+    backbone's tower is CLIP, so it does not apply.
+
+    `prune_threshold` is a distance in this backbone's feature space and does not carry
+    over from any other. It is the furthest of the four from llava_ov: 64 tokens a frame
+    against 196, and those 64 are already a spatial pooling of 256, so consecutive frames
+    are more similar here before stage 2 ever runs. Expect the useful range to sit lower
+    than llava_ov's 0.5-0.9 -- but that is a prediction, not a measurement, and the
+    threshold must be calibrated on this backbone before any number is trusted. For scale,
+    the same nominal threshold moved by more than 2x between llava_ov and longva.
+
+    Do not carry n_local/topk over from llava_ov or longva either: IVGSZ/Flash-VStream-7b
+    is a Vicuna-7B LM with a 4096-token context, where theirs are 32k and 224k. n_local
+    defaults to 3648 (57 frames at 64 tokens) and topk to 16 (1024 retrieved tokens), both
+    inside 4096 with room for the question and the generation.
+
+    3648 rather than the 4000 this function used to default to: n_init is 35 for the init
+    prompt above, so 4000 left 61 tokens of the context for a question, its formatted
+    choices and up to 128 generated tokens, which does not fit. Over-running it does not
+    raise -- the answer just comes back '' once the window has filled, which is how it
+    presented on video_llava (see model/video_llava_rekv.py). The assertion below turns
+    that silence into an error. 3648 is the largest multiple of block_size that clears it.
+    """
     n_frame_tokens = 64
     tokenizer = AutoTokenizer.from_pretrained(model_path, use_fast=False)
+
+    # Off by default: with no method selected the encode path is byte-for-byte the
+    # baseline (every frame contributes exactly n_frame_tokens, so one block is one frame
+    # and nothing is ever buffered).
+    if prune_method in (None, 'none') and prune_threshold is not None:
+        prune_method = 'rlt'  # back-compat: --prune_threshold alone used to mean RLT
+
+    token_pruner = None
+    if prune_method not in (None, 'none'):
+        if prune_method == 'rlt':
+            assert prune_threshold is not None, "'rlt' pruning requires --prune_threshold"
+            kwargs = dict(threshold=prune_threshold, metric=prune_metric,
+                          refresh_every=prune_refresh_every,
+                          log_percentiles=prune_log_percentiles)
+        else:
+            kwargs = {}
+        token_pruner = build_pruner(prune_method, **kwargs)
+        logger.info(f'token pruning: method={prune_method} '
+                    + ' '.join(f'{k}={v}' for k, v in kwargs.items()))
     
     """
     "<s> A chat between a curious user and an artificial intelligence assistant. The assistant gives helpful, detailed, and polite answers to the user's questions. USER: <unk>\nQuestion: Where did I put the dog fur?\nOptions:\n(A) on the sofa\n(B) on the floor\n(C) on the table\n(D) in the trash\nAnswer with the option's letter from the given choices directly and only give the best option. ASSISTANT:"
@@ -165,8 +221,34 @@ def load_model(model_path='/home/shangzhedi/shangzhedi/Flash-VStream-Base/checkp
     """
     init_prompt = "A chat between a curious user and an artificial intelligence assistant. The assistant gives helpful, detailed, and polite answers to the user's questions. USER: "
     init_prompt_ids = tokenizer(init_prompt).input_ids
+    _n_init = len(init_prompt_ids) if n_init is None else n_init
+
+    # Over-running a Llama context does not raise anywhere: the question is attended at RoPE
+    # positions the model never saw in training, the logits degenerate, the first sampled
+    # token is EOS and the answer decodes to ''. It shows up as early questions in a video
+    # answering normally and later ones coming back empty, which reads as a model defect
+    # rather than a misconfiguration -- that is exactly how it presented on video_llava.
+    # `margin` covers the question, the formatted choices and the generation, which all sit
+    # after the local window in the same position space. Skipped rather than guessed if the
+    # config does not expose a limit, since this backbone's config is not in the repo.
+    margin = 384
+    _cfg = AutoConfig.from_pretrained(model_path)
+    _ctx = getattr(getattr(_cfg, 'text_config', _cfg), 'max_position_embeddings', None)
+    if _ctx:
+        for _name, _need in (('n_local', _n_init + n_local),
+                             ('topk*block_size', _n_init + topk * n_frame_tokens)):
+            assert _need + margin <= _ctx, (
+                f'{_name} puts {_need} tokens in context, and with ~{margin} for the question '
+                f'and its answer that exceeds this checkpoint\'s {_ctx}-token limit. It holds '
+                f'~{(_ctx - margin) // n_frame_tokens} frames at {n_frame_tokens} tokens each. '
+                f'Do not carry n_local/retrieve_size over from llava_ov or longva.'
+            )
+    else:
+        logger.warning('could not read max_position_embeddings; n_local/topk are unchecked '
+                       'against the context limit, and over-running it fails silently')
+
     inf_llm_config = {
-        'n_init': len(init_prompt_ids) if n_init is None else n_init,
+        'n_init': _n_init,
         'n_local': n_local,
         'fattn': True,
         'block_size': n_frame_tokens,
@@ -187,6 +269,16 @@ def load_model(model_path='/home/shangzhedi/shangzhedi/Flash-VStream-Base/checkp
         topk=topk,
         chunk_size=chunk_size,
     )
+    # Attached after from_pretrained, not passed through it. Unrecognised kwargs are
+    # forwarded to GenerationConfig.from_pretrained, and whether they get set as attributes
+    # there depends on the checkpoint: a generation_config.json carrying
+    # "_from_model_config": true makes GenerationConfig.__init__ drop them, one without it
+    # does not -- and the pruner then lands on the generation config, whose __repr__
+    # json.dumps() it, killing the load with "Object of type StreamingTokenPruner is not
+    # JSON serializable". That is a real failure, not a hypothetical: it is what LongVA did
+    # (see model/longva_rekv.py). This checkpoint is not in the repo, so which way its
+    # generation_config falls is unverified -- hence the safe route rather than the lucky one.
+    model.token_pruner = token_pruner
     vision_tower = model.get_vision_tower()
     if not vision_tower.is_loaded:
         vision_tower.load_model()

@@ -179,8 +179,16 @@ def load_model(model_path='model_zoo/LongVA-7B',
         n_local=n_local,
         topk=topk,
         chunk_size=chunk_size,
-        token_pruner=token_pruner,
     )
+    # Attached after from_pretrained, not passed through it. Unrecognised kwargs are
+    # forwarded to GenerationConfig.from_pretrained, and whether they get set as
+    # attributes there depends on the checkpoint: a generation_config.json carrying
+    # "_from_model_config": true (llava-onevision) makes GenerationConfig.__init__ drop
+    # them, while LongVA-7B's does not -- so the pruner lands on the generation config,
+    # whose __repr__ json.dumps() it, and loading dies with "Object of type
+    # StreamingTokenPruner is not JSON serializable". The remaining ReKV kwargs above are
+    # ints and a list of ints, so they survive that round-trip harmlessly.
+    model.token_pruner = token_pruner
     vision_tower = model.get_vision_tower()
     if not vision_tower.is_loaded:
         vision_tower.load_model(device_map="auto")

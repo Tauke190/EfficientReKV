@@ -74,7 +74,7 @@ vision_threshold=0.001
 # list to sweep -- each threshold writes to its own results dir, so arms never overwrite
 # each other or the baseline. Scales with sample_fps: fewer frames/sec = less redundancy
 # = higher threshold, so do not transplant a value across frame rates either.
-prune_method=none
+prune_method=rlt
 prune_metric=cosine
 prune_refresh_every=0
 prune_thresholds="0.2"

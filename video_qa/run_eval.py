@@ -861,7 +861,7 @@ def eval_streambench(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model", type=str, default="llava_ov_7b", choices=['llava_ov_0.5b', 'llava_ov_7b', 'llava_ov_72b', 'video_llava_7b', 'longva_7b'])
+    parser.add_argument("--model", type=str, default="llava_ov_7b", choices=['llava_ov_0.5b', 'llava_ov_7b', 'llava_ov_72b', 'video_llava_7b', 'longva_7b', 'flash_vstream_7b'])
     parser.add_argument("--dataset", type=str, default=None, choices=['mlvu', 'mlvu_test', 'qaego4d', 'egoschema', 'activitynet_qa', 'rvs_ego', 'rvs_movie', 'cgbench', 'odvbench', 'ovbench', 'streambench', 'ovobench_realtime', 'ovobench_backward', 'streamingbench_real', 'streamingbench_omni', 'streamingbench_context', 'streamingbench_sqa', 'fpsbench_stream'])
     parser.add_argument("--num_chunks", type=int, default=1)
     parser.add_argument("--blind", action="store_true",

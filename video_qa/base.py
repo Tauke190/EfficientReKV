@@ -25,6 +25,32 @@ from model import llava_onevision_rekv, video_llava_rekv, longva_rekv
 from video_qa.reduction_args import add_reduction_args
 
 
+def _load_flash_vstream(**kwargs):
+    """Import the Flash-VStream backend only once it is actually selected.
+
+    Not imported beside the others at the top of this file on purpose. `flash_vstream` is a
+    third-party package with no PyPI release (it installs from the Flash-VStream-LLaVA
+    subdirectory of github.com/IVGSZ/Flash-VStream), and model/flash_vstream_rekv.py
+    subclasses its VStreamLlamaForCausalLM at module level. A module-level import here would
+    therefore make *every* eval run -- llava_ov and longva included -- die at import time on
+    any machine where that package is absent, for a backbone those runs never touch.
+    Deferring it keeps the dependency local to the one model that needs it, and lets the
+    failure carry the install command instead of a bare ModuleNotFoundError.
+    """
+    try:
+        from model import flash_vstream_rekv
+    except ImportError as e:
+        raise ImportError(
+            "flash_vstream_7b requires the Flash-VStream package, which has no PyPI "
+            "release. Install it from source:\n"
+            "  git clone --depth 1 https://github.com/IVGSZ/Flash-VStream.git ~/Flash-VStream\n"
+            "  pip install -e ~/Flash-VStream/Flash-VStream-LLaVA --no-deps --no-build-isolation\n"
+            "--no-deps is not optional: its pyproject pins transformers==4.31.0 and "
+            "torch==2.0.1, which would downgrade this env and break every other backbone."
+        ) from e
+    return flash_vstream_rekv.load_model(**kwargs)
+
+
 MODELS = {
     'llava_ov_0.5b': {
         'load_func': llava_onevision_rekv.load_model,
@@ -53,6 +79,13 @@ MODELS = {
     'longva_7b': {
         'load_func': longva_rekv.load_model,
         'model_path': 'model_zoo/LongVA-7B',
+    },
+    # Its LM is Vicuna-7B: 4096-token context, so n_local must stay under roughly 3648 (57
+    # frames at 64 tokens). The 15000 the other backbones run at is rejected by an assertion
+    # in load_model rather than silently returning empty answers -- see model/flash_vstream_rekv.py.
+    'flash_vstream_7b': {
+        'load_func': _load_flash_vstream,
+        'model_path': 'model_zoo/Flash-VStream-7b',
     },
 }
 
@@ -314,6 +347,15 @@ class BaseVQA:
 
     def extract_characters_regex(self, s):
         s = s.strip()
+        # An empty generation is a real outcome, not an impossible one: a backbone can emit
+        # EOS as its very first token and decode to ''. Returning '' rather than indexing
+        # into it lets the row be recorded and counted as unparseable by the scorers (which
+        # already report an "unparseable responses: n/m" rate) instead of taking down the
+        # whole chunk with an IndexError partway through a video. Seen on video_llava_7b:
+        # question 1 of a video answers normally and a later one comes back empty, which
+        # under the old code discarded every answer recorded since the last checkpoint.
+        if not s:
+            return ''
         if ")" in s:
             index = s.index(")")
             pred = s[index - 1 : index]
@@ -464,8 +506,10 @@ def pruning_load_kwargs(args):
     """
     if not pruning_enabled(args):
         return {}
-    assert args.model.startswith('llava_ov') or args.model == 'longva_7b', \
-        f'token pruning is only implemented for llava_ov_* and longva_7b, not {args.model}'
+    assert args.model.startswith('llava_ov') or args.model in (
+        'longva_7b', 'video_llava_7b', 'flash_vstream_7b'), \
+        f'token pruning is only implemented for llava_ov_*, longva_7b, video_llava_7b and ' \
+        f'flash_vstream_7b, not {args.model}'
     return dict(
         prune_method=getattr(args, 'prune_method', 'none'),
         prune_threshold=args.prune_threshold,
