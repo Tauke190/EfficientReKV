@@ -8,11 +8,11 @@
 # Proactive Output is unpacked (it is in the same download) but not converted: it is
 # scored on *when* the model speaks, not on a letter. See video_qa/run_eval.py.
 set -euo pipefail
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/../.."
 
 DATA=${DATA:-data/StreamingBench}
 
-python scripts/setup_streamingbench.py --src "${DATA}"
+python scripts/dataset_prep/setup_streamingbench.py --src "${DATA}"
 
 for subset in real omni context sqa; do
     python video_qa/convert_streamingbench.py \

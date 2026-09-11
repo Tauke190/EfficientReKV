@@ -19,9 +19,9 @@ an archive it did not finish writing. Re-running is cheap: members already
 present at the right size are skipped.
 
 Usage:
-    python scripts/setup_streamingbench.py                  # extract, then rm the zips
-    python scripts/setup_streamingbench.py --keep_zips      # extract only
-    python scripts/setup_streamingbench.py --verify_only    # check an earlier run
+    python scripts/dataset_prep/setup_streamingbench.py                  # extract, then rm the zips
+    python scripts/dataset_prep/setup_streamingbench.py --keep_zips      # extract only
+    python scripts/dataset_prep/setup_streamingbench.py --verify_only    # check an earlier run
 """
 
 import os

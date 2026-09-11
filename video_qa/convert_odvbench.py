@@ -30,7 +30,7 @@ Three further facts about the source data, all verified against `ODVbench.json`:
 * **The `video` field's leading component is the zip's name** ('TS_Retrieval/test_video/
   x.mp4' for TS_Retrieval.zip, whose root is 'test_video/'), so extracting each zip into a
   directory named after it under `--video_root` reproduces those paths exactly. That is
-  what scripts/setup_odvbench.py does.
+  what scripts/dataset_prep/setup_odvbench.py does.
 
 The 12 `subtask` values become `question_type` (the results CSV's `task` column, which
 video_qa/eval/eval_odvbench.py aggregates over). The coarse 3-way `task` becomes
@@ -162,7 +162,7 @@ def main():
         msg = (f'{len(missing)} of {len(by_video)} videos not found under '
                f'{args.video_root}:\n  {head}')
         if not args.skip_missing:
-            raise SystemExit(f'{msg}\n\nRun scripts/setup_odvbench.py first, or pass '
+            raise SystemExit(f'{msg}\n\nRun scripts/dataset_prep/setup_odvbench.py first, or pass '
                              f'--skip_missing to evaluate on what is present.')
         print(f'WARNING: {msg}')
 

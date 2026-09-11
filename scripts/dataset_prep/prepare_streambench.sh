@@ -11,7 +11,7 @@
 # are left in place here because deleting files is not this script's job -- remove them
 # with `find data/streambench -name '._*' -delete` if the inode count matters.
 set -euo pipefail
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/../.."
 
 DATA=${DATA:-data/streambench}
 

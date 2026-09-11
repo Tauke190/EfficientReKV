@@ -21,9 +21,9 @@ Needs ~14 GB for the extracted videos on top of the ~13.8 GB cache. Re-running i
 extraction skips files already present at the right size.
 
 Usage:
-    python scripts/setup_odvbench.py                    # cache -> data/odvbench
-    python scripts/setup_odvbench.py --no_probe         # skip the decord duration probe
-    python scripts/setup_odvbench.py --zips TS_Retrieval  # one collection only
+    python scripts/dataset_prep/setup_odvbench.py                    # cache -> data/odvbench
+    python scripts/dataset_prep/setup_odvbench.py --no_probe         # skip the decord duration probe
+    python scripts/dataset_prep/setup_odvbench.py --zips TS_Retrieval  # one collection only
 """
 
 import os

@@ -36,7 +36,7 @@ it the other way would need a start offset the solver does not have.
 Videos are resolved as `<video_root>/<video_id>` and then `<video_root>/<video_id>.mp4`.
 Both spellings are needed: the container sources name a real file with its extension
 ("COIN/.../xyz.mp4"), while the seven JPEG-derived sources name a directory that
-scripts/setup_ovbench.py transcoded to a single .mp4 of the same name. All 1463 resolve.
+scripts/dataset_prep/setup_ovbench.py transcoded to a single .mp4 of the same name. All 1463 resolve.
 
 Note that the transcoded clips are frequently *longer* than their own `clip` window (281
 of 326, median +3.0 s), which is upstream's framing inherited from the frame directories,
@@ -103,7 +103,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--src', type=str, default='data/OVBench/ovbench.json')
     parser.add_argument('--video_root', type=str, default='data/OVBench/videos',
-                        help='Output of scripts/setup_ovbench.py -- one video per clip.')
+                        help='Output of scripts/dataset_prep/setup_ovbench.py -- one video per clip.')
     parser.add_argument('--out', type=str, required=True)
     parser.add_argument('--allow_missing', action='store_true',
                         help='Emit records whose video file is absent instead of dropping '
@@ -187,7 +187,7 @@ def main():
         verb = 'kept (--allow_missing)' if args.allow_missing else 'DROPPED'
         print(f'\n{len(missing)} videos not found under {args.video_root} and {verb}; '
               f'e.g. {missing[:3]}')
-        print('Run scripts/setup_ovbench.py to unpack them.')
+        print('Run scripts/dataset_prep/setup_ovbench.py to unpack them.')
 
 
 if __name__ == '__main__':

@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+import shutil
 import argparse
 import subprocess
 import multiprocessing
@@ -442,7 +443,7 @@ def eval_streamingbench(args, subset):
     [0, t] -- so it runs on the same incremental solver, subclassed only for Sequential
     QA's carried conversation history (video_qa/rekv_streamingbench_vqa.py). Run
     video_qa/convert_streamingbench.py first to produce the annotation file, which in turn
-    needs scripts/setup_streamingbench.py to have unpacked the videos.
+    needs scripts/dataset_prep/setup_streamingbench.py to have unpacked the videos.
 
     Proactive Output is not wired up: it is scored on *when* the model speaks against a
     ground-truth timestamp, not on a letter, and needs its own solver and metric.
@@ -630,6 +631,14 @@ def eval_fpsbench_stream(args):
         if fps_list:
             print(f'splitting {save_dir}/results.csv by sample_fps:')
             split_multi_fps(save_dir, fps_list, dir_for_fps)
+            # The bundle was scratch. Every row now lives in its own rate's directory, and
+            # the scorer, the no-lookahead audit and collect_fpsbench_sweep.py all read
+            # those -- nothing reads this again. Left behind it would sit beside the real
+            # arms looking like one, and the sweep collector's directory regex would try to
+            # parse 'multi2.0+4.0' as a frame rate. Removed only after the split succeeded:
+            # split_multi_fps asserts every rate produced rows, so a partial bundled run
+            # raises there and this line is never reached.
+            shutil.rmtree(save_dir, ignore_errors=True)
     # There is an answer key here, so this scores. The streaming audit is the same one the
     # short-clip arm runs -- both write the same no-lookahead columns. A bundled run scores
     # each rate's own directory, so its output is indistinguishable from separate runs.
@@ -692,7 +701,7 @@ def eval_odvbench(args):
     Hallucination-detection answers are "Unable to say."), so the language-prior floor is
     high and uneven across subtasks.
 
-    Run scripts/setup_odvbench.py first to produce the annotation file.
+    Run scripts/dataset_prep/setup_odvbench.py first to produce the annotation file.
     """
     num_chunks = args.num_chunks
     # The '-blind' suffix keeps the control in its own directory, so it can never
@@ -760,7 +769,7 @@ def eval_ovbench(args):
     floor is high and very uneven across sub-tasks (~31.3% pooled chance, but far higher
     for that group).
 
-    Run scripts/prepare_ovbench.sh first to unpack the videos and write the annotation.
+    Run scripts/dataset_prep/prepare_ovbench.sh first to unpack the videos and write the annotation.
     """
     num_chunks = args.num_chunks
     # The '-blind' suffix keeps the control in its own directory, so it can never
@@ -823,7 +832,7 @@ def eval_streambench(args):
     unchanged while the memory and search classes collapse, and a class that does not
     collapse is one the video was not contributing to.
 
-    Run scripts/prepare_streambench.sh first to write the annotation.
+    Run scripts/dataset_prep/prepare_streambench.sh first to write the annotation.
     """
     num_chunks = args.num_chunks
     blind_tag = "-blind" if args.blind else ""

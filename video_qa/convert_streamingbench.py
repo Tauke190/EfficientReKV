@@ -68,7 +68,7 @@ SUBSETS = {
 }
 
 # question_id looks like "<category>_sample_<N>_<q>"; <category> is also the directory
-# scripts/setup_streamingbench.py extracted that zip into.
+# scripts/dataset_prep/setup_streamingbench.py extracted that zip into.
 QID_RE = re.compile(r'^(?P<category>.+)_sample_(?P<sample>\d+)_(?P<q>\d+)$')
 PREFIX_RE = re.compile(r'^\s*([A-H])[.)]\s*')
 
@@ -138,7 +138,7 @@ def main():
     parser.add_argument('--csv_root', type=str, default='data/StreamingBench',
                         help='Directory holding the six StreamingBench CSVs.')
     parser.add_argument('--video_root', type=str, default='data/StreamingBench/videos',
-                        help='Video tree written by scripts/setup_streamingbench.py.')
+                        help='Video tree written by scripts/dataset_prep/setup_streamingbench.py.')
     parser.add_argument('--out', type=str, required=True)
     parser.add_argument('--allow_missing', action='store_true',
                         help='Emit records whose video file is absent instead of dropping '

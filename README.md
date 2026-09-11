@@ -33,8 +33,8 @@ Notes:
   needs a judge. `--judge_preset` defaults to `streambench` (upstream's Llama-3-8B-Instruct
   prompt, reproduced byte-for-byte) instead of the repo-wide `prometheus`; override it and
 - Free-form (`rvs_*`, `qaego4d`, `activitynet_qa`): pass `--skip_scoring`, then score with
-  `scripts/score_open_ended.sh` (local) or `score_llmjudge_gpt.sh` (needs `OPENAI_API_KEY`).
-  Score a whole sweep with one judge — local scores aren't comparable to published ones.
+  `scripts/score_llmjudge_gpt.sh` (needs `OPENAI_API_KEY`).
+  Score a whole sweep with one judge — mixing judges compares judges, not systems.
 - `--blind` answers with no video, giving the language-prior floor. Refuses to run with
   any reduction flag.
 
@@ -60,25 +60,35 @@ Keep rates are already in `results.csv` when a pruner is attached: `tokens_kept`
 have none of these columns** — when concatenating arms, fill `token_keep_rate` with 1.0
 rather than dropping rows, and aggregate weighted by `tokens_seen`.
 
-## Speed
+## Efficiency
 
-One 1-hour RVS-Ego video, questions injected mid-stream; reports Video Enc. (FPS) and QA
-latency separately.
+Streaming throughput, KV-Cache growth and GFLOPs/frame, for the baseline and every pruning
+threshold, on one FPS-Bench-Stream stream.
 
 ```bash
-scripts/measure_speed.sh                 # both models, baseline + rlt 0.25 + rlt 0.5
-scripts/measure_speed.sh llava_ov_7b     # one model
-NUM_FRAMES=800 EXTRA="--skip_qa true" scripts/measure_speed.sh llava_ov_0.5b
+scripts/efficiency/cost_model.sh                      # llava_ov_7b, 0.1 .. 0.9
+MODEL=llava_ov_0.5b scripts/efficiency/cost_model.sh
+THRESHOLDS="0.5 0.9" N_STREAMS=3 scripts/efficiency/cost_model.sh
 ```
+
+Needs a GPU (`srun -p gpu --gres=gpu:1 bash scripts/efficiency/cost_model.sh`). Arms already
+on disk are skipped, so an interrupted run resumes; `FORCE=1` re-runs them. The table can be
+rebuilt at any time with `scripts/efficiency/collect_cost_model.py`.
 
 Three protocol choices decide whether the numbers are comparable:
 
-- `--encode_chunk_size 1` — strict frame-by-frame, as the paper describes (~1.6× slower
-  than batched).
-- `--gpu_preprocess true` — same work on GPU (~2 ms/frame vs 37–57 ms). Absolute FPS sits
-  **above** a published CPU-preprocessing figure; never quote a speedup from one protocol
-  against a baseline from another.
-- `NUM_FRAMES` must reach steady state: the `n_local` window fills after
-  `15000 / (196 × keep_rate)` frames — 77 at baseline but 379 at 20% keep. Default 800.
+- `ENCODE_CHUNK_SIZE=1` - one frame per forward pass, which is what streaming means: a
+  live stream has no frame t+1 to batch with frame t. ~2x apart from the batched default.
+- `TIMING=span` - three CUDA syncs for the whole run, so CPU preprocessing overlaps GPU
+  compute the way it does live. `per_chunk` adds a sync pair per chunk and reads low at
+  chunk size 1. Both write their own file, so running both cross-checks rather than
+  overwrites.
+- `NUM_FRAMES` must reach steady state - only chunks encoded after the local window
+  filled run at the sustained rate. The window fills after `15000 / (196 x keep_rate)`
+  frames: 77 at baseline, 306 at 25% keep, 1531 at 5%. At 1 fps x 600 frames anything
+  keeping under ~13% never gets there, and the collector flags those rows rather than
+  quoting them beside the others.
 
-`--skip_qa true` is the fast path for throughput only (QA never mutates the video cache).
+Throughput is measured, not derived: pruning drops tokens before the LM prefill (~84% of
+`_encode_video_chunk`), but the vision tower and preprocessing are untouched and cap the
+speed-up. GFLOPs/frame is analytic from `config.json` times the measured keep rate.

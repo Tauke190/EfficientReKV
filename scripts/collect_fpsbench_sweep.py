@@ -1,6 +1,6 @@
 """Assemble a frame-rate sweep of FPS-Bench-Stream into one table.
 
-scripts/eval_fpsbenchstream.slurm writes one results directory per frame rate
+scripts/eval/eval.slurm (FPS_LIST=...) writes one results directory per frame rate
 (results/<model>/fpsbench_stream/<retrieve_size>-<fps>[-<trigger>][-<subset>][<reduction>]),
 each already scored by video_qa/eval/eval_fpsbench_stream.py into a results.json. This
 reads those back and prints them as one row per arm, which is the form the sweep's question

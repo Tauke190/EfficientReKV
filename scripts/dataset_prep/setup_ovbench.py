@@ -39,10 +39,10 @@ encodes go to a .tmp that is renamed only on a clean exit, so an interrupted run
 leaves a half-written file that the next one would trust. Zips are never deleted.
 
 Usage:
-    python scripts/setup_ovbench.py                    # everything, 4 parallel encodes
-    python scripts/setup_ovbench.py --jobs 8
-    python scripts/setup_ovbench.py --sources HACS     # one source
-    python scripts/setup_ovbench.py --verify_only      # check an earlier run
+    python scripts/dataset_prep/setup_ovbench.py                    # everything, 4 parallel encodes
+    python scripts/dataset_prep/setup_ovbench.py --jobs 8
+    python scripts/dataset_prep/setup_ovbench.py --sources HACS     # one source
+    python scripts/dataset_prep/setup_ovbench.py --verify_only      # check an earlier run
 """
 
 import os
