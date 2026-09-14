@@ -13,12 +13,14 @@ import openai
 # importable. Add it rather than relying on the caller's cwd.
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from video_qa import answer_types  # noqa: E402
+from video_qa.eval import verdict_cache  # noqa: E402
 
 
 def parse_args():
     parser = argparse.ArgumentParser(description="question-answer-generation-using-gpt-3")
     parser.add_argument("--pred_path", required=True, help="The path to file containing prediction.")
-    parser.add_argument("--output_dir", required=True, help="The path to save annotation json files.")
+    parser.add_argument("--output_dir", required=True, help="Verdict cache, stored as ONE file <output_dir>.jsonl (the cluster has an "
+                             "inode quota). Reused on re-run.")
     parser.add_argument("--output_json", required=True, help="The path to save annotation final combined json file.")
     parser.add_argument("--num_tasks", default=16, type=int, help="Number of splits.")
     parser.add_argument("--max_workers", default=8, type=int,
@@ -108,97 +110,99 @@ class GPTService:
             time.sleep(delay)
         return None
 
-def claim_cache_dir(output_dir, judge_model):
+def claim_cache_dir(output_dir, cached, meta, judge_model):
     """Bind a verdict cache to one judge, and refuse to let a second judge reuse it.
 
-    Both scorers resume by skipping any item already present in output_dir. That makes
+    Both scorers resume by skipping any item already present in the cache. That makes
     a re-run with a *different* judge silently a no-op: every item is 'done', nothing is
     re-scored, and the final metrics get stamped with the new judge's name over the old
     judge's verdicts. This has already produced wrong numbers in this repo more than
-    once. Cheap marker file, permanent fix.
+    once. The judge is recorded as a line in the cache itself.
     """
-    marker = os.path.join(output_dir, ".judge_model")
-    existing = [f for f in os.listdir(output_dir) if f.endswith(".json")]
-
-    if os.path.exists(marker):
-        with open(marker) as f:
-            prev = f.read().strip()
-        if prev and prev != judge_model:
+    path = verdict_cache.path_of(output_dir)
+    prev = meta.get("judge_model")
+    if prev:
+        if prev != judge_model:
             raise SystemExit(
-                f"\nREFUSING TO RUN: {output_dir} holds {len(existing)} verdicts from "
+                f"\nREFUSING TO RUN: {path} holds {len(cached)} verdicts from "
                 f"{prev}, but this run uses {judge_model}.\nCached items are reused "
                 f"verbatim, so continuing would report {prev}'s scores under "
-                f"{judge_model}'s name.\nMove the directory aside, or point --output_dir "
+                f"{judge_model}'s name.\nMove the file aside, or point --output_dir "
                 f"somewhere else, then rerun.\n"
             )
-    elif existing:
+        return
+    if cached:
         # Predates this check, so its provenance is unknown and cannot be assumed.
         raise SystemExit(
-            f"\nREFUSING TO RUN: {output_dir} holds {len(existing)} verdicts with no "
+            f"\nREFUSING TO RUN: {path} holds {len(cached)} verdicts with no "
             f"record of which judge produced them.\nReusing them under {judge_model}'s "
-            f"name would be a guess.\nIf you know the judge, adopt the directory with:\n"
-            f"    echo <judge-model> > {marker}\nOtherwise move it aside and rerun.\n"
+            f"name would be a guess.\nIf you know the judge, adopt the cache with:\n"
+            f"    echo '{{\"judge_model\": \"<judge-model>\"}}' >> {path}\n"
+            f"Otherwise move it aside and rerun.\n"
         )
-
-    with open(marker, "w") as f:
-        f.write(judge_model)
+    verdict_cache.write_meta(output_dir, judge_model=judge_model)
 
 
-def annotate(prediction_set, caption_files, output_dir):
-    """
-    Evaluates question and answer pairs using GPT-3
-    Returns a score for correctness.
-    """
+_gpt_service = None
+
+
+def _init_worker():
     # One client per worker, not one per item: the original rebuilt the OpenAI client
     # inside the loop, so nothing was reused across a few thousand requests.
-    gpt_service = GPTService()
+    global _gpt_service
+    _gpt_service = GPTService()
 
-    for file in tqdm(caption_files):
-        key = file[:-5] # Strip file extension
-        qa_set = prediction_set[key]
-        question = qa_set['question']
-        answer = qa_set['answer']
-        pred = qa_set['pred_answer']
 
-        try:
-            # Compute the correctness score
-            messages=[
-                {
-                    "role": "system",
-                    "content": 
-                        "You are an intelligent chatbot designed for evaluating the correctness of generative outputs for question-answer pairs. "
-                        "Your task is to compare the predicted answer with the correct answer and determine if they match meaningfully. Here's how you can accomplish the task:"
-                        "------"
-                        "##INSTRUCTIONS: "
-                        "- Focus on the meaningful match between the predicted answer and the correct answer.\n"
-                        "- Consider synonyms or paraphrases as valid matches.\n"
-                        "- Evaluate the correctness of the prediction compared to the answer."
-                },
-                {
-                    "role": "user",
-                    "content":
-                        "Please evaluate the following video-based question-answer pair:\n\n"
-                        f"Question: {question}\n"
-                        f"Correct Answer: {answer}\n"
-                        f"Predicted Answer: {pred}\n\n"
-                        "Provide your evaluation only as a yes/no and score where the score is an integer value between 0 and 5, with 5 indicating the highest meaningful match. "
-                        "Please generate the response in the form of a Python dictionary string with keys 'pred' and 'score', where value of 'pred' is  a string of 'yes' or 'no' and value of 'score' is in INTEGER, not STRING."
-                        "DO NOT PROVIDE ANY OTHER OUTPUT TEXT OR EXPLANATION. Only provide the Python dictionary string. "
-                        "For example, your response should look like this: {'pred': 'yes', 'score': 4.8}."
-                }
-            ]
-            response_message = gpt_service.gpt_with_retry(messages)
-            # Convert response to a Python dictionary.
-            # response_message = completion["choices"][0]["message"]["content"]
-            response_dict = ast.literal_eval(response_message)
-            result_qa_pair = [response_dict, qa_set]
+def annotate(key, qa_set):
+    """
+    Evaluates one question and answer pair using GPT-3.
+    Returns (key, [verdict, qa_set]), or (key, None) if the item failed.
 
-            # Save the question-answer pairs to a json file.
-            with open(f"{output_dir}/{key}.json", "w") as f:
-                json.dump(result_qa_pair, f)
+    Workers only return verdicts; the parent is the single writer of the cache file, so
+    concurrent processes never interleave lines in it.
+    """
+    question = qa_set['question']
+    answer = qa_set['answer']
+    pred = qa_set['pred_answer']
 
-        except Exception as e:
-            print(f"Error processing file '{key}': {e}")
+    try:
+        # Compute the correctness score
+        messages=[
+            {
+                "role": "system",
+                "content": 
+                    "You are an intelligent chatbot designed for evaluating the correctness of generative outputs for question-answer pairs. "
+                    "Your task is to compare the predicted answer with the correct answer and determine if they match meaningfully. Here's how you can accomplish the task:"
+                    "------"
+                    "##INSTRUCTIONS: "
+                    "- Focus on the meaningful match between the predicted answer and the correct answer.\n"
+                    "- Consider synonyms or paraphrases as valid matches.\n"
+                    "- Evaluate the correctness of the prediction compared to the answer."
+            },
+            {
+                "role": "user",
+                "content":
+                    "Please evaluate the following video-based question-answer pair:\n\n"
+                    f"Question: {question}\n"
+                    f"Correct Answer: {answer}\n"
+                    f"Predicted Answer: {pred}\n\n"
+                    "Provide your evaluation only as a yes/no and score where the score is an integer value between 0 and 5, with 5 indicating the highest meaningful match. "
+                    "Please generate the response in the form of a Python dictionary string with keys 'pred' and 'score', where value of 'pred' is  a string of 'yes' or 'no' and value of 'score' is in INTEGER, not STRING."
+                    "DO NOT PROVIDE ANY OTHER OUTPUT TEXT OR EXPLANATION. Only provide the Python dictionary string. "
+                    "For example, your response should look like this: {'pred': 'yes', 'score': 4.8}."
+            }
+        ]
+        response_message = _gpt_service.gpt_with_retry(messages)
+        # Convert response to a Python dictionary.
+        response_dict = ast.literal_eval(response_message)
+        return key, [response_dict, qa_set]
+    except Exception as e:
+        print(f"Error processing file '{key}': {e}")
+        return key, None
+
+
+def _annotate_star(task):
+    return annotate(*task)
 
 
 def main():
@@ -233,15 +237,12 @@ def main():
         new_sample['video_id'] = f"{video_id}_{video_id_counts[video_id]}"
         new_pred_contents.append(new_sample)
 
-    # Generating list of id's and corresponding files
+    # Generating list of id's
     id_list = [x['video_id'] for x in new_pred_contents]
-    caption_files = [f"{id}.json" for id in id_list]
 
     output_dir = args.output_dir
-    # Generate output directory if not exists.
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-    claim_cache_dir(output_dir, os.environ.get("OPENAI_JUDGE_MODEL", DEFAULT_JUDGE))
+    cached, meta = verdict_cache.load(output_dir)
+    claim_cache_dir(output_dir, cached, meta, os.environ.get("OPENAI_JUDGE_MODEL", DEFAULT_JUDGE))
 
     # Preparing dictionary of question-answer sets
     prediction_set = {}
@@ -260,14 +261,11 @@ def main():
     prev_remaining = None
     while True:
         try:
-            # Files that have not been processed yet.
-            # .json only: the dir also holds the .judge_model marker, which would
-            # otherwise be counted as a completed item in the progress line.
-            completed_files = [f for f in os.listdir(output_dir) if f.endswith(".json")]
-            print(f"completed_files: {len(completed_files)}")
+            completed, _ = verdict_cache.load(output_dir)
+            print(f"completed_files: {len(completed)}")
 
-            # Files that have not been processed yet.
-            incomplete_files = [f for f in caption_files if f not in completed_files]
+            # Items that have not been processed yet.
+            incomplete_files = [k for k in id_list if k not in completed]
             print(f"incomplete_files: {len(incomplete_files)}")
 
             # Break the loop when there are no incomplete files
@@ -288,34 +286,32 @@ def main():
                 stalled_passes = 0
             prev_remaining = len(incomplete_files)
 
-            if len(incomplete_files) <= num_tasks:
-                num_tasks = 1
-
-            # Split tasks into parts.
-            part_len = len(incomplete_files) // num_tasks
-            all_parts = [incomplete_files[i:i + part_len] for i in range(0, len(incomplete_files), part_len)]
-            task_args = [(prediction_set, part, args.output_dir) for part in all_parts]
+            task_args = [(k, prediction_set[k]) for k in incomplete_files]
 
             # Bounded pool. Bare Pool() defaults to os.cpu_count() workers -- num_tasks
-            # only splits the list, it never limited concurrency -- which is what opened
+            # only split the list, it never limited concurrency -- which is what opened
             # the rvs_ego run at ~370 req/min and tripped the rate limit immediately.
-            with Pool(processes=min(args.max_workers, len(all_parts))) as pool:
-                pool.starmap(annotate, task_args)
+            # Verdicts are appended as they arrive, so a Ctrl-C loses at most the batch
+            # in flight.
+            with Pool(processes=min(args.max_workers, num_tasks, len(task_args)),
+                      initializer=_init_worker) as pool:
+                pending = {}
+                for key, result in tqdm(pool.imap_unordered(_annotate_star, task_args),
+                                        total=len(task_args)):
+                    if result is not None:
+                        pending[key] = result
+                    if len(pending) >= 32:
+                        verdict_cache.append(output_dir, pending)
+                        pending = {}
+                if pending:
+                    verdict_cache.append(output_dir, pending)
 
         except Exception as e:
             print(f"Error: {e}")
 
-    # Combine all the processed files into one
-    combined_contents = {}
+    # Combine all the cached verdicts into one
     json_path = args.output_json
-
-    # Iterate through json files
-    for file_name in os.listdir(output_dir):
-        if file_name.endswith(".json"):
-            file_path = os.path.join(output_dir, file_name)
-            with open(file_path, "r") as json_file:
-                content = json.load(json_file)
-                combined_contents[file_name[:-5]] = content
+    combined_contents, _ = verdict_cache.load(output_dir)
     # Write combined content to a json file
     with open(json_path, "w") as json_file:
         json.dump(combined_contents, json_file)

@@ -472,6 +472,7 @@ class BaseVQA:
                             f'{len(skipped)} videos failed to decode in chunk '
                             f'{self.chunk_idx}; aborting rather than reporting a run this '
                             f'incomplete. Last failure: {video_id}') from e
+                log_host_memory(self.chunk_idx, done, video_id)
                 if done % self.checkpoint_every == 0:
                     self.write_results()
         finally:
@@ -489,6 +490,32 @@ class BaseVQA:
             logger.error(
                 f'chunk {self.chunk_idx}: {len(skipped)}/{len(video_annos)} videos SKIPPED '
                 f'(undecodable): {", ".join(skipped)}')
+
+
+def log_host_memory(chunk_idx, done, video_id):
+    """One line per video: this worker's resident host RAM and PyTorch's pinned-memory pool.
+
+    Host RAM is what OOM-kills long-video runs (ReKV keeps the whole KV-Cache on the host),
+    and it should return to roughly the same level after every video. A number that only
+    climbs means the previous video's cache is not being released.
+    """
+    rss_gb = None
+    try:
+        with open('/proc/self/status') as f:
+            for line in f:
+                if line.startswith('VmRSS:'):
+                    rss_gb = int(line.split()[1]) / 1024 ** 2
+                    break
+    except OSError:
+        pass
+    pinned_gb = None
+    if torch.cuda.is_available():
+        stats = torch.cuda.host_memory_stats()
+        if 'reserved_bytes.current' in stats:
+            pinned_gb = stats['reserved_bytes.current'] / 1024 ** 3
+    fmt = lambda v: 'n/a' if v is None else f'{v:.1f} GB'
+    logger.info(f'[mem] chunk {chunk_idx} video {done} ({video_id}): '
+                f'rss {fmt(rss_gb)}, pinned pool {fmt(pinned_gb)}')
 
 
 def pruning_enabled(args):

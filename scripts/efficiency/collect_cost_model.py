@@ -57,6 +57,18 @@ MODEL_PATHS = {
 }
 
 
+def str2bool(v):
+    """Accept the same spellings video_qa/base.py does, so the shell can pass its knob
+    through verbatim without the two disagreeing about what 'true' means."""
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ('true', 't', 'yes', 'y', '1'):
+        return True
+    if v.lower() in ('false', 'f', 'no', 'n', '0'):
+        return False
+    raise argparse.ArgumentTypeError(f'expected a boolean, got {v!r}')
+
+
 # ---------------------------------------------------------------------------------
 # Closed forms, read off config.json. Nothing measured.
 # ---------------------------------------------------------------------------------
@@ -156,6 +168,10 @@ def read_arm(path):
         'flops_frames': int(_col(df, 'flops_frames') or 0),
         'flops_backend': (df.flops_attn_backend.iloc[0]
                           if 'flops_attn_backend' in df else None),
+        # None for runs written before the column existed; those are all CPU-preprocess,
+        # but the filename tag is what selects them, so this is only ever a cross-check.
+        'gpu_preprocess': (bool(df.gpu_preprocess.iloc[0])
+                           if 'gpu_preprocess' in df else None),
     }
 
 
@@ -187,8 +203,16 @@ def main():
                              "chunk size 1 serializes CPU preprocessing against GPU "
                              "compute and reads low -- so a directory holding both is "
                              "filtered rather than pooled.")
+    parser.add_argument('--gpu_preprocess', type=str2bool, nargs='?', const=True,
+                        default=True,
+                        help="Which preprocessing path's arms to table. GPU-preprocessed "
+                             "runs carry a -gpuprep filename tag and are kept apart from "
+                             "CPU ones for the same reason the timing protocols are: at "
+                             "chunk size 1 the HF processor is most of the frame, so the "
+                             "two sets differ ~2x in throughput and in nothing else. "
+                             "Pass false to re-table a CPU-preprocess sweep.")
     parser.add_argument('--out', type=str, default=None,
-                        help='Table CSV (default <dir>/<model>-fps<f>-table.csv).')
+                        help='Table CSV (default <dir>/<model>-fps<f>[-gpuprep]-table.csv).')
     args = parser.parse_args()
 
     cfg = json.load(open(os.path.join(MODEL_PATHS[args.model], 'config.json')))
@@ -197,17 +221,30 @@ def main():
     lm_att = lm_attn_gflops_per_token(cfg, args.n_local)
     vis = vision_gflops_per_frame(cfg)
 
-    pat = os.path.join(args.dir,
-                       f'{args.model}-fps{args.sample_fps:g}-v*-*-{args.timing}.csv')
+    prep_tag = '-gpuprep' if args.gpu_preprocess else ''
+    pat = os.path.join(
+        args.dir,
+        f'{args.model}-fps{args.sample_fps:g}-v*-*-{args.timing}{prep_tag}.csv')
     arms = {}
     for path in sorted(glob.glob(pat)):
         if path.endswith('_qa.csv') or path.endswith('-table.csv'):
             continue
-        m = re.search(r'-v(\d+)-(baseline|rlt([0-9.]+))-(?:span|per_chunk)\.csv$', path)
+        # The tag is anchored so the untagged pattern cannot swallow the tagged files:
+        # '...-span.csv' must not match '...-span-gpuprep.csv'.
+        m = re.search(r'-v(\d+)-(baseline|rlt([0-9.]+))-(?:span|per_chunk)'
+                      + re.escape(prep_tag) + r'\.csv$', path)
         if not m:
             continue
         arm = 'baseline' if m.group(2) == 'baseline' else float(m.group(3))
-        arms.setdefault(arm, []).append(read_arm(path))
+        rec = read_arm(path)
+        # The filename decides which set is tabled; this catches a file renamed by hand
+        # into the wrong set, which would otherwise silently mix a ~2x throughput step
+        # into one column.
+        if rec['gpu_preprocess'] is not None and rec['gpu_preprocess'] != args.gpu_preprocess:
+            raise SystemExit(
+                f'{path} records gpu_preprocess={rec["gpu_preprocess"]} but is filed as '
+                f'{args.gpu_preprocess} -- the two are not comparable; fix the name')
+        arms.setdefault(arm, []).append(rec)
     if not arms:
         raise SystemExit(f'no arm CSVs matched {pat} -- run scripts/efficiency/cost_model.sh first')
 
@@ -268,13 +305,15 @@ def main():
     t['speedup_vs_baseline'] = t.throughput_fps / base.throughput_fps
     t['gflops_vs_baseline'] = base.gflops_per_frame / t.gflops_per_frame
 
-    out = args.out or os.path.join(args.dir, f'{args.model}-fps{args.sample_fps:g}-table.csv')
+    out = args.out or os.path.join(
+        args.dir, f'{args.model}-fps{args.sample_fps:g}{prep_tag}-table.csv')
     t.to_csv(out, index=False)
 
     n_fr = arms[sorted(arms, key=order)[0]][0]['n_frames']
     print(f'\n{args.model} @ {args.sample_fps:g} fps -- {n_fr} frames/stream, '
           f'{t.n_streams.iloc[0]} stream(s), 1 frame/forward (streaming), '
-          f'{args.timing} timing')
+          f'{args.timing} timing, '
+          f'{"GPU" if args.gpu_preprocess else "CPU (HF processor)"} preprocessing')
     n_meas = int(t.gflops_is_measured.sum())
     if measured:
         print(f'GFLOPs/frame: MEASURED for {n_meas}/{len(t)} arms over '
@@ -308,6 +347,12 @@ def main():
         print('\nthroughput sums per-chunk timings, one sync pair per chunk. At 1 '
               'frame/forward those\nbarriers serialize preprocessing against compute, '
               'so read this as a lower bound.')
+
+    if args.gpu_preprocess:
+        print('preprocessing ran on the GPU (~2-4 ms/frame), so the throughput column is '
+              'the model.\n  It is NOT the eval path: the HF processor costs ~37-57 '
+              'ms/frame at 1080p and would\n  cap every arm well below these numbers. '
+              'Quote accuracy-run throughput from a\n  GPU_PREPROCESS=false sweep.')
 
     if not t.reached_steady_state.all():
         # The window fills after n_local / (n_frame_tokens * keep) frames, so the harder

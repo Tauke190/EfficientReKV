@@ -1,0 +1,440 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 1890" width="1240" height="1890" role="img" aria-label="Content-adaptive KV caching: variable per-frame token counts are cut into fixed 196-token blocks, decoupling cache block index from frame index, with a ledger that preserves frame addressability and a three-tier store whose retrieval budget covers a content-determined span of video.">
+<title>Content-Adaptive KV Caching</title>
+<desc>Six-stage pipeline. Frames are encoded to 196 tokens each, StreamPrune keeps a variable count per frame, the stream is cut into fixed 196-token blocks independent of frame boundaries, a frame-token-count ledger reconstructs the frame-to-block map, blocks are stored across GPU local window, CPU pinned memory and a GPU LRU cache, and retrieval selects a fixed number of blocks that now covers a content-determined span of video time.</desc>
+
+<defs>
+  <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path d="M0,0 L10,5 L0,10 z" fill="#1a1c20"/>
+  </marker>
+  <marker id="ari" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path d="M0,0 L10,5 L0,10 z" fill="#3f5aa6"/>
+  </marker>
+  <marker id="art" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path d="M0,0 L10,5 L0,10 z" fill="#0f6f6a"/>
+  </marker>
+  <marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path d="M0,0 L10,5 L0,10 z" fill="#8a6410"/>
+  </marker>
+  <pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+    <rect width="7" height="7" fill="#f8efd8"/>
+    <line x1="0" y1="0" x2="0" y2="7" stroke="#c79a3e" stroke-width="1.6"/>
+  </pattern>
+</defs>
+
+<rect x="0" y="0" width="1240" height="1890" fill="#fcfcfa"/>
+
+<g font-family="IBM Plex Sans, Helvetica Neue, Helvetica, Arial, sans-serif" fill="#1a1c20">
+
+<!-- ============================== TITLE ============================== -->
+<text x="100" y="52" font-size="27" font-weight="600" font-family="IBM Plex Serif, Georgia, serif">Content-Adaptive KV Caching</text>
+<text x="100" y="76" font-size="12.5" fill="#62676f">A cache block stops being a unit of time and becomes a unit of information.  LLaVA-OneVision-7B + ReKV, fp16, n_local 15000, retrieve_size 64.</text>
+<line x1="100" y1="94" x2="1180" y2="94" stroke="#1a1c20" stroke-width="1.4"/>
+
+<!-- ============================== STAGE 1 ============================== -->
+<rect x="100" y="113" width="20" height="20" fill="#1a1c20"/>
+<text x="110" y="128" font-size="12.5" font-weight="600" fill="#fcfcfa" text-anchor="middle" font-family="IBM Plex Mono, Menlo, Consolas, monospace">1</text>
+<text x="130" y="128" font-size="13" font-weight="600" letter-spacing="1.6">ENCODE  —  EVERY FRAME BECOMES A VARIABLE NUMBER OF TOKENS</text>
+<line x1="100" y1="142" x2="1180" y2="142" stroke="#dfe2e5" stroke-width="1"/>
+
+<g font-size="11.5">
+  <rect x="100" y="170" width="150" height="44" fill="#f1f2ef" stroke="#b9bec4" stroke-width="1"/>
+  <text x="175" y="189" text-anchor="middle" font-weight="600">frame t</text>
+  <text x="175" y="204" text-anchor="middle" font-size="9.5" fill="#62676f" font-family="IBM Plex Mono, Menlo, Consolas, monospace">(H, W, 3) uint8</text>
+
+  <rect x="300" y="170" width="150" height="44" fill="#f1f2ef" stroke="#b9bec4" stroke-width="1"/>
+  <text x="375" y="189" text-anchor="middle" font-weight="600">SigLIP tower</text>
+  <text x="375" y="204" text-anchor="middle" font-size="9.5" fill="#62676f" font-family="IBM Plex Mono, Menlo, Consolas, monospace">(T, 729, 1152)</text>
+
+  <rect x="500" y="170" width="130" height="44" fill="#f1f2ef" stroke="#b9bec4" stroke-width="1"/>
+  <text x="565" y="189" text-anchor="middle" font-weight="600">bilinear pool</text>
+  <text x="565" y="204" text-anchor="middle" font-size="9.5" fill="#62676f" font-family="IBM Plex Mono, Menlo, Consolas, monospace">(T, 196, 1152)</text>
+
+  <rect x="680" y="170" width="150" height="44" fill="#f1f2ef" stroke="#b9bec4" stroke-width="1"/>
+  <text x="755" y="189" text-anchor="middle" font-weight="600">projector</text>
+  <text x="755" y="204" text-anchor="middle" font-size="9.5" fill="#62676f" font-family="IBM Plex Mono, Menlo, Consolas, monospace">(T, 196, 3584)</text>
+
+  <line x1="252" y1="192" x2="296" y2="192" stroke="#1a1c20" stroke-width="1.3" marker-end="url(#ar)"/>
+  <line x1="452" y1="192" x2="496" y2="192" stroke="#1a1c20" stroke-width="1.3" marker-end="url(#ar)"/>
+  <line x1="632" y1="192" x2="676" y2="192" stroke="#1a1c20" stroke-width="1.3" marker-end="url(#ar)"/>
+
+  <text x="860" y="187" font-size="10.5" fill="#62676f">196 tokens per frame,</text>
+  <text x="860" y="201" font-size="10.5" fill="#62676f">fixed — this is where the</text>
+  <text x="860" y="215" font-size="10.5" fill="#62676f">baseline identity comes from.</text>
+</g>
+
+<path d="M755,216 L755,232 L315,232 L315,248" fill="none" stroke="#0f6f6a" stroke-width="1.4" marker-end="url(#art)"/>
+
+<!-- StreamPrune box -->
+<rect x="100" y="250" width="430" height="78" fill="#e4f0ee" stroke="#0f6f6a" stroke-width="1.6"/>
+<text x="114" y="270" font-size="12" font-weight="600" fill="#0f6f6a">StreamPrune — temporal redundancy test</text>
+<g font-family="IBM Plex Mono, Menlo, Consolas, monospace" font-size="10" fill="#1a1c20">
+  <text x="114" y="288">dist[p] = 1 - cos( f_t[p], ref[p] )      keep[p] = dist[p] &gt; tau</text>
+  <text x="114" y="303">ref[p] &lt;- f_t[p]  where keep          (dropped positions keep their ref)</text>
+  <text x="114" y="320" fill="#0f6f6a">out:  kept (N, 3584)   counts  c_t in [0, 196]</text>
+</g>
+<line x1="534" y1="289" x2="588" y2="289" stroke="#0f6f6a" stroke-width="1.4" marker-end="url(#art)"/>
+
+<!-- c_t bar strip -->
+<text x="620" y="272" font-size="11" font-weight="600">tokens kept per frame, c_t</text>
+<line x1="616" y1="286" x2="1166" y2="286" stroke="#a8a19a" stroke-width="1" stroke-dasharray="3 3"/>
+<text x="612" y="289" font-size="9" fill="#62676f" text-anchor="end">196</text>
+<line x1="616" y1="350" x2="1166" y2="350" stroke="#1a1c20" stroke-width="1"/>
+<g>
+  <rect x="620" y="286" width="36" height="64" fill="#0f6f6a"/>
+  <rect x="676" y="336.6" width="36" height="13.4" fill="#0f6f6a"/>
+  <rect x="732" y="349" width="36" height="1" fill="#0f6f6a"/>
+  <rect x="788" y="348" width="36" height="2" fill="#a8452f"/>
+  <rect x="844" y="348" width="36" height="2" fill="#a8452f"/>
+  <rect x="900" y="347.1" width="36" height="2.9" fill="#0f6f6a"/>
+  <rect x="956" y="288.6" width="36" height="61.4" fill="#0f6f6a"/>
+  <rect x="1012" y="286" width="36" height="64" fill="#0f6f6a"/>
+  <rect x="1068" y="335.6" width="36" height="14.4" fill="#0f6f6a"/>
+  <rect x="1124" y="347.7" width="36" height="2.3" fill="#0f6f6a"/>
+</g>
+<g font-size="9" text-anchor="middle" font-family="IBM Plex Mono, Menlo, Consolas, monospace">
+  <text x="638" y="282">196</text><text x="694" y="332">41</text><text x="750" y="345">3</text>
+  <text x="806" y="344" fill="#a8452f">0</text><text x="862" y="344" fill="#a8452f">0</text>
+  <text x="918" y="343">9</text><text x="974" y="284">188</text><text x="1030" y="282">196</text>
+  <text x="1086" y="331">44</text><text x="1142" y="343">7</text>
+</g>
+<g font-size="9.5" text-anchor="middle" fill="#62676f">
+  <text x="638" y="364">f0</text><text x="694" y="364">f1</text><text x="750" y="364">f2</text>
+  <text x="806" y="364">f3</text><text x="862" y="364">f4</text><text x="918" y="364">f5</text>
+  <text x="974" y="364">f6</text><text x="1030" y="364">f7</text><text x="1086" y="364">f8</text>
+  <text x="1142" y="364">f9</text>
+</g>
+<text x="806" y="378" font-size="9.5" fill="#a8452f" text-anchor="middle">static stretch: 0 tokens emitted</text>
+
+<!-- ============================== STAGE 2 ============================== -->
+<rect x="100" y="404" width="20" height="20" fill="#1a1c20"/>
+<text x="110" y="419" font-size="12.5" font-weight="600" fill="#fcfcfa" text-anchor="middle" font-family="IBM Plex Mono, Menlo, Consolas, monospace">2</text>
+<text x="130" y="419" font-size="13" font-weight="600" letter-spacing="1.6">CUT  —  TOKEN AXIS:  THE STORE COUNTS TOKENS, NEVER FRAMES</text>
+<line x1="100" y1="433" x2="1180" y2="433" stroke="#dfe2e5" stroke-width="1"/>
+
+<!-- frame labels above ribbon -->
+<g font-size="10" fill="#62676f" text-anchor="middle">
+  <text x="240" y="456">f0 · 196</text>
+  <text x="398" y="456">f1 · 41</text>
+  <text x="428" y="444">f2 · 3</text>
+  <text x="470" y="456">f5 · 9</text>
+  <text x="590" y="456">f6 · 188</text>
+  <text x="864" y="456">f7 · 196</text>
+  <text x="1036" y="444">f8 · 44</text>
+  <text x="1074" y="456">f9 · 7</text>
+</g>
+<g stroke="#9aa0a6" stroke-width="0.8" fill="none">
+  <path d="M409,468 L398,460"/>
+  <path d="M441,468 L430,448"/>
+  <path d="M449,468 L468,460"/>
+  <path d="M1036,468 L1036,448"/>
+  <path d="M1072,468 L1074,460"/>
+</g>
+
+<!-- ribbon segments -->
+<g stroke="#7fb0ab" stroke-width="0.8">
+  <rect x="100" y="470" width="280" height="52" fill="#cfe3e1"/>
+  <rect x="380" y="470" width="58.6" height="52" fill="#bcd8d5"/>
+  <rect x="438.6" y="470" width="4.3" height="52" fill="#cfe3e1"/>
+  <rect x="442.9" y="470" width="12.8" height="52" fill="#bcd8d5"/>
+  <rect x="455.7" y="470" width="268.6" height="52" fill="#cfe3e1"/>
+  <rect x="724.3" y="470" width="280" height="52" fill="#bcd8d5"/>
+  <rect x="1004.3" y="470" width="62.8" height="52" fill="#cfe3e1"/>
+  <rect x="1067.1" y="470" width="10" height="52" fill="#bcd8d5"/>
+</g>
+<!-- pending overlay -->
+<rect x="940" y="470" width="137.1" height="52" fill="url(#hatch)" stroke="#8a6410" stroke-width="1.2"/>
+<text x="1008" y="501" font-size="10" text-anchor="middle" fill="#8a6410" font-weight="600">R = 96</text>
+
+<!-- zero-token marker -->
+<path d="M442.9,470 L442.9,530" stroke="#a8452f" stroke-width="1.4" stroke-dasharray="2 2"/>
+<text x="452" y="540" font-size="9.5" fill="#a8452f">f3, f4 emit nothing — no width in the stream at all</text>
+
+<!-- block cut lines -->
+<g stroke="#3f5aa6" stroke-width="2">
+  <line x1="100" y1="462" x2="100" y2="534"/>
+  <line x1="380" y1="462" x2="380" y2="534"/>
+  <line x1="660" y1="462" x2="660" y2="534"/>
+  <line x1="940" y1="462" x2="940" y2="534"/>
+</g>
+
+<!-- block labels + brackets -->
+<g font-size="11" text-anchor="middle">
+  <text x="240" y="556" font-weight="600" fill="#3f5aa6">B0</text>
+  <text x="520" y="556" font-weight="600" fill="#3f5aa6">B1</text>
+  <text x="800" y="556" font-weight="600" fill="#3f5aa6">B2</text>
+  <text x="1008" y="556" font-weight="600" fill="#8a6410">_pending_embeds</text>
+</g>
+<g stroke="#3f5aa6" stroke-width="0.9" fill="none">
+  <path d="M102,566 L102,572 L378,572 L378,566"/>
+  <path d="M382,566 L382,572 L658,572 L658,566"/>
+  <path d="M662,566 L662,572 L938,572 L938,566"/>
+</g>
+<path d="M942,566 L942,572 L1076,572 L1076,566" stroke="#8a6410" stroke-width="0.9" fill="none"/>
+<g font-size="9" text-anchor="middle" fill="#62676f" font-family="IBM Plex Mono, Menlo, Consolas, monospace">
+  <text x="240" y="584">196 tok</text>
+  <text x="520" y="584">196 tok</text>
+  <text x="800" y="584">196 tok</text>
+  <text x="1009" y="584" fill="#8a6410">96 tok &lt; 196</text>
+</g>
+
+<!-- carry-back arrow -->
+<path d="M1077,590 L1077,612 L150,612 L150,596" fill="none" stroke="#8a6410" stroke-width="1.4" stroke-dasharray="5 3" marker-end="url(#ara)"/>
+<rect x="380" y="602" width="440" height="18" fill="#fcfcfa"/>
+<text x="600" y="616" font-size="10.5" fill="#8a6410" text-anchor="middle">held back, prepended to the next chunk — embeddings, not KV</text>
+
+<text x="100" y="642" font-size="11" fill="#62676f">Blocks are cut by counting 196 tokens off the stream (<tspan font-family="IBM Plex Mono, Menlo, Consolas, monospace" font-size="10">ContextManager._append_global</tspan>). Frame boundaries are invisible to it — so B1 alone absorbs f1 through f6,</text>
+<text x="100" y="658" font-size="11" fill="#62676f">while f0 needs a whole block to itself. The store requires whole blocks (three asserts), so the tail remainder R waits in <tspan font-family="IBM Plex Mono, Menlo, Consolas, monospace" font-size="10">_pending_embeds</tspan> rather than being padded.</text>
+
+<!-- ============================== STAGE 3 ============================== -->
+<rect x="100" y="688" width="20" height="20" fill="#1a1c20"/>
+<text x="110" y="703" font-size="12.5" font-weight="600" fill="#fcfcfa" text-anchor="middle" font-family="IBM Plex Mono, Menlo, Consolas, monospace">3</text>
+<text x="130" y="703" font-size="13" font-weight="600" letter-spacing="1.6">SPAN  —  TIME AXIS:  THE SAME TEN FRAMES, THE SAME CACHE BUDGET</text>
+<line x1="100" y1="717" x2="1180" y2="717" stroke="#dfe2e5" stroke-width="1"/>
+
+<line x1="100" y1="742" x2="1130" y2="742" stroke="#62676f" stroke-width="1" marker-end="url(#ar)"/>
+<text x="1140" y="746" font-size="10" fill="#62676f">time</text>
+<g>
+  <rect x="100" y="752" width="100" height="34" fill="#f1f2ef" stroke="#b9bec4"/>
+  <rect x="200" y="752" width="100" height="34" fill="#f1f2ef" stroke="#b9bec4"/>
+  <rect x="300" y="752" width="100" height="34" fill="#f1f2ef" stroke="#b9bec4"/>
+  <rect x="400" y="752" width="100" height="34" fill="#f6e9e5" stroke="#b9bec4"/>
+  <rect x="500" y="752" width="100" height="34" fill="#f6e9e5" stroke="#b9bec4"/>
+  <rect x="600" y="752" width="100" height="34" fill="#f1f2ef" stroke="#b9bec4"/>
+  <rect x="700" y="752" width="100" height="34" fill="#f1f2ef" stroke="#b9bec4"/>
+  <rect x="800" y="752" width="100" height="34" fill="#f1f2ef" stroke="#b9bec4"/>
+  <rect x="900" y="752" width="100" height="34" fill="#f1f2ef" stroke="#b9bec4"/>
+  <rect x="1000" y="752" width="100" height="34" fill="#f1f2ef" stroke="#b9bec4"/>
+</g>
+<g font-size="11" text-anchor="middle" font-weight="600">
+  <text x="150" y="770">f0</text><text x="250" y="770">f1</text><text x="350" y="770">f2</text>
+  <text x="450" y="770">f3</text><text x="550" y="770">f4</text><text x="650" y="770">f5</text>
+  <text x="750" y="770">f6</text><text x="850" y="770">f7</text><text x="950" y="770">f8</text>
+  <text x="1050" y="770">f9</text>
+</g>
+<g font-size="9" text-anchor="middle" fill="#62676f" font-family="IBM Plex Mono, Menlo, Consolas, monospace">
+  <text x="150" y="781">196</text><text x="250" y="781">41</text><text x="350" y="781">3</text>
+  <text x="450" y="781" fill="#a8452f">0</text><text x="550" y="781" fill="#a8452f">0</text>
+  <text x="650" y="781">9</text><text x="750" y="781">188</text><text x="850" y="781">196</text>
+  <text x="950" y="781">44</text><text x="1050" y="781">7</text>
+</g>
+
+<text x="100" y="812" font-size="11" font-weight="600" fill="#62676f">BASELINE — block index IS frame index: 10 blocks, each covering exactly 1 frame</text>
+<g stroke="#b9bec4" stroke-width="1" fill="#e8ecf6">
+  <rect x="100" y="820" width="100" height="30"/><rect x="200" y="820" width="100" height="30"/>
+  <rect x="300" y="820" width="100" height="30"/><rect x="400" y="820" width="100" height="30"/>
+  <rect x="500" y="820" width="100" height="30"/><rect x="600" y="820" width="100" height="30"/>
+  <rect x="700" y="820" width="100" height="30"/><rect x="800" y="820" width="100" height="30"/>
+  <rect x="900" y="820" width="100" height="30"/><rect x="1000" y="820" width="100" height="30"/>
+</g>
+<g font-size="10.5" text-anchor="middle" fill="#3f5aa6" font-weight="600">
+  <text x="150" y="840">B0</text><text x="250" y="840">B1</text><text x="350" y="840">B2</text>
+  <text x="450" y="840">B3</text><text x="550" y="840">B4</text><text x="650" y="840">B5</text>
+  <text x="750" y="840">B6</text><text x="850" y="840">B7</text><text x="950" y="840">B8</text>
+  <text x="1050" y="840">B9</text>
+</g>
+
+<text x="100" y="878" font-size="11" font-weight="600" fill="#0f6f6a">CONTENT-ADAPTIVE — 3 blocks cover the same 10 frames: 1 frame where it is busy, 6 where it is static</text>
+<rect x="100" y="886" width="100" height="30" fill="#cfe3e1" stroke="#0f6f6a" stroke-width="1.2"/>
+<text x="150" y="905" font-size="10.5" text-anchor="middle" font-weight="600" fill="#0f6f6a">B0 · 1 frame</text>
+<rect x="200" y="886" width="600" height="30" fill="#cfe3e1" stroke="#0f6f6a" stroke-width="1.2"/>
+<text x="500" y="905" font-size="10.5" text-anchor="middle" font-weight="600" fill="#0f6f6a">B1 · 6 frames (f1 – f6)</text>
+<rect x="800" y="886" width="300" height="30" fill="url(#hatch)" stroke="#8a6410" stroke-width="1.2"/>
+<text x="950" y="905" font-size="10.5" text-anchor="middle" font-weight="600" fill="#8a6410">pending · f7 – f9</text>
+<rect x="700" y="920" width="200" height="30" fill="#bcd8d5" stroke="#0f6f6a" stroke-width="1.2"/>
+<text x="800" y="939" font-size="10.5" text-anchor="middle" font-weight="600" fill="#0f6f6a">B2 · 2 frames</text>
+
+<path d="M700,952 L700,962 L900,962 L900,952" fill="none" stroke="#62676f" stroke-width="0.9"/>
+<text x="910" y="966" font-size="10" fill="#62676f">spans overlap on purpose: f6 and f7 each straddle a cut, so both blocks genuinely hold part of them.</text>
+
+<!-- ============================== STAGE 4 ============================== -->
+<rect x="100" y="996" width="20" height="20" fill="#1a1c20"/>
+<text x="110" y="1011" font-size="12.5" font-weight="600" fill="#fcfcfa" text-anchor="middle" font-family="IBM Plex Mono, Menlo, Consolas, monospace">4</text>
+<text x="130" y="1011" font-size="13" font-weight="600" letter-spacing="1.6">LEDGER  —  ONE ARRAY RESTORES EXACT FRAME ADDRESSABILITY</text>
+<line x1="100" y1="1025" x2="1180" y2="1025" stroke="#dfe2e5" stroke-width="1"/>
+
+<text x="100" y="1050" font-size="11" fill="#62676f">Everything below is derived from one list, <tspan font-family="IBM Plex Mono, Menlo, Consolas, monospace" font-size="10.5" fill="#1a1c20">frame_token_counts</tspan>, appended once per frame. No frame index is ever assumed equal to a block index again.</text>
+
+<g stroke="#dfe2e5" stroke-width="1">
+  <rect x="100" y="1066" width="980" height="26" fill="#f1f2ef"/>
+  <rect x="100" y="1092" width="980" height="26" fill="#fcfcfa"/>
+  <rect x="100" y="1118" width="980" height="26" fill="#fcfcfa"/>
+  <rect x="100" y="1144" width="980" height="26" fill="#fcfcfa"/>
+  <rect x="100" y="1170" width="980" height="26" fill="#f1f2ef"/>
+</g>
+<g stroke="#dfe2e5" stroke-width="1">
+  <line x1="200" y1="1066" x2="200" y2="1196"/><line x1="288" y1="1066" x2="288" y2="1196"/>
+  <line x1="376" y1="1066" x2="376" y2="1196"/><line x1="464" y1="1066" x2="464" y2="1196"/>
+  <line x1="552" y1="1066" x2="552" y2="1196"/><line x1="640" y1="1066" x2="640" y2="1196"/>
+  <line x1="728" y1="1066" x2="728" y2="1196"/><line x1="816" y1="1066" x2="816" y2="1196"/>
+  <line x1="904" y1="1066" x2="904" y2="1196"/><line x1="992" y1="1066" x2="992" y2="1196"/>
+</g>
+<rect x="464" y="1066" width="176" height="130" fill="#f6e9e5" fill-opacity="0.7" stroke="#a8452f" stroke-width="1.2"/>
+
+<g font-size="10.5" font-family="IBM Plex Mono, Menlo, Consolas, monospace">
+  <text x="112" y="1084" font-weight="600" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif">frame</text>
+  <text x="112" y="1110" fill="#62676f" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif">c_t</text>
+  <text x="112" y="1136" fill="#62676f" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif">start</text>
+  <text x="112" y="1162" fill="#62676f" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif">end</text>
+  <text x="112" y="1188" font-weight="600" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif">block(s)</text>
+</g>
+<g font-size="10.5" text-anchor="middle" font-family="IBM Plex Mono, Menlo, Consolas, monospace">
+  <g font-weight="600">
+    <text x="244" y="1084">f0</text><text x="332" y="1084">f1</text><text x="420" y="1084">f2</text>
+    <text x="508" y="1084">f3</text><text x="596" y="1084">f4</text><text x="684" y="1084">f5</text>
+    <text x="772" y="1084">f6</text><text x="860" y="1084">f7</text><text x="948" y="1084">f8</text>
+    <text x="1036" y="1084">f9</text>
+  </g>
+  <g>
+    <text x="244" y="1110">196</text><text x="332" y="1110">41</text><text x="420" y="1110">3</text>
+    <text x="508" y="1110" fill="#a8452f" font-weight="600">0</text><text x="596" y="1110" fill="#a8452f" font-weight="600">0</text>
+    <text x="684" y="1110">9</text><text x="772" y="1110">188</text><text x="860" y="1110">196</text>
+    <text x="948" y="1110">44</text><text x="1036" y="1110">7</text>
+  </g>
+  <g fill="#62676f">
+    <text x="244" y="1136">0</text><text x="332" y="1136">196</text><text x="420" y="1136">237</text>
+    <text x="508" y="1136">240</text><text x="596" y="1136">240</text><text x="684" y="1136">240</text>
+    <text x="772" y="1136">249</text><text x="860" y="1136">437</text><text x="948" y="1136">633</text>
+    <text x="1036" y="1136">677</text>
+  </g>
+  <g fill="#62676f">
+    <text x="244" y="1162">196</text><text x="332" y="1162">237</text><text x="420" y="1162">240</text>
+    <text x="508" y="1162">240</text><text x="596" y="1162">240</text><text x="684" y="1162">249</text>
+    <text x="772" y="1162">437</text><text x="860" y="1162">633</text><text x="948" y="1162">677</text>
+    <text x="1036" y="1162">684</text>
+  </g>
+  <g font-weight="600" fill="#3f5aa6">
+    <text x="244" y="1188">B0</text><text x="332" y="1188">B1</text><text x="420" y="1188">B1</text>
+    <text x="508" y="1188" fill="#a8452f">B1*</text><text x="596" y="1188" fill="#a8452f">B1*</text><text x="684" y="1188">B1</text>
+    <text x="772" y="1188" font-size="9.5">B1,B2</text><text x="860" y="1188" font-size="9.5">B2,pnd</text>
+    <text x="948" y="1188" fill="#8a6410">pnd</text><text x="1036" y="1188" fill="#8a6410">pnd</text>
+  </g>
+</g>
+<text x="1092" y="1110" font-size="9.5" fill="#62676f">counts</text>
+<text x="1092" y="1149" font-size="9.5" fill="#62676f">cumsum</text>
+<text x="1092" y="1188" font-size="9.5" fill="#62676f">// 196</text>
+
+<text x="100" y="1222" font-size="11" fill="#a8452f">* carrier rule — a frame that emitted nothing is not missing from memory. It was dropped because an earlier token already represents it to within tau, so it maps to</text>
+<text x="100" y="1238" font-size="11" fill="#a8452f">that token's block: <tspan font-family="IBM Plex Mono, Menlo, Consolas, monospace" font-size="10.5">carrier = (start - 1) // 196 = 239 // 196 = B1</tspan>. Mapping it to nothing would make a long static stretch unretrievable — exactly backwards.</text>
+
+<!-- ============================== STAGE 5 ============================== -->
+<rect x="100" y="1268" width="20" height="20" fill="#1a1c20"/>
+<text x="110" y="1283" font-size="12.5" font-weight="600" fill="#fcfcfa" text-anchor="middle" font-family="IBM Plex Mono, Menlo, Consolas, monospace">5</text>
+<text x="130" y="1283" font-size="13" font-weight="600" letter-spacing="1.6">STORE  —  WRITE PATH, PER LAYER (x 28)</text>
+<line x1="100" y1="1297" x2="1180" y2="1297" stroke="#dfe2e5" stroke-width="1"/>
+
+<rect x="100" y="1318" width="320" height="112" fill="#e4f0ee" stroke="#0f6f6a" stroke-width="1.6"/>
+<text x="114" y="1338" font-size="11.5" font-weight="600" fill="#0f6f6a">TIER 0 · LOCAL WINDOW (GPU)</text>
+<g font-size="10" fill="#1a1c20">
+  <text x="114" y="1356" font-family="IBM Plex Mono, Menlo, Consolas, monospace">local_k/v  (1, 4, &lt;=15000, 128) fp16</text>
+  <text x="114" y="1372">encode-time attention only; not read at QA</text>
+  <text x="114" y="1388">0.80 GiB across 28 layers</text>
+  <text x="114" y="1406" fill="#62676f">encode context   77 frames @ keep 1.00</text>
+  <text x="114" y="1421" fill="#0f6f6a" font-weight="600">encode context  348 frames @ keep 0.22</text>
+</g>
+
+<line x1="424" y1="1374" x2="466" y2="1374" stroke="#1a1c20" stroke-width="1.3" marker-end="url(#ar)"/>
+<text x="445" y="1364" font-size="9" fill="#62676f" text-anchor="middle">same KV</text>
+
+<rect x="470" y="1318" width="250" height="112" fill="#f1f2ef" stroke="#b9bec4" stroke-width="1"/>
+<text x="484" y="1338" font-size="11.5" font-weight="600">global_remainder</text>
+<g font-size="10" fill="#1a1c20">
+  <text x="484" y="1356" font-family="IBM Plex Mono, Menlo, Consolas, monospace">(1, 4, m*196, 128)</text>
+  <text x="484" y="1376" font-family="IBM Plex Mono, Menlo, Consolas, monospace" fill="#62676f">assert len % 196 == 0</text>
+  <text x="484" y="1398" fill="#62676f">drained to CPU every block,</text>
+  <text x="484" y="1412" fill="#62676f">once stream &gt; n_local</text>
+</g>
+
+<line x1="724" y1="1374" x2="766" y2="1374" stroke="#3f5aa6" stroke-width="1.6" marker-end="url(#ari)"/>
+<text x="745" y="1364" font-size="9" fill="#3f5aa6" text-anchor="middle">cut 196</text>
+
+<rect x="770" y="1318" width="410" height="112" fill="#f1f2ef" stroke="#b9bec4" stroke-width="1"/>
+<text x="784" y="1338" font-size="11.5" font-weight="600">TIER 2 · CPU PINNED — every block, forever</text>
+<g font-size="10" fill="#1a1c20">
+  <text x="784" y="1356" font-family="IBM Plex Mono, Menlo, Consolas, monospace">MemoryUnit.cpu_data  2 x (4, 196, 128)</text>
+  <text x="784" y="1374">392 KiB / block / layer</text>
+  <text x="784" y="1390">10.72 MiB / block across 28 layers</text>
+  <text x="784" y="1410" fill="#62676f">unbounded — grows with tokens stored,</text>
+  <text x="784" y="1424" fill="#62676f">which is what StreamPrune shrinks</text>
+</g>
+
+<path d="M975,1432 L975,1450" fill="none" stroke="#3f5aa6" stroke-width="1.4" marker-end="url(#ari)"/>
+<rect x="770" y="1452" width="410" height="66" fill="#e8ecf6" stroke="#3f5aa6" stroke-width="1.4"/>
+<text x="784" y="1471" font-size="11.5" font-weight="600" fill="#3f5aa6">REPRESENTATIVE KEY — one per block</text>
+<g font-size="10">
+  <text x="784" y="1488" font-family="IBM Plex Mono, Menlo, Consolas, monospace">block_k: VectorTensor (n_blocks, 3584) on GPU</text>
+  <text x="784" y="1505" fill="#62676f">mean over the block's 196 GQA-expanded keys · 7 KiB / block / layer</text>
+</g>
+
+<text x="100" y="1470" font-size="11" fill="#62676f">One block is always 196 tokens and always 10.72 MiB — but no longer always one frame.</text>
+<text x="100" y="1488" font-size="11" fill="#62676f">The bytes are fixed; the amount of video time they buy is decided by the content.</text>
+<text x="100" y="1510" font-size="11" fill="#62676f">Same allocation, same code path, same asserts — only the frame-to-block relation changed.</text>
+
+<!-- ============================== STAGE 6 ============================== -->
+<rect x="100" y="1550" width="20" height="20" fill="#1a1c20"/>
+<text x="110" y="1565" font-size="12.5" font-weight="600" fill="#fcfcfa" text-anchor="middle" font-family="IBM Plex Mono, Menlo, Consolas, monospace">6</text>
+<text x="130" y="1565" font-size="13" font-weight="600" letter-spacing="1.6">RETRIEVE  —  READ PATH:  A FIXED BUDGET, A CONTENT-DETERMINED REACH</text>
+<line x1="100" y1="1579" x2="1180" y2="1579" stroke="#dfe2e5" stroke-width="1"/>
+
+<g font-size="10.5">
+  <rect x="100" y="1600" width="190" height="52" fill="#f1f2ef" stroke="#b9bec4"/>
+  <text x="195" y="1621" text-anchor="middle" font-weight="600">question</text>
+  <text x="195" y="1637" text-anchor="middle" font-size="9.5" fill="#62676f" font-family="IBM Plex Mono, Menlo, Consolas, monospace">ids (1, Lq)</text>
+
+  <rect x="330" y="1600" width="230" height="52" fill="#f1f2ef" stroke="#b9bec4"/>
+  <text x="445" y="1621" text-anchor="middle" font-weight="600">mean over Lq, flatten heads</text>
+  <text x="445" y="1637" text-anchor="middle" font-size="9.5" fill="#62676f" font-family="IBM Plex Mono, Menlo, Consolas, monospace">q (1, 3584)</text>
+
+  <rect x="600" y="1600" width="260" height="52" fill="#e8ecf6" stroke="#3f5aa6" stroke-width="1.4"/>
+  <text x="730" y="1621" text-anchor="middle" font-weight="600" fill="#3f5aa6">score every block</text>
+  <text x="730" y="1637" text-anchor="middle" font-size="9.5" fill="#3f5aa6" font-family="IBM Plex Mono, Menlo, Consolas, monospace">block_k @ q.T  (n_blocks,)</text>
+
+  <rect x="900" y="1600" width="280" height="52" fill="#e8ecf6" stroke="#3f5aa6" stroke-width="1.4"/>
+  <text x="1040" y="1621" text-anchor="middle" font-weight="600" fill="#3f5aa6">top-k -&gt; 64 block ids</text>
+  <text x="1040" y="1637" text-anchor="middle" font-size="9.5" fill="#3f5aa6">the budget that never changes</text>
+
+  <line x1="292" y1="1626" x2="326" y2="1626" stroke="#1a1c20" stroke-width="1.3" marker-end="url(#ar)"/>
+  <line x1="562" y1="1626" x2="596" y2="1626" stroke="#1a1c20" stroke-width="1.3" marker-end="url(#ar)"/>
+  <line x1="862" y1="1626" x2="896" y2="1626" stroke="#1a1c20" stroke-width="1.3" marker-end="url(#ar)"/>
+</g>
+<path d="M1040,1654 L1040,1672 L290,1672 L290,1692" fill="none" stroke="#3f5aa6" stroke-width="1.4" marker-end="url(#ari)"/>
+
+<g font-size="10.5">
+  <rect x="100" y="1694" width="380" height="56" fill="#e8ecf6" stroke="#3f5aa6" stroke-width="1.4"/>
+  <text x="114" y="1713" font-weight="600" fill="#3f5aa6">TIER 1 · GPU BLOCK CACHE (CudaCache)</text>
+  <text x="114" y="1729" font-size="9.5" fill="#1a1c20">128 slots x 392 KiB · 1.34 GiB across 28 layers</text>
+  <text x="114" y="1743" font-size="9.5" fill="#62676f">LRU by load_count, current top-k pinned · misses load async from Tier 2</text>
+
+  <rect x="520" y="1694" width="330" height="56" fill="#f1f2ef" stroke="#b9bec4"/>
+  <text x="534" y="1713" font-weight="600">global_buffer</text>
+  <text x="534" y="1729" font-size="9.5" font-family="IBM Plex Mono, Menlo, Consolas, monospace">(2, 1, 4, n_init + 64*196, 128)</text>
+  <text x="534" y="1743" font-size="9.5" fill="#62676f">687 MiB across 28 layers, preallocated</text>
+
+  <rect x="890" y="1694" width="290" height="56" fill="#e4f0ee" stroke="#0f6f6a" stroke-width="1.4"/>
+  <text x="904" y="1713" font-weight="600" fill="#0f6f6a">attend</text>
+  <text x="904" y="1729" font-size="9.5">retrieved 64 blocks + question + answer</text>
+  <text x="904" y="1743" font-size="9.5" fill="#62676f">local window not attended</text>
+
+  <line x1="484" y1="1722" x2="516" y2="1722" stroke="#1a1c20" stroke-width="1.3" marker-end="url(#ar)"/>
+  <line x1="854" y1="1722" x2="886" y2="1722" stroke="#1a1c20" stroke-width="1.3" marker-end="url(#ar)"/>
+</g>
+
+<!-- payoff table -->
+<line x1="100" y1="1782" x2="1180" y2="1782" stroke="#1a1c20" stroke-width="1.2"/>
+<g font-size="11">
+  <text x="112" y="1800" font-weight="600" fill="#62676f">keep rate</text>
+  <text x="300" y="1800" font-weight="600" fill="#62676f">frames per block</text>
+  <text x="580" y="1800" font-weight="600" fill="#62676f">reach of the same 64 blocks</text>
+  <text x="900" y="1800" font-weight="600" fill="#62676f">encode context of the 15 000-token window</text>
+</g>
+<line x1="100" y1="1808" x2="1180" y2="1808" stroke="#dfe2e5" stroke-width="1"/>
+<g font-size="11.5" font-family="IBM Plex Mono, Menlo, Consolas, monospace">
+  <text x="112" y="1828">1.00 x</text><text x="300" y="1828">1.00</text><text x="580" y="1828">64 frames</text><text x="900" y="1828">77 frames</text>
+  <text x="112" y="1850">0.60 x</text><text x="300" y="1850">1.67</text><text x="580" y="1850">107 frames</text><text x="900" y="1850">128 frames</text>
+</g>
+<rect x="100" y="1858" width="1080" height="26" fill="#e4f0ee"/>
+<g font-size="11.5" font-family="IBM Plex Mono, Menlo, Consolas, monospace" fill="#0f6f6a" font-weight="600">
+  <text x="112" y="1876">0.22 x</text><text x="300" y="1876">4.55</text><text x="580" y="1876">291 frames</text><text x="900" y="1876">348 frames</text>
+</g>
+
+</g>
+</svg>

@@ -36,7 +36,11 @@ Notes:
   `scripts/score_llmjudge_gpt.sh` (needs `OPENAI_API_KEY`).
   Score a whole sweep with one judge — mixing judges compares judges, not systems.
 - `--blind` answers with no video, giving the language-prior floor. Refuses to run with
-  any reduction flag.
+  any reduction flag. Multiple-choice datasets use `video_qa/blind_vqa.py`; StreamBench,
+  whose answers are free-form, uses `video_qa/blind_stream_vqa.py` and goes through the
+  same judge as its sighted arm; `rvs_ego`/`rvs_movie` use `video_qa/blind_rvs_vqa.py`,
+  likewise judged like their sighted arms. Read StreamBench's blind number per class, not pooled:
+  KG needs no video and should barely move, while LM/SM/OS should collapse.
 
 ### Pruning
 
@@ -75,10 +79,19 @@ Needs a GPU (`srun -p gpu --gres=gpu:1 bash scripts/efficiency/cost_model.sh`). 
 on disk are skipped, so an interrupted run resumes; `FORCE=1` re-runs them. The table can be
 rebuilt at any time with `scripts/efficiency/collect_cost_model.py`.
 
-Three protocol choices decide whether the numbers are comparable:
+Four protocol choices decide whether the numbers are comparable:
 
 - `ENCODE_CHUNK_SIZE=1` - one frame per forward pass, which is what streaming means: a
   live stream has no frame t+1 to batch with frame t. ~2x apart from the batched default.
+- `GPU_PREPROCESS=true` (the default here) - resize/normalize on the GPU rather than in the
+  HF processor, which sits inside the encode timer. Worth less than it sounds on this
+  dataset: measured on an A100 at baseline, 720x540, chunk size 1, span timing, it is
+  11.39 vs 11.40 f/s on the 7B (nothing) and 17.87 vs 15.65 f/s on the 0.5B (+14%). The
+  "nearly 2x" figure in `measure_encoding_fps.py` is 1080p, where the HF processor costs
+  ~37-57 ms/frame; expect the gap back at that resolution, under `per_chunk` timing, or at
+  aggressive keep rates. GPU resampling is not bit-identical to PIL's (mean absolute
+  difference ~0.002), so prefer `GPU_PREPROCESS=false` for throughput quoted beside an
+  accuracy number. The two write separate files (`-gpuprep` tag) and separate tables.
 - `TIMING=span` - three CUDA syncs for the whole run, so CPU preprocessing overlaps GPU
   compute the way it does live. `per_chunk` adds a sync pair per chunk and reads low at
   chunk size 1. Both write their own file, so running both cross-checks rather than

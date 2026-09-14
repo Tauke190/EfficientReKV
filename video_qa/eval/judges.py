@@ -325,7 +325,7 @@ DEFAULT_STYLE = 'prometheus'
 #: The suffix keeps judges from overwriting each other's verdicts inside one results dir.
 #: It is per *preset*, not per style: prometheus-7b and prometheus-8x7b disagree often
 #: enough that pooling them would be its own experiment. `qwen` keeps the empty suffix it
-#: had when it was the only judge, so existing results_local.json / tmp_local/ caches stay
+#: had when it was the only judge, so existing results_local.json / tmp_local.jsonl caches stay
 #: valid and blind/compare_blind.py keeps reading them.
 PRESETS = {
     'prometheus':     ('prometheus', 'prometheus-eval/prometheus-7b-v2.0', '_prometheus'),

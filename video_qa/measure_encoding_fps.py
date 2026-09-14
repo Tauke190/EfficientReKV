@@ -906,6 +906,11 @@ def main():
     df['video_id'] = video_sample['video_id']
     df['anno_path'] = args.anno_path
     df['timing'] = args.timing
+    # Which preprocessing path was inside the encode timer. At chunk size 1 the CPU path is
+    # most of the frame time, so two sweeps differing only in this flag differ by ~2x in
+    # the throughput column and in nothing else -- the one thing a reader must not have to
+    # guess at.
+    df['gpu_preprocess'] = args.gpu_preprocess
     # Visual tokens actually handed to the LM over the run. This -- not
     # `kv_cache_bytes` -- is what the KV growth rate should be read off:
     # `calc_memory_usage()` reports only blocks that were *offloaded*, so a run whose

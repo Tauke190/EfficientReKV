@@ -86,6 +86,33 @@ FLOPS_FRAMES=${FLOPS_FRAMES:-64}
 # the ingestion-granularity note in video_qa/measure_encoding_fps.py.
 ENCODE_CHUNK_SIZE=${ENCODE_CHUNK_SIZE:-1}
 
+# Resize/normalize on the GPU instead of in the HF processor. This sits inside the encode
+# timer (measure_encoding_fps.py times `_encode_video_chunk` whole), so on the CPU path it
+# competes with the model for the frame budget.
+#
+# How much it actually buys, measured here rather than assumed -- A100 80GB, baseline,
+# FPS-Bench-Stream at 720x540, 200 frames, chunk size 1, span timing:
+#
+#     llava_ov_7b     11.39 f/s GPU  vs  11.40 f/s CPU   (nothing, within noise)
+#     llava_ov_0.5b   17.87 f/s GPU  vs  15.65 f/s CPU   (+14%)
+#
+# Far less than the "nearly 2x" in measure_encoding_fps.py, and the difference is the
+# protocol: that figure is 1080p, where the HF processor costs ~37-57 ms/frame; this
+# dataset is ~4x fewer pixels, and under span timing the CPU work overlaps GPU compute
+# instead of serializing against it. The 7B's LM is large enough to hide preprocessing
+# completely; the 0.5B has less GPU work to hide behind, so some of it leaks through.
+# Expect the gap to widen again at 1080p, under per_chunk timing, or once stage 2 prunes
+# hard enough that little LM work is left.
+#
+# The trade: GPU resampling is not bit-identical to PIL's (mean absolute difference ~0.002
+# on a +-1 tensor), so keep rates can shift by a hair and these are not the byte-identical
+# numbers the eval and the paper ran. Given the 7B gains nothing, GPU_PREPROCESS=false is
+# the better choice for any throughput figure quoted beside an accuracy number. The two
+# write different files (PREP_TAG below), so running both cross-checks rather than
+# overwrites -- same arrangement as TIMING.
+GPU_PREPROCESS=${GPU_PREPROCESS:-true}
+if [ "${GPU_PREPROCESS}" = "true" ]; then PREP_TAG="-gpuprep"; else PREP_TAG=""; fi
+
 # QA off. Each FPS-Bench-Stream stream carries exactly one question, so a latency figure
 # from this run would be n=1 -- not reportable, and it would add time to every arm.
 # Latency has its own protocol (many questions injected mid-stream, --force_answer_length
@@ -122,6 +149,7 @@ run_arm () {
         --retrieve_size "${RETRIEVE_SIZE}" \
         --skip_qa "${SKIP_QA}" \
         --timing "${TIMING}" \
+        --gpu_preprocess "${GPU_PREPROCESS}" \
         --flops_frames "${FLOPS_FRAMES}" \
         --save_path "${out}" \
         "$@"
@@ -130,13 +158,14 @@ run_arm () {
 
 for i in $(seq 0 $((N_STREAMS - 1))); do
     IDX=$((VIDEO_IDX + i))
-    run_arm "${IDX}" "baseline" "${OUT_DIR}/${MODEL}-fps${FPS}-v${IDX}-baseline-${TIMING}.csv"
+    run_arm "${IDX}" "baseline" "${OUT_DIR}/${MODEL}-fps${FPS}-v${IDX}-baseline-${TIMING}${PREP_TAG}.csv"
     for THR in ${THRESHOLDS}; do
-        run_arm "${IDX}" "rlt@${THR}" "${OUT_DIR}/${MODEL}-fps${FPS}-v${IDX}-rlt${THR}-${TIMING}.csv" \
+        run_arm "${IDX}" "rlt@${THR}" "${OUT_DIR}/${MODEL}-fps${FPS}-v${IDX}-rlt${THR}-${TIMING}${PREP_TAG}.csv" \
             --prune_method rlt --prune_threshold "${THR}" --prune_metric "${PRUNE_METRIC}"
     done
 done
 
 echo
 python scripts/efficiency/collect_cost_model.py --model "${MODEL}" --sample_fps "${FPS}" \
-    --n_local "${N_LOCAL}" --dir "${OUT_DIR}" --timing "${TIMING}"
+    --n_local "${N_LOCAL}" --dir "${OUT_DIR}" --timing "${TIMING}" \
+    --gpu_preprocess "${GPU_PREPROCESS}"

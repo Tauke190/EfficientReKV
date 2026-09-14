@@ -22,7 +22,7 @@ Class names are upstream's (StreamChat README): OS Object Search, LM Long-term M
 Search, SM Short-term Memory Search, CI Conversational Interaction, KG Knowledge-based
 Question Answering, SF Simple Factual.
 
-The judge writes one verdict file per item into its cache directory, keyed
+The judge appends one verdict per item to its cache (verdict_cache.py, one JSONL per run), keyed
 `{video_id}_{n}` where n counts occurrences of that video_id **in results.csv row order**
 (eval_open_ended_local.build_prediction_set). This rebuilds the same keys from the same
 CSV to rejoin verdicts to rows, so nothing here depends on the judge emitting metadata it
@@ -40,6 +40,8 @@ import argparse
 from collections import Counter, defaultdict
 
 import pandas as pd
+
+import verdict_cache  # sibling module; this file runs as a script from video_qa/eval/
 
 # Upstream's abbreviations, expanded. Order is deliberate: the memory/perception classes
 # the benchmark exists to test first, KG last because it is the one answerable blind.
@@ -86,15 +88,11 @@ def judge_keys(df):
 
 def load_verdicts(cache_dir, keys):
     """key -> {'pred','score'} for the items the judge managed to score."""
+    cached, _ = verdict_cache.load(cache_dir)
     out = {}
     for key in keys:
-        path = os.path.join(cache_dir, f'{key}.json')
-        if not os.path.exists(path):
-            continue
-        try:
-            with open(path) as f:
-                payload = json.load(f)
-        except (ValueError, OSError):
+        payload = cached.get(key)
+        if payload is None:
             continue
         verdict = payload[0] if isinstance(payload, list) and payload else payload
         if isinstance(verdict, dict) and verdict.get('pred') is not None \
@@ -104,16 +102,16 @@ def load_verdicts(cache_dir, keys):
 
 
 def find_cache_dir(save_dir, explicit=None):
-    """The judge's per-item cache. `tmp_local_streambench/` by default (judges.PRESETS)."""
+    """The judge's verdict cache. `tmp_local_streambench.jsonl` by default (judges.PRESETS)."""
     if explicit:
-        return explicit
+        return verdict_cache.path_of(explicit)
     candidates = sorted(d for d in os.listdir(save_dir)
-                        if d.startswith('tmp') and os.path.isdir(os.path.join(save_dir, d)))
+                        if d.startswith('tmp') and d.endswith('.jsonl'))
     if not candidates:
         raise SystemExit(
-            f'ABORT: no judge cache directory under {save_dir}. Run the judge first '
-            f'(run_eval does this automatically); expected e.g. tmp_local_streambench/.')
-    # Prefer the StreamBench judge's own directory when several judges have run here.
+            f'ABORT: no judge cache under {save_dir}. Run the judge first '
+            f'(run_eval does this automatically); expected e.g. tmp_local_streambench.jsonl.')
+    # Prefer the StreamBench judge's own cache when several judges have run here.
     for c in candidates:
         if 'streambench' in c:
             return os.path.join(save_dir, c)
@@ -144,7 +142,12 @@ def main():
     parser.add_argument('--save_dir', type=str, required=True)
     parser.add_argument('--results_path', type=str, default=None)
     parser.add_argument('--cache_dir', type=str, default=None,
-                        help="The judge's per-item verdict directory. Auto-detected.")
+                        help="The judge's verdict cache (tmp_*.jsonl). Auto-detected.")
+    parser.add_argument('--out_name', type=str, default='streambench_scores.json',
+                        help='Filename of the summary written into save_dir. Give each '
+                             'judge its own name so two judges\' breakdowns cannot '
+                             'overwrite each other -- scripts/score_streambench_judge.sh '
+                             'does exactly that.')
     args = parser.parse_args()
 
     results_path = args.results_path or os.path.join(args.save_dir, 'results.csv')
@@ -167,6 +170,18 @@ def main():
     keys = judge_keys(df)
     verdicts = load_verdicts(cache_dir, keys)
     print(f'judge cache: {cache_dir}  ({len(verdicts)}/{len(keys)} items scored)')
+    # Which judge actually wrote these verdicts. Stamped per item by
+    # eval_open_ended_local.run_judge; absent only in caches written before judges were
+    # selectable (all qwen). Recorded in the summary so a table row can never lose track
+    # of what graded it -- accuracy from two judges is not the same quantity.
+    judge_ids = sorted({v['judge'] for v in verdicts.values() if v.get('judge')})
+    if judge_ids:
+        print('judge: ' + ', '.join(judge_ids))
+    if len(judge_ids) > 1:
+        raise SystemExit(
+            f'ABORT: {cache_dir} holds verdicts from more than one judge ({judge_ids}). '
+            f'Averaging them measures the judges, not the model. Use one cache '
+            f'per judge.')
     if not verdicts:
         raise SystemExit(
             'ABORT: the judge cache holds no usable verdicts. Nothing to break down.')
@@ -217,10 +232,11 @@ def main():
         'n_scored': int(len(scored)),
         'n_unscored': n_unscored,
         'judge_cache': os.path.basename(cache_dir),
+        'judge': judge_ids[0] if len(judge_ids) == 1 else (judge_ids or None),
         'blind': blind,
     })
 
-    out_path = os.path.join(save_dir, 'streambench_scores.json')
+    out_path = os.path.join(save_dir, args.out_name)
     with open(out_path, 'w') as f:
         json.dump(summary, f, indent=2)
     print(f'\nwrote {out_path}')

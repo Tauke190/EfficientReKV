@@ -80,11 +80,29 @@ def score(args, cmd):
 
     Skipping stops after predictions land in results.csv, which is all the scorers
     read -- so scoring can be run later without redoing inference.
+
+    THE SCORER GETS ONE GPU, not the job's whole allocation. QA fans out one worker per
+    GPU, each pinned by `exec(cmd, sub=True, device=idx)`; scoring is a single process and
+    used to run through plain `os.system`, inheriting every device the job held. An 8B
+    judge under eval_open_ended_local.py's `--device_map auto` then gets sharded across all
+    of them by accelerate and runs pipeline-parallel: one GPU busy at a time, the rest
+    idle, a PCIe hop per layer boundary per decoded token. Measured on a 4x A100 job
+    judging StreamBench: 434 s/batch, 13.9 h projected for 115 batches, against ~4 minutes
+    for the same 115 batches on a single GPU. More GPUs made scoring monotonically slower.
+
+    Raise --judge_num_gpus only for a judge that genuinely does not fit on one card:
+    judges.PRESETS carries 'qwen' (Qwen2.5-32B) and 'prometheus8x7b' (Mixtral-8x7B), which
+    do need sharding. The 7B/8B presets -- 'streambench', 'prometheus', 'qwen7b' -- do not,
+    and are slower for every extra device they are given.
+
+    Indices are relative to whatever CUDA_VISIBLE_DEVICES the job already has, so this
+    narrows the allocation and never reaches outside it.
     """
     if args.skip_scoring:
         print(f'skip scoring (--skip_scoring): {cmd}')
         return
-    exec(cmd)
+    n = max(1, getattr(args, 'judge_num_gpus', 1))
+    exec(f"CUDA_VISIBLE_DEVICES={','.join(str(i) for i in range(n))} {cmd}")
 
 
 def reduction_tag(args):
@@ -328,8 +346,11 @@ def eval_activitynet_qa(args):
 
 def eval_rvs_ego(args):
     num_chunks = args.num_chunks
-    save_dir = f"results/{args.model}/rvs_ego/{args.retrieve_size}-{args.sample_fps}{reduction_tag(args)}"
-    solver = "rekv_stream_vqa"
+    # `--blind` swaps in video_qa/blind_rvs_vqa.py (no video at all) and writes to a
+    # '-blind' directory, the same suffix convention as the other blind controls.
+    blind_tag = "-blind" if args.blind else ""
+    save_dir = f"results/{args.model}/rvs_ego/{args.retrieve_size}-{args.sample_fps}{reduction_tag(args)}{blind_tag}"
+    solver = "blind_rvs_vqa" if args.blind else "rekv_stream_vqa"
     if not args.only_eval:
         # QA
         processes = []
@@ -357,8 +378,11 @@ def eval_rvs_ego(args):
 
 def eval_rvs_movie(args):
     num_chunks = args.num_chunks
-    save_dir = f"results/{args.model}/rvs_movie/{args.retrieve_size}-{args.sample_fps}{reduction_tag(args)}"
-    solver = "rekv_stream_vqa"
+    # `--blind` swaps in video_qa/blind_rvs_vqa.py (no video at all) and writes to a
+    # '-blind' directory, the same suffix convention as the other blind controls.
+    blind_tag = "-blind" if args.blind else ""
+    save_dir = f"results/{args.model}/rvs_movie/{args.retrieve_size}-{args.sample_fps}{reduction_tag(args)}{blind_tag}"
+    solver = "blind_rvs_vqa" if args.blind else "rekv_stream_vqa"
     if not args.only_eval:
         # QA
         processes = []
@@ -828,16 +852,19 @@ def eval_streambench(args):
     macro-average excluding it. And the six classes are near-evenly balanced by design, so
     the macro-average is the honest headline.
 
-    `--blind` swaps in video_qa/blind_vqa.py. Worth running once: it should leave KG almost
-    unchanged while the memory and search classes collapse, and a class that does not
-    collapse is one the video was not contributing to.
+    `--blind` swaps in video_qa/blind_stream_vqa.py -- the open-ended blind control, not
+    the multiple-choice blind_vqa.py the other benchmarks here use: StreamBench's
+    annotation has no `choices`, so the MCQA solver raises KeyError on the first sample.
+    The blind rows go through the same judge as the sighted ones. Worth running once: it
+    should leave KG almost unchanged while the memory and search classes collapse, and a
+    class that does not collapse is one the video was not contributing to.
 
     Run scripts/dataset_prep/prepare_streambench.sh first to write the annotation.
     """
     num_chunks = args.num_chunks
     blind_tag = "-blind" if args.blind else ""
     save_dir = f"results/{args.model}/streambench/{args.retrieve_size}-{args.sample_fps}{reduction_tag(args)}{blind_tag}"
-    solver = "blind_vqa" if args.blind else "rekv_streambench_vqa"
+    solver = "blind_stream_vqa" if args.blind else "rekv_streambench_vqa"
     anno_path = args.anno_path or "data/streambench/full_oe.json"
     if not args.only_eval:
         # QA
@@ -875,9 +902,19 @@ if __name__ == "__main__":
     parser.add_argument("--num_chunks", type=int, default=1)
     parser.add_argument("--blind", action="store_true",
                         help="Blind control: answer every question with no video at all "
-                             "(video_qa/blind_vqa.py). Produces the language-prior floor "
-                             "a real score has to be read against. Results land in a "
-                             "'-blind' directory of their own.")
+                             "(video_qa/blind_vqa.py for the multiple-choice datasets, "
+                             "video_qa/blind_stream_vqa.py for open-ended streambench, "
+                             "video_qa/blind_rvs_vqa.py for rvs_ego/rvs_movie). "
+                             "Produces the language-prior floor a real score has to be "
+                             "read against. Results land in a '-blind' directory of "
+                             "their own.")
+    parser.add_argument("--judge_num_gpus", type=int, default=1,
+                        help="GPUs the scoring step may use (default 1). Scoring is a "
+                             "single process, so it is pinned to one device no matter how "
+                             "many the job holds -- an 8B judge sharded over 4 GPUs by "
+                             "--device_map auto runs ~200x slower than on one. Raise this "
+                             "only for a judge too large for one card, e.g. --judge "
+                             "presets qwen (32B) or prometheus8x7b (Mixtral-8x7B).")
     parser.add_argument("--only_eval", action="store_true")
     parser.add_argument("--skip_scoring", action="store_true",
                         help="Stop after writing results.csv. For rvs_*/activitynet_qa "
@@ -1006,7 +1043,7 @@ if __name__ == "__main__":
     BLIND_DATASETS = {'odvbench', 'ovbench', 'streambench',
                       'ovobench_realtime', 'ovobench_backward',
                       'streamingbench_real', 'streamingbench_omni',
-                      'streamingbench_context'}
+                      'streamingbench_context', 'rvs_ego', 'rvs_movie'}
     if args.blind:
         if args.dataset not in BLIND_DATASETS:
             parser.error(f"--blind is not wired up for {args.dataset!r}; "

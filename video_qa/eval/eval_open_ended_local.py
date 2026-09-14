@@ -1,7 +1,7 @@
 """Open-ended (free-form answer) scoring with a *local* HF judge instead of the API.
 
 Drop-in replacement for eval_open_ended.py: same CLI (--pred_path/--output_dir/
---output_json), same per-item cache files, same combined results.json shape, same
+--output_json), same verdict cache (verdict_cache.py), same combined results.json shape, same
 printed Accuracy / Average score. Only the thing producing the yes-no+score verdict
 differs -- a local instruct model rather than an OpenAI endpoint.
 
@@ -31,8 +31,8 @@ Differences from the API version that follow from the judge being local:
 Scores from a local judge are NOT comparable to published numbers produced by
 gpt-3.5-turbo-0613, nor across judges (see judges.py). They are comparable across runs
 scored by the same judge, which is what a pruning sweep actually needs. The judge id is
-written into every cache file and this run aborts rather than mixing verdicts from two
-different judges in one directory.
+written into every cached verdict and this run aborts rather than mixing verdicts from two
+different judges in one cache.
 
 Usage:
     python video_qa/eval/eval_open_ended_local.py \
@@ -57,12 +57,14 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from video_qa import answer_types  # noqa: E402
 from video_qa.eval import judges  # noqa: E402
+from video_qa.eval import verdict_cache  # noqa: E402
 
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Open-ended QA scoring with a local LLM judge.")
     parser.add_argument("--pred_path", required=True, help="results.csv written by the eval run.")
-    parser.add_argument("--output_dir", required=True, help="Per-item verdict cache. Reused on re-run.")
+    parser.add_argument("--output_dir", required=True, help="Verdict cache, stored as ONE file <output_dir>.jsonl (the cluster has an "
+                             "inode quota). Reused on re-run.")
     parser.add_argument("--output_json", required=True, help="Combined verdicts + final metrics.")
     parser.add_argument("--judge_style", default='auto',
                         choices=['auto'] + sorted(judges.STYLES),
@@ -99,7 +101,7 @@ def build_prediction_set(pred_path, limit=None):
 
     Videos carry several questions each, so video_id alone is not unique; the API
     version disambiguates by appending an occurrence counter. Same scheme here, so the
-    two scorers' cache directories are interchangeable.
+    two scorers' caches are interchangeable.
     """
     pred_contents = pd.read_csv(pred_path).to_dict(orient="records")
 
@@ -131,36 +133,32 @@ def build_prediction_set(pred_path, limit=None):
     return prediction_set, order
 
 
-def check_cache_judge(output_dir, judge_id):
-    """Refuse to add verdicts to a directory another judge already wrote into.
+def check_cache_judge(output_dir, cached, judge_id):
+    """Refuse to add verdicts to a cache another judge already wrote into.
 
     Two judges' verdicts averaged together are not a number of anything. Caches written
     before judges were stamped carry no id and are accepted with a warning -- they are
     all qwen, since that was the only judge that existed.
     """
-    for fname in sorted(os.listdir(output_dir)):
-        if not fname.endswith('.json'):
-            continue
+    for result in cached.values():
         try:
-            with open(os.path.join(output_dir, fname)) as f:
-                cached = json.load(f)[0]
-        except (ValueError, OSError, IndexError):
+            found = result[0].get('judge')
+        except (AttributeError, IndexError, TypeError):
             continue
-        found = cached.get('judge')
         if found is None:
             print(f"WARNING: {output_dir} holds unstamped verdicts (pre-dating judge "
                   f"selection, i.e. {judges.QwenJudge.default_model}). Assuming they match "
-                  f"{judge_id}; delete the directory to re-judge from scratch.")
+                  f"{judge_id}; delete {verdict_cache.path_of(output_dir)} to re-judge from scratch.")
         elif found != judge_id:
             sys.exit(f"{output_dir} was judged by {found!r}, this run is {judge_id!r}. "
                      f"Mixing verdicts from two judges gives a number that means nothing. "
-                     f"Use a separate --output_dir/--output_json, or delete this one.")
+                     f"Use a separate --output_dir/--output_json, or delete {verdict_cache.path_of(output_dir)}.")
         return
 
 
 @torch.inference_mode()
 def run_judge(model, tokenizer, judge, prediction_set, todo, args, prompt_of):
-    """Score `todo` keys, writing one cache file per key as soon as it is decoded."""
+    """Score `todo` keys, appending each batch to the cache as soon as it is decoded."""
     unparsed = 0
     max_new_tokens = args.max_new_tokens or judge.default_max_new_tokens
     for start in tqdm(range(0, len(todo), args.batch_size), desc="judging"):
@@ -183,6 +181,7 @@ def run_judge(model, tokenizer, judge, prediction_set, todo, args, prompt_of):
         completions = tokenizer.batch_decode(out[:, enc["input_ids"].shape[1]:],
                                              skip_special_tokens=True)
 
+        batch = {}
         for key, completion in zip(batch_keys, completions):
             verdict = judge.parse(completion)
             if verdict is None:
@@ -191,18 +190,14 @@ def run_judge(model, tokenizer, judge, prediction_set, todo, args, prompt_of):
                 # without re-running the judge over the whole set.
                 verdict = {"pred": None, "score": None, "raw": completion.strip()}
             verdict["judge"] = judge.id
-            with open(os.path.join(args.output_dir, f"{key}.json"), "w") as f:
-                json.dump([verdict, prediction_set[key]], f)
+            batch[key] = [verdict, prediction_set[key]]
+        verdict_cache.append(args.output_dir, batch)
     return unparsed
 
 
 def aggregate(output_dir, keys, output_json, judge):
-    combined = {}
-    for key in keys:
-        path = os.path.join(output_dir, f"{key}.json")
-        if os.path.exists(path):
-            with open(path) as f:
-                combined[key] = json.load(f)
+    cached, _ = verdict_cache.load(output_dir)
+    combined = {key: cached[key] for key in keys if key in cached}
 
     score_sum = 0
     count = 0
@@ -313,13 +308,12 @@ def make_prompt_formatter(tokenizer, judge):
 
 def main():
     args = parse_args()
-    os.makedirs(args.output_dir, exist_ok=True)
-
     judge = judges.resolve(args.judge_style, args.judge_model, args.yes_threshold)
-    check_cache_judge(args.output_dir, judge.id)
+    cached, _ = verdict_cache.load(args.output_dir)
+    check_cache_judge(args.output_dir, cached, judge.id)
 
     prediction_set, order = build_prediction_set(args.pred_path, args.limit)
-    done = {f[:-5] for f in os.listdir(args.output_dir) if f.endswith(".json")}
+    done = set(cached)
     todo = [k for k in order if k not in done]
     print(f"judge: {judge.id}")
     print(f"{len(order)} items, {len(order) - len(todo)} already cached, {len(todo)} to judge")
@@ -351,7 +345,7 @@ def main():
         prompt_of = make_prompt_formatter(tokenizer, judge)
         unparsed = run_judge(model, tokenizer, judge, prediction_set, todo, args, prompt_of)
         if unparsed:
-            print(f"{unparsed}/{len(todo)} completions did not parse; raw text kept in {args.output_dir}")
+            print(f"{unparsed}/{len(todo)} completions did not parse; raw text kept in {verdict_cache.path_of(args.output_dir)}")
 
     aggregate(args.output_dir, order, args.output_json, judge)
 

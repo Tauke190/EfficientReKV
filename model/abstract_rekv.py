@@ -1,3 +1,5 @@
+import gc
+
 import numpy as np
 import torch
 from logzero import logger
@@ -59,8 +61,18 @@ class Abstract_ReKV:
             self.token_pruner.reset()
         if self.vision_reducer is not None:
             self.vision_reducer.reset()
+        # Release the previous video's KV-Cache before the next one starts filling. The
+        # host-side copies are pinned (kv_cache_manager.MemoryUnit), and dropping the last
+        # reference is not enough on its own: anything held by a reference cycle waits for
+        # the garbage collector, and freed pinned blocks go back to PyTorch's host caching
+        # allocator rather than to the OS. Both keep host RAM at the sum of every video so
+        # far instead of the largest one -- which is how a 4 fps FPS-Bench-Stream run
+        # (~7-24 GB of KV per video) was OOM-killed at 160 GB after ~8 videos.
+        gc.collect()
         torch.cuda.empty_cache()
         torch.cuda.ipc_collect()
+        if hasattr(torch._C, '_host_emptyCache'):
+            torch._C._host_emptyCache()
 
     @torch.inference_mode()
     def encode_init_prompt(self):

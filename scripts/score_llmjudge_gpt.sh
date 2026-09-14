@@ -9,9 +9,10 @@
 #   scripts/score_llmjudge_gpt.sh results/llava_ov_0.5b/rvs_ego/64-0.5/results.csv
 #   scripts/score_llmjudge_gpt.sh results/llava_ov_0.5b/rvs_{ego,movie}/64-0.5/results.csv
 #
-# Verdicts go next to each CSV as results.json, with per-item cache in tmp/ (re-running
-# skips what is already cached, so a Ctrl-C costs nothing). Local-judge outputs
-# (results_local*.json / tmp_local*/, one pair per judge -- see scripts/score_open_ended.sh)
+# Verdicts go next to each CSV as results.json, with the per-item cache in ONE file,
+# tmp_<judge>.jsonl (re-running skips what is already cached, so a Ctrl-C costs nothing;
+# one file, not one per item, because the cluster has an inode quota). Local-judge outputs
+# (results_local*.json / tmp_local*.jsonl, one pair per judge -- see scripts/score_open_ended.sh)
 # are on separate paths and are left untouched.
 #
 # RUN THIS ON A LOGIN NODE, not through eval.slurm: compute nodes here have no outbound
