@@ -1,11 +1,8 @@
 #!/bin/bash
 # The efficiency table: KV-Cache growth, streaming throughput, and GFLOPs/frame, for the
-# baseline and every stage-2 threshold, on one FPS-Bench-Stream stream.
+# baseline on one FPS-Bench-Stream stream.
 #
-# Each arm is a real run through video_qa/measure_encoding_fps.py -- the LM included.
-# Throughput is the number that forces this: stage 2 drops tokens before the LM prefill,
-# which is ~84% of `_encode_video_chunk`, so a measurement that skipped the LM would miss
-# the entire effect. Ten arms x 600 frames, ~4 min each on a 7B, so budget ~40 min.
+# Ten arms x 600 frames, ~4 min each on a 7B, so budget ~40 min.
 #
 # One stream is enough for the shape of the curve and exact for the config-derived
 # columns, but the keep rate -- and therefore every column that scales with it -- is a

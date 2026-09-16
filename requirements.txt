@@ -1,0 +1,71 @@
+# EfficientReKV -- pinned environment (Python 3.11, CUDA 13.0)
+#
+#   conda create -n Rekv python=3.11 -y
+#   conda activate Rekv
+#   pip install -r requirements.txt
+#   pip install -e model/longva --no-deps     # vendored LongVA package, ships in this repo
+#
+# The torch wheels below are the +cu130 builds; the extra index is declared in this
+# file, so a plain `pip install -r requirements.txt` picks them up. On a different
+# CUDA, swap the index URL (e.g. .../whl/cu128) and drop the +cu130 local versions.
+
+--extra-index-url https://download.pytorch.org/whl/cu130
+
+# --- core DL ---------------------------------------------------------------
+torch==2.13.0+cu130
+torchvision==0.28.0+cu130
+torchaudio==2.11.0+cu130
+triton==3.7.1
+
+# Ragged per-frame attention for the RLT pruner (model/vision_reduction.py).
+# Required for --prune_method rlt; the unmodified baseline path does not use it.
+# Must match the torch build -- a mismatched wheel loads but disables the CUDA
+# kernels and prints a warning at import.
+xformers==0.0.35
+
+# --- HuggingFace stack -----------------------------------------------------
+# transformers is a git pin: the LLaVA-OneVision / Video-LLaVA KV-cache patches
+# in model/patch.py are written against this commit, not against a release.
+transformers @ git+https://github.com/huggingface/transformers.git@66bc4def9505fa7c7fe4aa7a248c34a026bb552b
+tokenizers==0.19.1
+accelerate==1.14.0
+huggingface_hub==0.36.2
+safetensors==0.8.0
+sentencepiece==0.2.2
+einops==0.8.2
+
+# --- video / image IO ------------------------------------------------------
+decord==0.6.0
+pillow==12.3.0
+
+# --- numerics, results, figures -------------------------------------------
+numpy==2.4.6
+pandas==3.0.5
+matplotlib==3.11.1
+seaborn==0.13.2
+
+# --- LLM-judge scoring (scripts/score_llmjudge_gpt.sh, needs OPENAI_API_KEY) -
+openai==1.57.1
+
+# --- logging / CLI ---------------------------------------------------------
+logzero==1.7.0
+tqdm==4.70.0
+rich==15.0.0
+packaging==26.2
+psutil==7.2.2
+requests==2.34.2
+
+# --- optional --------------------------------------------------------------
+# Demo UI only (video_qa/gradio_app.py):
+# gradio==6.17.3
+#
+# FLOPs counting in the __main__ block of model/flash_vstream_rekv.py:
+# calflops
+#
+# The flash_vstream_7b backbone has no PyPI package -- install it from source:
+# pip install -e git+https://github.com/IVGSZ/Flash-VStream.git@8f6bde2f397f4846505df4d03364d97617fc02ee#egg=vstream&subdirectory=Flash-VStream-LLaVA
+#
+# model/longva/trl/* is vendored LongVA *training* code and is never imported by
+# the eval paths. If you touch it you additionally need: peft, trl, datasets,
+# deepspeed, diffusers, wandb, bitsandbytes, tyro, flash-attn, ring-flash-attn,
+# s2wrapper, einops-exts, av.
