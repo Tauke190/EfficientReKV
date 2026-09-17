@@ -7,7 +7,7 @@ is what makes this a retrieval measurement: by then the needle is a median 294 s
 past `n_local`, and only ReKV's memory can reach it.
 
 The construction is what makes that a clean measurement (see
-/home/av354855/FPSBenchStream/README.md):
+FPSBenchStream/README.md):
 
 * the needle is a median 9.0 s, i.e. 1.5% of the stream, so nothing but retrieval can put
   it in front of the model at question time;

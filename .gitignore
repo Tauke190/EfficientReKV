@@ -26,6 +26,8 @@ ENV/
 !/data/fpsbench_stream/
 /data/fpsbench_stream/*
 !/data/fpsbench_stream/test_mc.json
+# FPS-Bench-Stream: metadata is tracked, the videos (~184G) are not
+/FPSBenchStream/videos/
 /datasets/
 /dataset/
 *.tsv
@@ -178,3 +180,8 @@ htmlcov/
 
 # sbatch job logs (scripts/eval.slurm)
 slurmlogs/
+
+# FPS-Bench-Stream release metadata -- after the global *.jsonl / *.tsv rules, which would
+# otherwise win. Needed by video_qa/convert_fpsbench_stream.py to rebuild test_mc.json.
+!/FPSBenchStream/*.jsonl
+!/FPSBenchStream/*.tsv

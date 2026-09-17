@@ -3,7 +3,7 @@
 FPS-Bench-Stream is FPSBench's needle-in-a-haystack build: each of the 996 FPSBench
 questions keeps its clip (the *needle*, median 9 s) but that clip is spliced into a
 600 s MLVU video (the *haystack*), so the evidence is 1.5% of the stream and sits at a
-known timestamp. See /home/av354855/FPSBenchStream/README.md; this script reads the
+known timestamp. See FPSBenchStream/README.md; this script reads the
 canonical `fpsbench_stream_v1.jsonl` and the assembled `videos/` directory it describes.
 
 Why this conversion is not `video_qa/convert_fpsbench.py` with a different --src:
@@ -35,8 +35,8 @@ Lives here rather than beside the data because `data/*` is gitignored.
 
 Usage:
     python video_qa/convert_fpsbench_stream.py \
-        --src /home/av354855/FPSBenchStream/fpsbench_stream_v1.jsonl \
-        --video_root /home/av354855/FPSBenchStream/videos \
+        --src FPSBenchStream/fpsbench_stream_v1.jsonl \
+        --video_root FPSBenchStream/videos \
         --out data/fpsbench_stream/test_mc.json
 """
 
@@ -68,9 +68,9 @@ def ordered_choices(question):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--src', type=str,
-                        default='/home/av354855/FPSBenchStream/fpsbench_stream_v1.jsonl')
+                        default='FPSBenchStream/fpsbench_stream_v1.jsonl')
     parser.add_argument('--video_root', type=str,
-                        default='/home/av354855/FPSBenchStream/videos')
+                        default='FPSBenchStream/videos')
     parser.add_argument('--out', type=str, required=True)
     parser.add_argument('--limit', type=int, default=0,
                         help='Keep only the first N records that survive every other '

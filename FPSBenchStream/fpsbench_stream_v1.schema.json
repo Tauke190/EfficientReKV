@@ -1,0 +1,199 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "FPS-Bench-Stream v1 record",
+  "description": "A full FPS-Bench v1 record with one added 'stream' block describing how to splice it into a long MLVU haystack. Every original FPS-Bench field is preserved verbatim, so this file is a strict superset of annotations/fpsbench_v1.jsonl and can be used wherever that is. The haystack videos are shippable; the needle clip is not, and is rebuilt from source.url plus time.clip_start_sec / time.clip_end_sec.",
+  "type": "object",
+  "required": [
+    "id",
+    "source",
+    "time",
+    "question",
+    "temporal_requirements",
+    "categories",
+    "stream"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "FPS-Bench question id, unchanged"
+    },
+    "source": {
+      "type": "object",
+      "description": "unchanged: youtube video_id and url for the needle"
+    },
+    "time": {
+      "type": "object",
+      "description": "unchanged: clip and certificate times IN THE SOURCE YOUTUBE VIDEO"
+    },
+    "question": {
+      "type": "object",
+      "description": "unchanged"
+    },
+    "temporal_requirements": {
+      "type": "object",
+      "description": "unchanged: min_fps still applies to the needle"
+    },
+    "categories": {
+      "type": "object",
+      "description": "unchanged"
+    },
+    "stream": {
+      "type": "object",
+      "description": "ADDED. Everything needed to build the long stream.",
+      "required": [
+        "stream_id",
+        "target_duration_sec",
+        "haystack",
+        "needle",
+        "insertion",
+        "timeline",
+        "normalization"
+      ],
+      "properties": {
+        "stream_id": {
+          "type": "string",
+          "pattern": "^fpsstream_[0-9]{6}$",
+          "description": "output filename stem"
+        },
+        "target_duration_sec": {
+          "type": "number"
+        },
+        "haystack": {
+          "type": "object",
+          "description": "SHIPPABLE. The MLVU video supplying the padding.",
+          "required": [
+            "dataset",
+            "file",
+            "window_start_sec",
+            "window_duration_sec"
+          ],
+          "properties": {
+            "dataset": {
+              "const": "MLVU"
+            },
+            "file": {
+              "type": "string"
+            },
+            "subset": {
+              "type": "string"
+            },
+            "file_size_bytes": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "description": "for verifying a shipped copy"
+            },
+            "full_duration_sec": {
+              "type": "number"
+            },
+            "window_start_sec": {
+              "type": "number",
+              "description": "offset INTO THE MLVU FILE where the used window begins"
+            },
+            "window_duration_sec": {
+              "type": "number",
+              "description": "seconds of MLVU footage used = target - needle"
+            }
+          }
+        },
+        "needle": {
+          "type": "object",
+          "description": "NOT SHIPPABLE. Rebuild locally from YouTube.",
+          "required": [
+            "clip_file",
+            "measured_duration_sec",
+            "rebuild_from"
+          ],
+          "properties": {
+            "clip_file": {
+              "type": "string",
+              "description": "expected filename in the FPS-Bench clip cache"
+            },
+            "measured_duration_sec": {
+              "type": "number"
+            },
+            "rebuild_from": {
+              "type": "object",
+              "description": "mirrors source.url and time.clip_*_sec for convenience",
+              "properties": {
+                "url": {
+                  "type": "string"
+                },
+                "start_sec": {
+                  "type": "number"
+                },
+                "end_sec": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        },
+        "insertion": {
+          "type": "object",
+          "properties": {
+            "offset_in_window_sec": {
+              "type": "number",
+              "description": "needle start, measured from window_start_sec"
+            },
+            "position_bin": {
+              "enum": [
+                "early",
+                "middle",
+                "late"
+              ]
+            },
+            "position_frac": {
+              "type": "number"
+            }
+          }
+        },
+        "timeline": {
+          "type": "object",
+          "description": "ALL TIMES IN THE ASSEMBLED STREAM. Use these for evaluation.",
+          "required": [
+            "needle_start_sec",
+            "needle_end_sec",
+            "query_time_sec"
+          ],
+          "properties": {
+            "needle_start_sec": {
+              "type": "number"
+            },
+            "needle_end_sec": {
+              "type": "number"
+            },
+            "certificate_start_sec": {
+              "type": "number"
+            },
+            "certificate_end_sec": {
+              "type": "number"
+            },
+            "query_time_sec": {
+              "type": "number",
+              "description": "when to ask; equals certificate_end_sec so no future frames are needed"
+            }
+          }
+        },
+        "normalization": {
+          "type": "object",
+          "properties": {
+            "width": {
+              "type": "integer"
+            },
+            "height": {
+              "type": "integer"
+            },
+            "fps": {
+              "type": "integer"
+            },
+            "audio": {
+              "const": "stripped"
+            }
+          }
+        }
+      }
+    }
+  }
+}

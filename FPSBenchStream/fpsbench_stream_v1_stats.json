@@ -1,0 +1,65 @@
+{
+  "num_records": 996,
+  "num_built": 990,
+  "num_unbuilt": 6,
+  "unbuilt_ids": [
+    "fpsbench_000333",
+    "fpsbench_000648",
+    "fpsbench_000649",
+    "fpsbench_000650",
+    "fpsbench_000651",
+    "fpsbench_000996"
+  ],
+  "target_duration_sec": 600.0,
+  "total_footage_hours": 165.0,
+  "total_size_gb": 197.5,
+  "canvas_policy": "haystack native resolution; fps = max(haystack_fps, min_fps)",
+  "distinct_canvases": 60,
+  "canvas_top": [
+    [
+      "720x540",
+      411
+    ],
+    [
+      "320x240",
+      59
+    ],
+    [
+      "1920x802",
+      40
+    ],
+    [
+      "1920x792",
+      31
+    ],
+    [
+      "1920x796",
+      30
+    ],
+    [
+      "1920x798",
+      29
+    ]
+  ],
+  "fps_distribution": {
+    "25": 502,
+    "30": 372,
+    "24": 101,
+    "26": 1,
+    "60": 2,
+    "28": 6,
+    "50": 4,
+    "29": 2
+  },
+  "position_bins": {
+    "early": 329,
+    "middle": 330,
+    "late": 331
+  },
+  "haystack_pool_used": 459,
+  "known_limitations": [
+    "query_time_sec fires at certificate_end, so retrieval distance is 0; the needle is always the most recent content in the cache",
+    "needle/haystack pairing is random -- MLVU ships no topic labels, so a cut detector can localise the needle",
+    "uniform frame sampling cannot solve this benchmark at any budget below ~3600 frames"
+  ]
+}
