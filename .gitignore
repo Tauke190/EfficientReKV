@@ -22,7 +22,10 @@ ENV/
 # =========================
 # Machine Learning Datasets
 # =========================
-/data/
+/data/*
+!/data/fpsbench_stream/
+/data/fpsbench_stream/*
+!/data/fpsbench_stream/test_mc.json
 /datasets/
 /dataset/
 *.tsv
