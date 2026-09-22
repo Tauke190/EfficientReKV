@@ -114,7 +114,7 @@ without --gpu_preprocess true.
 Example (the paper's setup is the default):
     python video_qa/measure_encoding_fps.py --model llava_ov_7b
     python video_qa/measure_encoding_fps.py --model llava_ov_7b \
-        --prune_method rlt --prune_threshold 0.25
+        --prune_method rlt_ref --prune_threshold 0.25
 """
 
 import os
@@ -135,7 +135,7 @@ import logzero
 from logzero import logger
 
 from video_qa.base import (MODELS, str2bool, add_reduction_args,
-                           pruning_enabled, pruning_load_kwargs,
+                           pruning_enabled, pruning_load_kwargs, set_prune_cache,
                            vision_reduction_enabled, vision_reduction_load_kwargs)
 # The eval's own reader, so this harness measures the path the eval actually runs and the
 # two cannot drift apart.
@@ -295,6 +295,92 @@ class GPUVideoProcessor:
         if self.do_normalize:
             x = x.sub_(self.mean).div_(self.std)
         return _Preprocessed(x.unsqueeze(0).to(self.dtype))
+
+
+class _PreprocessedImages:
+    """Stand-in for an image processor's BatchFeature: only this field is read."""
+    __slots__ = ('pixel_values',)
+
+    def __init__(self, pixel_values):
+        self.pixel_values = pixel_values
+
+
+class GPUImageProcessor:
+    """GPU preprocessing for backbones whose tower carries a plain CLIPImageProcessor.
+
+    LongVA and Flash-VStream have no `processor.video_processor` to swap -- their
+    `_encode_video_chunk` calls `processor.preprocess(chunk).pixel_values` directly -- so
+    GPUVideoProcessor cannot be dropped in. Two differences from it, both load-bearing:
+
+    * **Resize then center-crop.** CLIP's config is do_center_crop=True with a
+      shortest-edge resize, so the aspect ratio is preserved and the centre is cut out.
+      GPUVideoProcessor resizes straight to a square, which is right for the fixed-square
+      video processors it was written for and wrong here: on this dataset's 720x540 frames
+      a square resize squashes the image instead of cropping it, changing the pixels the
+      tower sees and with them the keep rate.
+    * **No batch dimension.** The video path returns (1, N, 3, H, W); these callers expect
+      (N, 3, H, W).
+
+    The rescale/normalize arithmetic and the uint8-domain clamp/round that matches PIL are
+    the same as GPUVideoProcessor's.
+    """
+
+    _MODES = {0: 'nearest', 2: 'bilinear', 3: 'bicubic'}
+
+    @staticmethod
+    def _pair(v, keys):
+        """HF accepts an int or a dict for size/crop_size; normalise both to (h, w)."""
+        if isinstance(v, dict):
+            if 'height' in v:
+                return int(v['height']), int(v['width'])
+            return int(v['shortest_edge']), None      # aspect-preserving
+        return int(v), None
+
+    def __init__(self, ref, device, dtype):
+        self.short, self.fixed_w = self._pair(getattr(ref, 'size', 224), ('shortest_edge',))
+        ch, cw = self._pair(getattr(ref, 'crop_size', self.short), ('height', 'width'))
+        self.crop = (ch, cw if cw is not None else ch)
+        self.mode = self._MODES.get(int(getattr(ref, 'resample', 3)), 'bicubic')
+        self.device, self.dtype = device, dtype
+        self.do_resize = getattr(ref, 'do_resize', True)
+        self.do_center_crop = getattr(ref, 'do_center_crop', True)
+        self.do_rescale = getattr(ref, 'do_rescale', True)
+        self.do_normalize = getattr(ref, 'do_normalize', True)
+        self.rescale_factor = getattr(ref, 'rescale_factor', 1 / 255)
+        self.mean = torch.tensor(ref.image_mean, device=device).view(1, 3, 1, 1)
+        self.std = torch.tensor(ref.image_std, device=device).view(1, 3, 1, 1)
+
+    def _resized_hw(self, h, w):
+        """HF's get_resize_output_image_size for a shortest-edge int, in (h, w)."""
+        if self.fixed_w is not None:
+            return self.short, self.fixed_w
+        if h <= w:
+            return self.short, int(self.short * w / h)
+        return int(self.short * h / w), self.short
+
+    def preprocess(self, images, return_tensors=None):
+        x = images if torch.is_tensor(images) else torch.as_tensor(np.asarray(images))
+        x = x.to(self.device, non_blocking=True).permute(0, 3, 1, 2).float()
+        if self.do_resize:
+            size = self._resized_hw(x.shape[-2], x.shape[-1])
+            if self.mode == 'nearest':
+                x = F.interpolate(x, size=size, mode='nearest')
+            else:
+                x = F.interpolate(x, size=size, mode=self.mode,
+                                  align_corners=False, antialias=True)
+            # PIL resamples in the uint8 domain; clip and round before rescaling or the
+            # two paths diverge on exactly the high-contrast edges the tower keys on.
+            x = x.clamp_(0, 255).round_()
+        if self.do_center_crop:
+            ch, cw = self.crop
+            top = (x.shape[-2] - ch) // 2
+            left = (x.shape[-1] - cw) // 2
+            x = x[..., top:top + ch, left:left + cw]
+        if self.do_rescale:
+            x = x.mul_(self.rescale_factor)
+        if self.do_normalize:
+            x = x.sub_(self.mean).div_(self.std)
+        return _PreprocessedImages(x.to(self.dtype))
 
 
 @torch.inference_mode()
@@ -749,6 +835,7 @@ def main():
         **vision_reduction_load_kwargs(args),
         **pruning_load_kwargs(args),
     )
+    set_prune_cache(model, args)
 
     # The model's own footprint, which does not scale with video length. Separating it out
     # is what makes the per-hour GPU figure mean anything: ReKV's whole claim is that GPU
@@ -772,8 +859,21 @@ def main():
     source = 'decord, in-process (decoded up front, outside every timer)'
 
     if args.gpu_preprocess:
-        model.processor.video_processor = GPUVideoProcessor(
-            model.processor.video_processor, model.device, model.dtype)
+        # Two shapes of processor across the backbones: llava_ov and video_llava expose a
+        # `video_processor` the base _encode_video_chunk calls; longva and flash_vstream
+        # carry a plain CLIPImageProcessor their overrides call `.preprocess()` on. Swap
+        # whichever one the timed path actually reaches.
+        _proc = model.processor
+        if hasattr(_proc, 'video_processor'):
+            _proc.video_processor = GPUVideoProcessor(
+                _proc.video_processor, model.device, model.dtype)
+        elif hasattr(_proc, 'preprocess'):
+            _proc.preprocess = GPUImageProcessor(
+                _proc, model.device, model.dtype).preprocess
+        else:
+            raise SystemExit(
+                f'{args.model}: --gpu_preprocess is on but its processor exposes neither '
+                f'video_processor nor preprocess; nothing to swap')
 
     if len(stream) < args.num_frames:
         logger.warning(f"video yields {len(stream)} frames at {args.sample_fps} FPS, "
@@ -934,6 +1034,7 @@ def main():
     df['sample_fps'] = args.sample_fps
     df['n_frame_tokens'] = model.n_frame_tokens
     df['prune_method'] = args.prune_method if pruning_enabled(args) else 'none'
+    df['prune_cache'] = args.prune_cache if pruning_enabled(args) else None
     df['prune_threshold'] = args.prune_threshold
     df['tokens_kept'] = keep_counts[0] if keep_counts else None
     df['tokens_seen'] = keep_counts[1] if keep_counts else None
@@ -1005,11 +1106,13 @@ def main():
         print("  stage 1 (encoder) : none (baseline)")
 
     if pruning_enabled(args):
-        desc = args.prune_method if args.prune_method not in (None, 'none') else 'rlt'
+        desc = args.prune_method if args.prune_method not in (None, 'none') else 'rlt_ref'
         if args.prune_threshold is not None:
             desc += f"  threshold={args.prune_threshold:g} metric={args.prune_metric}"
             if args.prune_refresh_every:
                 desc += f" refresh_every={args.prune_refresh_every}"
+            if args.prune_cache != 'adaptive':
+                desc += f" cache={args.prune_cache}"
         print(f"  stage 2 (memory)  : {desc}")
         if keep_counts:
             kept, seen = keep_counts

@@ -9,7 +9,7 @@ Casual Streaming Token reduction for ReKV streaming video QA.
 python -m video_qa.run_eval \
     --model llava_ov_0.5b --dataset ovobench_realtime --sample_fps 1 \
     --num_chunks 2 --n_local 15000 --retrieve_size 64 --decode_window 256 \
-    --prune_method rlt --prune_threshold 0.5
+    --prune_method rlt_ref --prune_threshold 0.5
 ```
 
 ### Datasets
@@ -44,10 +44,21 @@ Notes:
 
 ### Pruning
 
-- **`--prune_method rlt`** — drops tokens before the LM prefill
+- **`--prune_method rlt_ref`** — drops tokens before the LM prefill
   shrinks throughput, KV RAM and retrieval together. This is the
   one that matters. Flags: `--prune_threshold`, `--prune_metric cosine|l2`,
   `--prune_refresh_every`.
+- **`--prune_method rlt_prev`**: the published RLT rule, which diffs against frame t-1
+  instead of the last kept token. It takes the same flags and exists as the ablation for
+  `rlt_ref` (`sbatch scripts/eval/ablation.slurm`). Compare the two at matched `token_keep_rate`,
+  not at matched threshold.
+- **`--prune_method rlt_frame`**: `rlt_ref` with a per-frame decision. A frame is kept whole
+  when more than half its tokens are over `--prune_threshold` against the last kept frame,
+  and dropped whole otherwise. The ablation for deciding per token.
+- **`--prune_cache adaptive|pad`**: how pruned frames enter the KV-Cache. `adaptive` (default,
+  CAC) packs the kept tokens into full blocks. `pad` is the no-CAC ablation: each frame is padded
+  back to one full block by repeating its last kept token, so the cache layout is exactly
+  unpruned ReKV's and pruning saves nothing. Tag: `-rlt_ref0.5cosine-pad`.
 
 **`--prune_threshold` is a cosine distance, not a rate** — a token is kept iff its distance
 to the feature its position was last kept with exceeds it. Measured on `llava_ov_0.5b`,
@@ -56,7 +67,7 @@ ovobench_realtime @ 1 fps: 0.25 → 72% kept, 0.5 → 22% kept. Thresholds do no
 ### Results
 
 `results/<model>/<dataset>/<retrieve_size>-<sample_fps><tag>/results.csv`, where `<tag>` is
-`` (baseline), `-blind`, or `-rlt0.5cosine`. StreamingBench writes one directory per
+`` (baseline), `-blind`, `-rlt_ref0.5cosine`, `-rlt_prev0.5cosine` or `-rlt_frame0.5cosine`. StreamingBench writes one directory per
 subset (`streamingbench_real`, …).
 
 Keep rates are already in `results.csv` when a pruner is attached: `tokens_kept`,

@@ -1,0 +1,22 @@
+{
+  "strict_letter": {
+    "OCR": 67.11,
+    "ACR": 53.21,
+    "ATR": 74.14,
+    "STU": 47.75,
+    "FPD": 72.28,
+    "OJR": 64.13,
+    "realtime_average": 63.1
+  },
+  "ovo_substring": {
+    "OCR": 71.14,
+    "ACR": 53.21,
+    "ATR": 75.0,
+    "STU": 48.88,
+    "FPD": 72.28,
+    "OJR": 69.57,
+    "realtime_average": 65.01
+  },
+  "n_queries": 837,
+  "unparseable": 0
+}

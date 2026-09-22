@@ -1,0 +1,26 @@
+{
+ "save_dir": "results/needle_only/llava_ov_7b/fpsbench_stream/64-4.0-rlt_ref0.9cosine",
+ "n_questions": 990,
+ "qa_acc": 26.87,
+ "chance": 20.0,
+ "n_resolvable": 249,
+ "qa_acc_resolvable": 30.92,
+ "n_needle_in_local_window": 990,
+ "qa_acc_by_position": {
+  "late": 23.56,
+  "middle": 29.7,
+  "early": 27.36
+ },
+ "qa_acc_by_task": {
+  "instance_count": 12.93,
+  "repetitive_motion": 13.39,
+  "fine_grained_motion": 21.82,
+  "speed_recognition": 39.09,
+  "state_at_event": 21.82,
+  "synchronization_assessment": 30.0,
+  "action_order": 41.28,
+  "blink_and_miss": 30.28,
+  "causality_detection": 32.69
+ },
+ "token_keep_rate": 0.0391
+}

@@ -3,7 +3,9 @@
 The 7B companion to plot_pareto.py (0.5B, OVO-Bench only). Prune rate on x rather than
 --prune_threshold, because equal steps in the threshold are not equal steps in tokens
 dropped. The axis is linear from 0 to 1 (prune rate as a fraction). `--threshold` plots
-against the threshold instead, which needs no measured prune rates.
+against the threshold instead, which needs no measured prune rates; each arm gets an
+equal-width slot there (baseline, 0.25, 0.5, ..., 0.9, blind), since the prune-rate axis
+crowds the high thresholds into its right edge.
 
 The blind run (no video at all) is a special case, drawn at x = 1 -- every visual token
 dropped, or equivalently threshold 1 -- as a dot inside a dotted circle in the benchmark's
@@ -34,14 +36,17 @@ MODEL = "LLaVA-OV-7B"
 SAMPLE_FPS = 1
 
 # arms: (threshold, prune rate %, accuracy %). Threshold None is the unpruned baseline,
-# which prunes nothing by definition.
+# which prunes nothing by definition. Pruned arms are --prune_method rlt_ref
+# (results/llava_ov_7b/<dataset>/64-1.0-rlt_ref<thr>cosine). Accuracy is strict-letter
+# for OVO-Bench / StreamingBench, micro average for ODV-Bench / OVBench / StreamBench, and
+# gpt-3.5-turbo-0125 judge "yes" rate for RVS.
 BENCHMARKS = {
     "OVO-Bench (Real-Time)": {
-        "blind": 32.00,
+        "blind": 32.19,
         "arms": [
-            (None,   0.0, 63.00),
-            (0.25,  None, 63.61),   # prune rate: 64-1.0-rlt0.25cosine is not on disk
-            (0.5,   72.9, 61.00),
+            (None,   0.0, 63.10),
+            (0.25,  40.3, 63.61),
+            (0.5,   72.9, 61.60),
             (0.6,   84.5, 60.42),
             (0.7,   92.3, 58.75),
             (0.8,   96.5, 56.02),
@@ -51,8 +56,8 @@ BENCHMARKS = {
     "OVO-Bench (Backward)": {
         "blind": 38.53,
         "arms": [
-            (None,   0.0, 45.70),
-            (0.25,  None, 45.80),   # prune rate: 64-1.0-rlt0.25cosine is not on disk
+            (None,   0.0, 45.73),
+            (0.25,  38.7, 45.82),
             (0.5,   74.5, 45.44),
             (0.6,   86.3, 44.79),
             (0.7,   93.5, 44.64),
@@ -66,7 +71,7 @@ BENCHMARKS = {
             (None,   0.0, 70.30),
             (0.25,  46.8, 70.62),
             (0.5,   76.8, 70.82),
-            (0.6,   86.7, 68.38),
+            (0.6,   86.7, 69.38),
             (0.7,   93.4, 68.02),
             (0.8,   97.0, 65.29),
             (0.9,   98.7, 62.32),
@@ -75,7 +80,7 @@ BENCHMARKS = {
     "ODV-Bench": {
         "blind": 46.19,
         "arms": [
-            (None,   0.0, 52.00),
+            (None,   0.0, 51.53),
             (0.25,  51.8, 51.72),
             (0.5,   79.1, 51.32),
             (0.6,   86.4, 51.20),
@@ -97,41 +102,40 @@ BENCHMARKS = {
         ],
     },
     "StreamBench": {
-        "blind": 32.75,
+        "blind": 32.75,   # 64-1.0-blind has no streambench_scores.json on disk to check against
         "arms": [
-            (None,   0.0, 66.05),
-            (0.25,  42.1, 65.60),
-            (0.5,   73.6, 65.10),
-            (0.6,   84.8, 63.80),
-            (0.7,   92.4, 60.40),
-            (0.8,   96.4, 58.20),
-            (0.9,   98.2, 52.40),
+            (None,   0.0, 65.83),
+            (0.25,  42.1, 65.61),
+            (0.5,   73.6, 65.13),
+            (0.6,   84.8, 63.76),
+            (0.7,   92.4, 60.45),
+            (0.8,   96.4, 58.22),
+            (0.9,   98.2, 52.39),
         ],
     },
-    # Accuracies to fill in once the GPT judge finishes. The 0.25-0.7 prune rates are
-    # from partial runs (846 of 1465 questions).
+    # 0.25-0.7 are partial runs (846 of 1465 questions); baseline, blind, 0.8 and 0.9 are full.
     "RVS-Ego": {
-        "blind": None,
+        "blind": 36.31,
         "arms": [
-            (None,   0.0, None),
-            (0.25,  51.8, None),
-            (0.5,   82.4, None),
-            (0.6,   90.9, None),
-            (0.7,   95.9, None),
-            (0.8,   98.1, None),
-            (0.9,   99.2, None),
+            (None,   0.0, 59.52),
+            (0.25,  51.8, 59.57),
+            (0.5,   82.4, 61.70),
+            (0.6,   90.9, 60.99),
+            (0.7,   95.9, 62.06),
+            (0.8,   98.1, 61.84),
+            (0.9,   99.2, 61.50),
         ],
     },
     "RVS-Movie": {
-        "blind": None,
+        "blind": 38.06,
         "arms": [
-            (None,   0.0, None),
-            (0.25,  10.5, None),
-            (0.5,   54.1, None),
-            (0.6,   76.1, None),
-            (0.7,   89.7, None),
-            (0.8,   95.9, None),
-            (0.9,   98.4, None),
+            (None,   0.0, 47.61),
+            (0.25,  10.5, 48.40),
+            (0.5,   54.1, 49.03),
+            (0.6,   76.1, 51.50),
+            (0.7,   89.7, 51.76),
+            (0.8,   95.9, 51.71),
+            (0.9,   98.4, 48.29),
         ],
     },
 }
@@ -141,9 +145,9 @@ DOT_SIZE = 28
 RING_SIZE = 220
 
 
-def blind_marker(ax, y, color, label=None):
-    ax.scatter([1.0], [y], s=DOT_SIZE, color=color, zorder=4, label=label)
-    ax.scatter([1.0], [y], s=RING_SIZE, facecolors="none", edgecolors=color,
+def blind_marker(ax, x, y, color, label=None):
+    ax.scatter([x], [y], s=DOT_SIZE, color=color, zorder=4, label=label)
+    ax.scatter([x], [y], s=RING_SIZE, facecolors="none", edgecolors=color,
                linestyles=":", linewidths=1.4, zorder=4)
 
 
@@ -177,9 +181,16 @@ def main():
     ap.add_argument("--dpi", type=int, default=200)
     args = ap.parse_args()
 
-    fig, ax = plt.subplots(figsize=(8.5, 6.0))
+    fig, ax = plt.subplots(figsize=(7.0, 7.0))
     colors = plt.get_cmap("tab10").colors
     drawn = []  # every plotted point set, sorted by x, for placing the legend below them
+
+    # Threshold mode: one evenly spaced slot per arm, baseline first and blind last.
+    thresholds = sorted({thr for data in BENCHMARKS.values()
+                         for thr, _, _ in data["arms"] if thr is not None})
+    slot = {thr: i + 1 for i, thr in enumerate(thresholds)}
+    slot[None] = 0
+    blind_x = len(thresholds) + 1 if args.threshold else 1.0
 
     for (name, data), color in zip(BENCHMARKS.items(), colors):
         pts = []
@@ -187,7 +198,7 @@ def main():
             if acc is None:
                 continue
             if args.threshold:
-                x = 0.0 if thr is None else thr
+                x = slot[thr]
             elif prune is None:
                 print(f"skipped {name} @ {thr}: no prune rate")
                 continue
@@ -205,27 +216,35 @@ def main():
                     zorder=3)
         if data["blind"] is not None:
             # Not joined to the curve: blind is a separate control, not a pruning arm.
-            blind_marker(ax, data["blind"], color,
+            blind_marker(ax, blind_x, data["blind"], color,
                          label=None if pts else f"{name} (blind)")
-            drawn.append([(1.0, data["blind"])])
+            drawn.append([(blind_x, data["blind"])])
 
     if args.threshold:
-        ax.set_xlabel("RLT prune threshold (0 = unpruned baseline, 1 = blind)")
+        ax.set_xlabel("RLT prune threshold")
+        ax.set_xlim(-0.4, blind_x + 0.4)
+        ax.set_xticks(range(blind_x + 1))
+        ax.set_xticklabels(["base"] + [f"{t:g}" for t in thresholds] + ["blind"])
     else:
         ax.set_xlabel("Prune rate (fraction of visual tokens dropped; 1 = blind)")
-    ax.set_xlim(-0.03, 1.05)
-    ax.set_xticks(np.arange(0, 1.01, 0.1))
+        ax.set_xlim(-0.03, 1.05)
+        ax.set_xticks(np.arange(0, 1.01, 0.1))
 
     # One legend entry for the blind marker, instead of one per benchmark: the dot and
     # its dotted ring drawn on top of each other.
-    dot = ax.scatter([], [], s=DOT_SIZE, color="grey")
-    ring = ax.scatter([], [], s=RING_SIZE, facecolors="none", edgecolors="grey",
+    dot = ax.scatter([], [], s=DOT_SIZE, color="black")
+    ring = ax.scatter([], [], s=RING_SIZE, facecolors="none", edgecolors="black",
                       linestyles=":", linewidths=1.4)
     handles, labels = ax.get_legend_handles_labels()
     handles.append((dot, ring))
     labels.append("blind (no video)")
 
     ax.set_ylabel("Accuracy (%)")
+    # Axis labels and tick labels at 1.3x the default font size; title and legend unchanged.
+    axis_fs = 1.3 * plt.rcParams["font.size"]
+    ax.xaxis.label.set_size(axis_fs)
+    ax.yaxis.label.set_size(axis_fs)
+    ax.tick_params(axis="both", labelsize=axis_fs)
     ax.set_title(f"{MODEL} @ {SAMPLE_FPS} fps: accuracy vs. RLT token pruning")
     ax.grid(alpha=0.25, zorder=0)
     leg = ax.legend(handles, labels, handler_map={tuple: HandlerTuple(ndivide=1, pad=0)},
@@ -235,7 +254,7 @@ def main():
     make_room_for_legend(fig, ax, leg, drawn)
 
     os.makedirs(os.path.dirname(args.out) or ".", exist_ok=True)
-    fig.savefig(args.out, dpi=args.dpi, bbox_inches="tight")
+    fig.savefig(args.out, dpi=args.dpi)  # no bbox_inches="tight": it would crop off the square
     print(f"wrote {args.out}")
 
 

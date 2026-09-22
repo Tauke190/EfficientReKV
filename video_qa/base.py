@@ -177,8 +177,9 @@ class _RetryingVideoReader:
 
     Hence: attempt the threaded decode, and on a DECORDError reopen single-threaded and
     try again, up to `max_attempts` times. The downgrade sticks for the life of the
-    reader, so a windowed FrameStream that decodes block after block pays the detection
-    cost once rather than per block.
+    reader, and `num_threads` exposes it so a windowed FrameStream -- which opens a fresh
+    reader per block -- can carry it to the next one and pay the detection cost once
+    rather than per block.
 
     Retrying more than once is worth it because a reopen clears decoder state as well as
     dropping the thread count -- decord keeps its FFmpeg context on the reader, and a
@@ -198,6 +199,10 @@ class _RetryingVideoReader:
         self._path = video_path
         self._num_threads = max(1, num_threads)
         self._vr = VideoReader(video_path, ctx=cpu(0), num_threads=self._num_threads)
+
+    @property
+    def num_threads(self):
+        return self._num_threads
 
     def __len__(self):
         return len(self._vr)
@@ -227,16 +232,20 @@ class _RetryingVideoReader:
                 self._vr = VideoReader(self._path, ctx=cpu(0), num_threads=1)
 
 
-def open_video_reader(video_path):
+def open_video_reader(video_path, num_threads=None):
     """decord for containers, `NpyFrameReader` for pre-extracted `.npy` frame arrays.
 
     Both honour the same small slice of the VideoReader API (`len`, `get_avg_fps`,
     `get_batch(...).asnumpy()`), so the sampling grids below are written once and do not
     care which kind of source they are on.
+
+    `num_threads` overrides `decord_num_threads()` for a container; a caller reopening a
+    file passes the previous reader's `num_threads` so a single-threaded downgrade sticks.
+    Ignored for `.npy`.
     """
     if video_path.endswith('.npy'):
         return NpyFrameReader(video_path)
-    return _RetryingVideoReader(video_path, decord_num_threads())
+    return _RetryingVideoReader(video_path, num_threads or decord_num_threads())
 
 
 class BaseVQA:
@@ -384,6 +393,9 @@ class BaseVQA:
             stats['tokens_kept'] = pruner.n_kept
             stats['tokens_seen'] = pruner.n_seen
             stats['token_keep_rate'] = round(pruner.keep_rate, 4)
+            # Under "pad", token_keep_rate is what the pruner dropped, not what memory holds:
+            # read n_tokens_fed / kv_cache_bytes for the cost.
+            stats['prune_cache'] = getattr(model, 'prune_cache', 'adaptive')
 
         reducer = getattr(model, 'vision_reducer', None)
         if reducer is not None:
@@ -520,7 +532,7 @@ def log_host_memory(chunk_idx, done, video_id):
 
 def pruning_enabled(args):
     """True when args select a stage-2 method. --prune_threshold alone still means
-    'rlt', so scripts written before --prune_method exists keep working."""
+    'rlt_ref', so scripts written before --prune_method exists keep working."""
     method = getattr(args, 'prune_method', 'none')
     return method not in (None, 'none') or getattr(args, 'prune_threshold', None) is not None
 
@@ -544,6 +556,16 @@ def pruning_load_kwargs(args):
         prune_refresh_every=args.prune_refresh_every,
         prune_log_percentiles=getattr(args, 'prune_log_percentiles', False),
     )
+
+
+def set_prune_cache(model, args):
+    """Apply --prune_cache to a loaded model. Set after loading rather than threaded
+    through each backend's load_model, since it lives on Abstract_ReKV, shared by all."""
+    mode = getattr(args, 'prune_cache', 'adaptive')
+    if mode != 'adaptive':
+        assert getattr(model, 'token_pruner', None) is not None, \
+            f'--prune_cache {mode} needs a --prune_method: with nothing pruned it is the baseline'
+    model.prune_cache = mode
 
 
 def vision_reduction_enabled(args):
@@ -651,6 +673,7 @@ def work(QA_CLASS, add_args=None):
     load_kwargs.update(vision_reduction_load_kwargs(args))
     load_kwargs.update(pruning_load_kwargs(args))
     videoqa_model, videoqa_processor = load_func(**load_kwargs)
+    set_prune_cache(videoqa_model, args)
 
     # Load ground truth file
     anno = json.load(open(args.anno_path))

@@ -1,0 +1,15 @@
+arm,model,accuracy,token_reduction,throughput_fps,kv_gb_per_hour,n_extrapolated,d_accuracy,speedup,d_kv_pct,benchmarks
+baseline,llava_ov_7b,54.346,0.0,8.233,37.683,0,0.0,1.0,0.0,odvbench ovbench rvs_movie streambench streamingbench_real
+rlt_ref0.25,llava_ov_7b,54.322,40.14,11.822,23.419,0,-0.025,1.436,-37.854,odvbench ovbench rvs_movie streambench streamingbench_real
+rlt_ref0.5,llava_ov_7b,54.318,72.048,19.206,11.574,0,-0.029,2.333,-69.285,odvbench ovbench rvs_movie streambench streamingbench_real
+rlt_ref0.6,llava_ov_7b,54.251,84.016,24.5,7.155,3,-0.095,2.976,-81.014,odvbench ovbench rvs_movie streambench streamingbench_real
+rlt_ref0.7,llava_ov_7b,53.696,91.85,29.159,4.29,4,-0.651,3.542,-88.617,odvbench ovbench rvs_movie streambench streamingbench_real
+rlt_ref0.8,llava_ov_7b,52.723,95.866,31.727,2.842,5,-1.623,3.854,-92.458,odvbench ovbench rvs_movie streambench streamingbench_real
+rlt_ref0.9,llava_ov_7b,50.219,97.67,32.683,2.098,5,-4.128,3.97,-94.432,odvbench ovbench rvs_movie streambench streamingbench_real
+baseline,llava_ov_0.5b,43.368,0.0,11.905,8.075,0,0.0,1.0,0.0,odvbench ovbench ovobench_backward ovobench_realtime streambench streamingbench_real
+rlt_ref0.25,llava_ov_0.5b,43.862,51.51,19.741,4.083,0,0.493,1.658,-49.44,odvbench ovbench ovobench_backward ovobench_realtime streambench streamingbench_real
+rlt_ref0.5,llava_ov_0.5b,43.787,84.145,25.528,1.491,5,0.418,2.144,-81.535,odvbench ovbench ovobench_backward ovobench_realtime streambench streamingbench_real
+rlt_ref0.6,llava_ov_0.5b,42.355,92.547,29.95,0.836,5,-1.013,2.516,-89.646,odvbench ovbench ovobench_backward ovobench_realtime streambench streamingbench_real
+rlt_ref0.7,llava_ov_0.5b,40.602,96.943,35.44,0.466,6,-2.767,2.977,-94.234,odvbench ovbench ovobench_backward ovobench_realtime streambench streamingbench_real
+rlt_ref0.8,llava_ov_0.5b,38.265,98.5,36.019,0.276,6,-5.103,3.025,-96.579,odvbench ovbench ovobench_backward ovobench_realtime streambench streamingbench_real
+rlt_ref0.9,llava_ov_0.5b,35.492,98.88,36.239,0.172,6,-7.877,3.044,-97.871,odvbench ovbench ovobench_backward ovobench_realtime streambench streamingbench_real

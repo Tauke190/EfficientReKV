@@ -61,6 +61,13 @@ class FrameStream:
     again, so a block is decoded exactly once either way; windowing only bounds what is
     resident. Random access still works, but a caller that jumps between blocks re-decodes
     on every jump.
+
+    Each block is decoded by a reader opened for it and closed right after. A decord
+    reader left open is not idle: after `get_batch` returns, its threaded decoder keeps
+    decoding further into the file and buffers every frame it produces -- measured at
+    ~0.4 GB/s on a 2560x1920 stream with nothing asking for frames. Held for the length of
+    a video, that buffer was 44-82 GB per worker on FPS-Bench-Stream at 4 fps, more than
+    the KV-Cache itself. Reopening costs one index scan per block.
     """
 
     def __init__(self, video_path, sample_fps, exact=False, num_frames=None, window=None):
@@ -87,9 +94,11 @@ class FrameStream:
         self._block = None        # the decoded block, windowed mode only
         self._block_start = -1
         if self.window:
-            # The reader has to outlive __init__ here, unlike the eager path where the
-            # pixels are all copied out before it goes.
-            self._vr = vr
+            # Not the reader itself -- see the class docstring. Its thread count is kept so
+            # a single-threaded downgrade carries over to the next block's reader.
+            self._path = video_path
+            self._num_threads = getattr(vr, 'num_threads', None)
+            del vr
             logger.debug(f'video: {len(self._index)} slots, decoded '
                          f'{self.window} at a time')
         else:
@@ -108,7 +117,10 @@ class FrameStream:
         start = (k // self.window) * self.window
         self._block = None
         idx = self._index[start:start + self.window]
-        self._block = torch.from_numpy(self._vr.get_batch(idx).asnumpy())
+        vr = open_video_reader(self._path, self._num_threads)
+        self._block = torch.from_numpy(vr.get_batch(idx).asnumpy())
+        self._num_threads = getattr(vr, 'num_threads', None)
+        del vr  # stops its decoder threads and frees what they buffered
         self._block_start = start
 
     def get(self, k):

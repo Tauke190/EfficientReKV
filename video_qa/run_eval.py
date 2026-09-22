@@ -125,12 +125,14 @@ def reduction_tag(args):
     if pruning_on(args):
         # The method name leads: with more than one method in the registry a bare
         # threshold no longer identifies a run.
-        method = args.prune_method if args.prune_method not in (None, 'none') else 'rlt'
+        method = args.prune_method if args.prune_method not in (None, 'none') else 'rlt_ref'
         tag += f"-{method}"
         if args.prune_threshold is not None:
             tag += f"{args.prune_threshold:g}{args.prune_metric}"
         if args.prune_refresh_every:
             tag += f"-r{args.prune_refresh_every}"
+        if args.prune_cache != 'adaptive':
+            tag += f"-{args.prune_cache}"
     return tag
 
 
@@ -169,7 +171,7 @@ def vision_on(args):
 
 
 def pruning_on(args):
-    """--prune_threshold alone still selects rlt, so pre-existing scripts keep working."""
+    """--prune_threshold alone still selects rlt_ref, so pre-existing scripts keep working."""
     return args.prune_method not in (None, 'none') or args.prune_threshold is not None
 
 
@@ -185,8 +187,8 @@ def reduction_args(args):
         if args.vision_threshold is not None:
             cmd += ["--vision_threshold", str(args.vision_threshold)]
     if pruning_on(args):
-        method = args.prune_method if args.prune_method not in (None, 'none') else 'rlt'
-        cmd += ["--prune_method", method]
+        method = args.prune_method if args.prune_method not in (None, 'none') else 'rlt_ref'
+        cmd += ["--prune_method", method, "--prune_cache", args.prune_cache]
         if args.prune_threshold is not None:
             cmd += ["--prune_threshold", str(args.prune_threshold),
                     "--prune_metric", args.prune_metric,

@@ -141,12 +141,12 @@ def load_model(model_path='model_zoo/LongVA-7B',
     # baseline (every frame contributes exactly n_frame_tokens, so one block is one frame
     # and nothing is ever buffered).
     if prune_method in (None, 'none') and prune_threshold is not None:
-        prune_method = 'rlt'  # back-compat: --prune_threshold alone used to mean RLT
+        prune_method = 'rlt_ref'  # back-compat: --prune_threshold alone means the default pruner
 
     token_pruner = None
     if prune_method not in (None, 'none'):
-        if prune_method == 'rlt':
-            assert prune_threshold is not None, "'rlt' pruning requires --prune_threshold"
+        if prune_method in ('rlt_ref', 'rlt_prev', 'rlt_frame'):
+            assert prune_threshold is not None, f"{prune_method!r} pruning requires --prune_threshold"
             kwargs = dict(threshold=prune_threshold, metric=prune_metric,
                           refresh_every=prune_refresh_every,
                           log_percentiles=prune_log_percentiles)

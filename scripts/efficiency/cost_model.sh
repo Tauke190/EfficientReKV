@@ -158,11 +158,21 @@ for i in $(seq 0 $((N_STREAMS - 1))); do
     run_arm "${IDX}" "baseline" "${OUT_DIR}/${MODEL}-fps${FPS}-v${IDX}-baseline-${TIMING}${PREP_TAG}.csv"
     for THR in ${THRESHOLDS}; do
         run_arm "${IDX}" "rlt@${THR}" "${OUT_DIR}/${MODEL}-fps${FPS}-v${IDX}-rlt${THR}-${TIMING}${PREP_TAG}.csv" \
-            --prune_method rlt --prune_threshold "${THR}" --prune_metric "${PRUNE_METRIC}"
+            --prune_method rlt_ref --prune_threshold "${THR}" --prune_metric "${PRUNE_METRIC}"
     done
 done
 
-echo
-python scripts/efficiency/collect_cost_model.py --model "${MODEL}" --sample_fps "${FPS}" \
-    --n_local "${N_LOCAL}" --dir "${OUT_DIR}" --timing "${TIMING}" \
-    --gpu_preprocess "${GPU_PREPROCESS}"
+# The collector derives the KV/GFLOPs columns from config.json and only understands the
+# HF-nested Qwen2 configs; LongVA and Flash-VStream ship flat LLaVA-style configs with no
+# text_config/vision_config, so it raises on them. The span CSVs -- which carry the
+# measured throughput -- are already on disk by this point, so a collector that cannot
+# table them must not fail the sweep. COLLECT=false skips it.
+if [ "${COLLECT:-true}" = "true" ]; then
+    echo
+    python scripts/efficiency/collect_cost_model.py --model "${MODEL}" --sample_fps "${FPS}" \
+        --n_local "${N_LOCAL}" --dir "${OUT_DIR}" --timing "${TIMING}" \
+        --gpu_preprocess "${GPU_PREPROCESS}"
+else
+    echo
+    echo "COLLECT=false -- span CSVs written to ${OUT_DIR}; skipping the table."
+fi

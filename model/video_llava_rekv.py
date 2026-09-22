@@ -32,6 +32,13 @@ class VideoLlava_ReKV(VideoLlavaForConditionalGeneration, Abstract_ReKV):
         video_features = video_features.reshape(batch_size, frames * video_features.shape[1], -1)  # (B, Nv*257, D)
         return video_features
     
+    # Decorated for the same reason the base class is (model/abstract_rekv.py): the
+    # throughput harness calls _encode_video_chunk directly rather than through
+    # encode_video/encode_frame, so the inference_mode context those wrappers
+    # establish is not in scope here. Without it the cached RoPE cos/sin -- built
+    # under inference mode -- are used in grad-enabled computation and append()
+    # raises 'Inference tensors cannot be saved for backward'.
+    @torch.inference_mode()
     def _encode_video_chunk(self, video_chunk):  # (Nv, H, W, 3)
         pixel_values_videos = self.processor.video_processor(images=None, videos=video_chunk, return_tensors="pt").pixel_values_videos.to(self.device, self.dtype)  # (1, Nv, 3, H, W)
         video_features = self._get_video_features(pixel_values_videos)  # (1, Nv*257, D)
@@ -165,12 +172,12 @@ def load_model(model_path='model_zoo/Video-LLaVA-7B-hf', n_init=None, n_local=30
     # baseline (every frame contributes exactly n_frame_tokens, so one block is one frame
     # and nothing is ever buffered).
     if prune_method in (None, 'none') and prune_threshold is not None:
-        prune_method = 'rlt'  # back-compat: --prune_threshold alone used to mean RLT
+        prune_method = 'rlt_ref'  # back-compat: --prune_threshold alone means the default pruner
 
     token_pruner = None
     if prune_method not in (None, 'none'):
-        if prune_method == 'rlt':
-            assert prune_threshold is not None, "'rlt' pruning requires --prune_threshold"
+        if prune_method in ('rlt_ref', 'rlt_prev', 'rlt_frame'):
+            assert prune_threshold is not None, f"{prune_method!r} pruning requires --prune_threshold"
             kwargs = dict(threshold=prune_threshold, metric=prune_metric,
                           refresh_every=prune_refresh_every,
                           log_percentiles=prune_log_percentiles)

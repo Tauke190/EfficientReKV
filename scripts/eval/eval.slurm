@@ -50,7 +50,7 @@ dataset=fpsbench_stream
 fps_list="${FPS_LIST:-1 2 4}"   # space-separated; each rate is its own run and results dir
 n_local=15000        # tokens (llava_ov 196/frame, longva 144, video_llava 257, flash_vstream 64)
 retrieve_size=64     # blocks (frames) retrieved per query
-prune_method=rlt
+prune_method=rlt_ref
 
 # Scoring stays on: multiple-choice, and it runs the no-lookahead audit
 for model in ${models}; do

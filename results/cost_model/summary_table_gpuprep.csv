@@ -1,0 +1,15 @@
+arm,model,accuracy,token_reduction,throughput_fps,kv_gb_per_hour,n_extrapolated,d_accuracy,speedup,d_kv_pct,benchmarks
+baseline,llava_ov_7b,55.01,0.0,11.401,37.683,0,0.0,1.0,0.0,odvbench ovbench ovobench_backward ovobench_realtime rvs_ego rvs_movie streambench streamingbench_real
+rlt_ref0.25,llava_ov_7b,55.077,41.433,19.188,22.66,0,0.066,1.683,-39.866,odvbench ovbench ovobench_backward ovobench_realtime rvs_ego rvs_movie streambench streamingbench_real
+rlt_ref0.5,llava_ov_7b,55.041,73.759,37.727,10.593,1,0.031,3.309,-71.889,odvbench ovbench ovobench_backward ovobench_realtime rvs_ego rvs_movie streambench streamingbench_real
+rlt_ref0.6,llava_ov_7b,54.682,85.23,53.17,6.327,6,-0.328,4.664,-83.211,odvbench ovbench ovobench_backward ovobench_realtime rvs_ego rvs_movie streambench streamingbench_real
+rlt_ref0.7,llava_ov_7b,54.241,92.625,67.945,3.597,7,-0.77,5.96,-90.454,odvbench ovbench ovobench_backward ovobench_realtime rvs_ego rvs_movie streambench streamingbench_real
+rlt_ref0.8,llava_ov_7b,52.92,96.365,77.646,2.232,8,-2.091,6.811,-94.076,odvbench ovbench ovobench_backward ovobench_realtime rvs_ego rvs_movie streambench streamingbench_real
+rlt_ref0.9,llava_ov_7b,50.966,98.07,81.427,1.556,8,-4.045,7.142,-95.871,odvbench ovbench ovobench_backward ovobench_realtime rvs_ego rvs_movie streambench streamingbench_real
+baseline,llava_ov_0.5b,43.368,0.0,18.188,8.075,0,0.0,1.0,0.0,odvbench ovbench ovobench_backward ovobench_realtime streambench streamingbench_real
+rlt_ref0.25,llava_ov_0.5b,43.862,51.51,31.247,4.083,0,0.493,1.718,-49.44,odvbench ovbench ovobench_backward ovobench_realtime streambench streamingbench_real
+rlt_ref0.5,llava_ov_0.5b,43.787,84.145,54.436,1.491,5,0.418,2.993,-81.535,odvbench ovbench ovobench_backward ovobench_realtime streambench streamingbench_real
+rlt_ref0.6,llava_ov_0.5b,42.355,92.547,72.345,0.836,5,-1.013,3.978,-89.646,odvbench ovbench ovobench_backward ovobench_realtime streambench streamingbench_real
+rlt_ref0.7,llava_ov_0.5b,40.602,96.943,86.133,0.466,6,-2.767,4.736,-94.234,odvbench ovbench ovobench_backward ovobench_realtime streambench streamingbench_real
+rlt_ref0.8,llava_ov_0.5b,38.265,98.5,93.061,0.276,6,-5.103,5.117,-96.579,odvbench ovbench ovobench_backward ovobench_realtime streambench streamingbench_real
+rlt_ref0.9,llava_ov_0.5b,35.492,98.88,97.214,0.172,6,-7.877,5.345,-97.871,odvbench ovbench ovobench_backward ovobench_realtime streambench streamingbench_real

@@ -48,8 +48,9 @@ def add_reduction_args(parser):
     # ---- Stage 2: memory-side -------------------------------------------------------
     parser.add_argument("--prune_method", type=str, default='none',
                         help="Reduction method applied at the KV-Cache boundary; must be "
-                             "registered in model/token_pruning.py (currently: rlt). The "
-                             "--prune_* flags below are rlt's hyperparameters.")
+                             "registered in model/token_pruning.py (currently: rlt_ref, rlt_prev, "
+                             "rlt_frame). The "
+                             "--prune_* flags below are the hyperparameters of both.")
     parser.add_argument("--prune_threshold", type=float, default=None,
                         help="Drop a visual token when its distance to the feature it "
                              "would reuse is below this. Calibrate with "
@@ -60,4 +61,10 @@ def add_reduction_args(parser):
                              "model/token_pruning.py).")
     parser.add_argument("--prune_refresh_every", type=int, default=0,
                         help="Force-keep every Nth frame to bound staleness. 0 = off.")
+    parser.add_argument("--prune_cache", type=str, default='adaptive',
+                        choices=['adaptive', 'pad'],
+                        help="How pruned frames enter the KV-Cache. 'adaptive' (CAC) packs "
+                             "survivors into full blocks. 'pad' is the no-CAC ablation: pads "
+                             "each frame back to one full block, as in unpruned ReKV, so "
+                             "the pruner saves no prefill, KV or retrieval cost.")
     return parser

@@ -93,6 +93,13 @@ class StreamingTokenPruner:
             this to pick `threshold`.
     """
 
+    # What `ref[p]` holds between frames: "kept" = the feature position p was last kept
+    # with (the drift-bounded rule); "prev" = frame t-1's feature, kept or not.
+    reference = "kept"
+    # "token" = each position decides for itself; "frame" = the whole frame is kept or
+    # dropped together, kept iff more than half its tokens are over `threshold`.
+    granularity = "token"
+
     def __init__(self, threshold, metric="cosine", refresh_every=0, log_percentiles=False):
         assert metric in ("l2", "cosine"), f"unknown metric {metric!r}"
         assert threshold > 0, f"threshold must be positive, got {threshold}"
@@ -166,11 +173,19 @@ class StreamingTokenPruner:
                 if all_dists is not None:
                     all_dists.append(dist)
                 mask = dist > self.threshold
+                if self.granularity == "frame":
+                    mask = torch.full_like(mask, bool(mask.float().mean() > 0.5))
                 if self.refresh_every > 0 and self.frame_idx % self.refresh_every == 0:
                     mask = torch.ones_like(mask)
-                # A kept token becomes the new reference for its position; a dropped
-                # one leaves the reference alone, which is what bounds its drift.
-                self.ref[mask] = f[mask]
+                if self.reference == "kept":
+                    # A kept token becomes the new reference for its position; a dropped
+                    # one leaves the reference alone, which is what bounds its drift.
+                    self.ref[mask] = f[mask]
+                else:
+                    # "prev": every position moves on to frame t whether or not it was
+                    # kept, so the next frame is diffed against t, not against what the
+                    # LM holds. This is the rule whose drift is unbounded.
+                    self.ref.copy_(f)
 
             kept_rows.append(feats[t][mask])
             counts.append(int(mask.sum()))
@@ -195,6 +210,40 @@ class StreamingTokenPruner:
             f"video-so-far {100.0 * self.keep_rate:.1f}%"
         )
         return kept, counts
+
+
+class ConsecutiveTokenPruner(StreamingTokenPruner):
+    """Published RLT's consecutive-frame rule, as an ablation of the carried reference.
+
+        keep(t, p)  iff  dist(feat[t, p], feat[t-1, p]) > threshold
+
+    Identical to StreamingTokenPruner in every other respect -- metric, streaming state,
+    refresh_every, first frame kept whole -- so any difference between the two is the
+    reference alone. Here a slow change that stays under `threshold` per frame is dropped
+    at every frame, and the token the LM holds for that position can end up arbitrarily
+    far from the current content.
+
+    Distances to frame t-1 are smaller than distances to the last kept token, so at equal
+    `threshold` this keeps fewer tokens. Compare the two at matched keep rate
+    (`token_keep_rate` in results.csv), not at matched threshold.
+    """
+
+    reference = "prev"
+
+
+class FrameTokenPruner(StreamingTokenPruner):
+    """Frame-level ablation of the per-token decision.
+
+        keep frame t  iff  more than half of its P tokens have dist(feat[t, p], ref[p]) > threshold
+
+    and a kept frame is kept whole, so it becomes the new reference at every position.
+    The reference is the last kept frame, as in StreamingTokenPruner -- only the
+    granularity differs. This is plain keyframe selection: a small moving object in a
+    static scene changes too few tokens to keep its frame, and when a frame is kept its
+    static background is re-sent with it.
+    """
+
+    granularity = "frame"
 
 
 # ---- method registry ---------------------------------------------------------------
@@ -225,7 +274,9 @@ class StreamingTokenPruner:
 # that never went down. TPAT-style methods that select among already-projected tokens
 # do fit this hook as-is.
 PRUNERS = {
-    'rlt': StreamingTokenPruner,
+    'rlt_ref': StreamingTokenPruner,       # diff against the last kept token (ours)
+    'rlt_prev': ConsecutiveTokenPruner,    # diff against frame t-1 (published RLT)
+    'rlt_frame': FrameTokenPruner,         # keep/drop whole frames, vs the last kept frame
 }
 
 

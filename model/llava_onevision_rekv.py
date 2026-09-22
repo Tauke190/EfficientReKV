@@ -212,17 +212,19 @@ def load_model(model_path='model_zoo/LLaVA/llava-onevision-qwen2-7b-ov-hf',
     # the baseline (every frame contributes exactly n_frame_tokens, so one block is one
     # frame and nothing is ever buffered).
     #
-    # Each method owns its own hyperparameters; the ones below belong to 'rlt'. A second
+    # Each method owns its own hyperparameters; the ones below belong to 'rlt_ref',
+    # 'rlt_prev' and 'rlt_frame', which differ only in the reference they diff against
+    # or in deciding per token vs per frame. A second
     # method with different knobs adds its own branch here rather than overloading these
     # -- build_pruner rejects arguments the method does not accept, so a mismatch fails
     # at load time instead of quietly doing nothing.
     if prune_method in (None, 'none') and prune_threshold is not None:
-        prune_method = 'rlt'  # back-compat: --prune_threshold alone used to mean RLT
+        prune_method = 'rlt_ref'  # back-compat: --prune_threshold alone means the default pruner
 
     token_pruner = None
     if prune_method not in (None, 'none'):
-        if prune_method == 'rlt':
-            assert prune_threshold is not None, "'rlt' pruning requires --prune_threshold"
+        if prune_method in ('rlt_ref', 'rlt_prev', 'rlt_frame'):
+            assert prune_threshold is not None, f"{prune_method!r} pruning requires --prune_threshold"
             kwargs = dict(threshold=prune_threshold, metric=prune_metric,
                           refresh_every=prune_refresh_every,
                           log_percentiles=prune_log_percentiles)

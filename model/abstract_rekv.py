@@ -35,6 +35,12 @@ class Abstract_ReKV:
         # same number purely by convention. `frame_token_counts` is what restores the
         # frame<->block correspondence that convention used to provide for free.
         self.token_pruner = token_pruner
+        # How pruned frames enter the KV-Cache (--prune_cache). "adaptive" is CAC: survivors
+        # are packed back-to-back into full blocks, so a block spans a content-dependent
+        # number of frames. "pad" is the no-CAC ablation: each frame's survivors are padded
+        # back up to n_frame_tokens, so one frame is one block exactly as in unpruned ReKV
+        # and the pruner saves nothing in prefill, KV or retrieval.
+        self.prune_cache = "adaptive"
         self._reset_stream_state()
 
     @property
@@ -49,6 +55,7 @@ class Abstract_ReKV:
         self.frame_token_counts = []   # tokens contributed to memory by each frame
         self._pending_embeds = None    # tokens not yet fed (< block_size, awaiting a full block)
         self._n_tokens_fed = 0         # video tokens handed to the LM so far
+        self._last_token = None        # (1, D) last token fed, pads frames with no survivors ("pad")
         self.last_retrieved_blocks = None  # blocks the last question retrieved (per layer)
 
     def clear_cache(self):
@@ -116,6 +123,9 @@ class Abstract_ReKV:
         if self.token_pruner is not None:
             feats = video_features.view(n_frames, self.n_frame_tokens, D)
             kept, counts = self.token_pruner(feats)     # (N, D), list[int]
+            if self.prune_cache == "pad":
+                kept = self._pad_frames(kept, counts)
+                counts = [self.n_frame_tokens] * n_frames
             video_features = kept.unsqueeze(0)          # (1, N, D)
         else:
             counts = [self.n_frame_tokens] * n_frames
@@ -130,6 +140,25 @@ class Abstract_ReKV:
         if n_full > 0:
             self._forward_features(video_features[:, :n_full].contiguous())
         self._pending_embeds = video_features[:, n_full:].contiguous() if n_full < n else None
+
+    def _pad_frames(self, kept, counts):
+        """Pad every frame's survivors back up to n_frame_tokens ("pad" mode, no CAC).
+
+        Padding repeats the frame's last surviving token, as `_flush_pending` does for the
+        final partial block. A frame with no survivors repeats the last token fed before
+        it, which is the token already representing it. Survivors keep their order and
+        come first, so padding changes only what fills the dropped slots.
+        """
+        P = self.n_frame_tokens
+        frames, off = [], 0
+        for c in counts:
+            toks = kept[off:off + c]
+            off += c
+            if c:
+                self._last_token = toks[-1:]
+            assert self._last_token is not None, "first frame of a video kept no tokens"
+            frames.append(torch.cat([toks, self._last_token.expand(P - c, -1)], dim=0))
+        return torch.cat(frames, dim=0)
 
     def flush_stream(self):
         """Make everything ingested so far visible to a question, right now.

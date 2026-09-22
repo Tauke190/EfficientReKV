@@ -65,7 +65,7 @@ retrieve_size=64     # blocks retrieved per query; one block is one frame
 # Token pruning -- the thing this fork adds. Space-separated, each value its own run and
 # its own results directory, so arms never overwrite each other. 'none' is the untouched
 # ReKV baseline; put it first so the reference lands before the sweep.
-prune_method=rlt
+prune_method=rlt_ref
 prune_thresholds="none"
 
 # Blind control -- video_qa/blind_stream_vqa.py on streambench, video_qa/blind_rvs_vqa.py on
@@ -97,7 +97,7 @@ streamingbench_real streamingbench_omni streamingbench_context rvs_ego rvs_movie
 for fps in ${sample_fps}; do
   for thr in ${prune_thresholds}; do
 
-    # A bare --prune_threshold already reads as "enable rlt" in run_eval, so the baseline
+    # A bare --prune_threshold already reads as "enable rlt_ref" in run_eval, so the baseline
     # has to pass no pruning flags at all rather than a threshold of 0.
     prune_args=""
     [ "${thr}" != "none" ] && prune_args="--prune_method ${prune_method} \
