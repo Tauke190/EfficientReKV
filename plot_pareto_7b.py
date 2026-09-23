@@ -140,9 +140,33 @@ BENCHMARKS = {
     },
 }
 
+# Eight benchmarks is the most one axes can carry, so identity is never colour alone:
+# each benchmark gets a hue AND its own marker, in the order BENCHMARKS is declared.
+# The hues were picked against the light-mode gates (OKLCH L in 0.43-0.77, C >= 0.11,
+# >= 3:1 on white) and checked for protan/deutan separation; neighbouring entries in the
+# legend are the ones held furthest apart. Red-vs-olive style pairs still collapse under
+# simulated colour blindness at this series count -- the markers are what carry those,
+# which is also what keeps the figure readable printed in greyscale.
+PALETTE = [
+    "#a6761d",  # gold
+    "#7b2d8e",  # purple
+    "#1a9641",  # green
+    "#1f5fbf",  # blue
+    "#d6301f",  # red
+    "#12a3b5",  # teal
+    "#7f3b08",  # brown
+    "#d84f9c",  # pink
+]
+# Shapes are paired with the hues so that the pairs colour blindness collapses -- gold /
+# green / red, and teal / pink -- are the ones furthest apart in outline.
+MARKERS = ["o", "P", "^", "s", "X", "v", "D", "*"]
+
 # Blind marker: a small solid dot inside a larger dotted ring.
 DOT_SIZE = 28
 RING_SIZE = 220
+
+# Axis labels and tick labels at 1.5x the default font size.
+AXIS_FONT_SCALE = 1.5
 
 
 def blind_marker(ax, x, y, color, label=None):
@@ -181,8 +205,10 @@ def main():
     ap.add_argument("--dpi", type=int, default=200)
     args = ap.parse_args()
 
-    fig, ax = plt.subplots(figsize=(7.0, 7.0))
-    colors = plt.get_cmap("tab10").colors
+    # ~1.44x wider than tall: the curves bunch up near prune rate 1, and the extra
+    # width is what separates them there.
+    fig, ax = plt.subplots(figsize=(10.08, 7.0))
+    colors = PALETTE
     drawn = []  # every plotted point set, sorted by x, for placing the legend below them
 
     # Threshold mode: one evenly spaced slot per arm, baseline first and blind last.
@@ -192,7 +218,7 @@ def main():
     slot[None] = 0
     blind_x = len(thresholds) + 1 if args.threshold else 1.0
 
-    for (name, data), color in zip(BENCHMARKS.items(), colors):
+    for (name, data), color, marker in zip(BENCHMARKS.items(), colors, MARKERS):
         pts = []
         for thr, prune, acc in data["arms"]:
             if acc is None:
@@ -212,8 +238,9 @@ def main():
         if pts:
             xs, ys = zip(*pts)
             drawn.append(pts)
-            ax.plot(xs, ys, "-o", color=color, label=name, markersize=5, linewidth=1.8,
-                    zorder=3)
+            ax.plot(xs, ys, "-", marker=marker, color=color, label=name,
+                    markersize=7 if marker != "*" else 10, markeredgecolor="white",
+                    markeredgewidth=0.6, linewidth=2.0, zorder=3)
         if data["blind"] is not None:
             # Not joined to the curve: blind is a separate control, not a pruning arm.
             blind_marker(ax, blind_x, data["blind"], color,
@@ -221,10 +248,11 @@ def main():
             drawn.append([(blind_x, data["blind"])])
 
     if args.threshold:
-        ax.set_xlabel("RLT prune threshold")
+        ax.set_xlabel("Prune threshold")
         ax.set_xlim(-0.4, blind_x + 0.4)
         ax.set_xticks(range(blind_x + 1))
-        ax.set_xticklabels(["base"] + [f"{t:g}" for t in thresholds] + ["blind"])
+        # The unpruned baseline is threshold 0 -- it keeps every token by definition.
+        ax.set_xticklabels(["0"] + [f"{t:g}" for t in thresholds] + ["blind"])
     else:
         ax.set_xlabel("Prune rate (fraction of visual tokens dropped; 1 = blind)")
         ax.set_xlim(-0.03, 1.05)
@@ -240,13 +268,12 @@ def main():
     labels.append("blind (no video)")
 
     ax.set_ylabel("Accuracy (%)")
-    # Axis labels and tick labels at 1.3x the default font size; title and legend unchanged.
-    axis_fs = 1.3 * plt.rcParams["font.size"]
+    axis_fs = AXIS_FONT_SCALE * plt.rcParams["font.size"]
     ax.xaxis.label.set_size(axis_fs)
     ax.yaxis.label.set_size(axis_fs)
     ax.tick_params(axis="both", labelsize=axis_fs)
-    ax.set_title(f"{MODEL} @ {SAMPLE_FPS} fps: accuracy vs. RLT token pruning")
-    ax.grid(alpha=0.25, zorder=0)
+    # No title: the caption carries "{MODEL} @ {SAMPLE_FPS} fps" in the paper.
+    ax.grid(color="#9e9e9e", alpha=0.55, linewidth=0.7, zorder=0)
     leg = ax.legend(handles, labels, handler_map={tuple: HandlerTuple(ndivide=1, pad=0)},
                     loc="lower left", ncol=2, fontsize=9, labelspacing=0.9,
                     framealpha=0.95, edgecolor="lightgrey")
@@ -254,8 +281,9 @@ def main():
     make_room_for_legend(fig, ax, leg, drawn)
 
     os.makedirs(os.path.dirname(args.out) or ".", exist_ok=True)
-    fig.savefig(args.out, dpi=args.dpi)  # no bbox_inches="tight": it would crop off the square
-    print(f"wrote {args.out}")
+    fig.savefig(args.out, dpi=args.dpi)  # no bbox_inches="tight": it would crop the figure box
+    # The title moved out of the figure, so the run prints what the caption has to say.
+    print(f"wrote {args.out} -- caption it {MODEL} @ {SAMPLE_FPS} fps, accuracy vs. token pruning")
 
 
 if __name__ == "__main__":

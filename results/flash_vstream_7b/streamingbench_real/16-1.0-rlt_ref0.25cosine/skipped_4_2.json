@@ -1,0 +1,9 @@
+{
+  "chunk_idx": 2,
+  "num_chunks": 4,
+  "n_expected": 125,
+  "n_skipped": 1,
+  "skipped": [
+    "Real-Time_Visual_Understanding__sample_332"
+  ]
+}
