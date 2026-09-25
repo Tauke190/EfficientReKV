@@ -87,10 +87,10 @@ sits at a known timestamp: 990 streams, 165 h. `FPSBenchStream/` holds the annot
 
 Two sources, neither redistributable from here:
 
-1. **Needles** — the FPS-Bench clips, fetched with FPS-Bench's own tooling into a clip
-   cache (default `~/.cache/fpsbench/clips/clip`).
+1. **Needles** — the FPS-Bench clips, obtained through FPS-Bench's own release, collected
+   into one directory (`<clip-dir>` below).
 2. **Haystacks** — the 459 MLVU files named in `FPSBenchStream/haystack_files_used.txt`
-   (159.4 GB).
+   (159.4 GB), in one directory (`<mlvu-dir>`).
 
 Then assemble. Needs `ffmpeg`; writes ~197 GB, skips streams already on disk, and shards
 with `--shard/--num-shards`:
@@ -101,15 +101,19 @@ python scripts/build_stream_dataset.py assemble \
     --plan fpsbench_stream_v1.jsonl \
     --video-dir videos \
     --canvas haystack \
-    --clip-dir ~/.cache/fpsbench/clips/clip \
-    --haystack-dir /path/to/mlvu \
+    --clip-dir <clip-dir> \
+    --haystack-dir <mlvu-dir> \
     --encoder h264_nvenc              # or libx264, the default
 ```
 
+`--video-dir` is where the streams are written; `videos` keeps them beside the annotations,
+which is what the shipped eval annotation expects.
+
 **Assemble against the shipped plan; do not re-run `plan`.** It redraws haystack
-assignments from an RNG that depends on which clips are in the cache, so a different cache
-gives a different — equally valid, but not identical — dataset. `--canvas haystack` is what
-the release was cut with.
+assignments from an RNG that depends on which needle clips are present, so a different set
+of clips gives a different — equally valid, but not identical — dataset. `--canvas haystack`
+is what the release was cut with. Rebuilds match on frames and timestamps, not bytes: the
+encoder settings are not recorded per record, so file hashes will differ.
 
 ### Run it
 
@@ -121,11 +125,11 @@ python -m video_qa.run_eval --model llava_ov_0.5b --dataset fpsbench_stream --sa
     --num_chunks 2 --prune_method rlt_ref --prune_threshold 0.5
 ```
 
-Regenerate that annotation only if you rebuilt somewhere else:
+If you assembled into a different `--video-dir`, regenerate the annotation against it:
 
 ```bash
 python video_qa/convert_fpsbench_stream.py --src FPSBenchStream/fpsbench_stream_v1.jsonl \
-    --video_root FPSBenchStream/videos --out data/fpsbench_stream/test_mc.json
+    --video_root <video-dir> --out data/fpsbench_stream/test_mc.json
 ```
 
 `python -m video_qa.run_eval_fpsbench_needle` runs the needle-only arm — the same questions
