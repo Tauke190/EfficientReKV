@@ -18,7 +18,7 @@ python -m video_qa.run_eval \
 |---|---|
 | `ovobench_realtime`, `ovobench_backward` | `python video_qa/convert_ovobench.py` |
 | `odvbench` | `python scripts/dataset_prep/setup_odvbench.py` |
-| `fpsbench_stream` | `python video_qa/convert_fpsbench_stream.py` |
+| `fpsbench_stream` | shipped; videos are rebuilt — see [FPS-Bench-Stream](#fps-bench-stream) |
 | `streamingbench_real` | `scripts/dataset_prep/prepare_streamingbench.sh` |
 | `ovbench` | `scripts/dataset_prep/prepare_ovbench.sh` |
 | `streambench` | `scripts/dataset_prep/prepare_streambench.sh` |
@@ -75,10 +75,67 @@ Keep rates are already in `results.csv` when a pruner is attached: `tokens_kept`
 have none of these columns** — when concatenating arms, fill `token_keep_rate` with 1.0
 rather than dropping rows, and aggregate weighted by `tokens_seen`.
 
+## FPS-Bench-Stream
+
+Our long-form streaming benchmark. Each FPS-Bench clip (the *needle*, median 9 s) is
+spliced into a 600 s MLVU video (the *haystack*), so the evidence is 1.5% of the stream and
+sits at a known timestamp: 990 streams, 165 h. `FPSBenchStream/` holds the annotations and
+`FPSBenchStream/README.md` the record layout, the three clocks and the known limitations.
+**No video ships with it** — the streams are rebuilt locally.
+
+### Build the videos
+
+Two sources, neither redistributable from here:
+
+1. **Needles** — the FPS-Bench clips, fetched with FPS-Bench's own tooling into a clip
+   cache (default `~/.cache/fpsbench/clips/clip`).
+2. **Haystacks** — the 459 MLVU files named in `FPSBenchStream/haystack_files_used.txt`
+   (159.4 GB).
+
+Then assemble. Needs `ffmpeg`; writes ~197 GB, skips streams already on disk, and shards
+with `--shard/--num-shards`:
+
+```bash
+cd FPSBenchStream
+python scripts/build_stream_dataset.py assemble \
+    --plan fpsbench_stream_v1.jsonl \
+    --video-dir videos \
+    --canvas haystack \
+    --clip-dir ~/.cache/fpsbench/clips/clip \
+    --haystack-dir /path/to/mlvu \
+    --encoder h264_nvenc              # or libx264, the default
+```
+
+**Assemble against the shipped plan; do not re-run `plan`.** It redraws haystack
+assignments from an RNG that depends on which clips are in the cache, so a different cache
+gives a different — equally valid, but not identical — dataset. `--canvas haystack` is what
+the release was cut with.
+
+### Run it
+
+`data/fpsbench_stream/test_mc.json` (990 records pointing into `FPSBenchStream/videos/`) is
+already in the repo, so once the videos exist:
+
+```bash
+python -m video_qa.run_eval --model llava_ov_0.5b --dataset fpsbench_stream --sample_fps 1 \
+    --num_chunks 2 --prune_method rlt_ref --prune_threshold 0.5
+```
+
+Regenerate that annotation only if you rebuilt somewhere else:
+
+```bash
+python video_qa/convert_fpsbench_stream.py --src FPSBenchStream/fpsbench_stream_v1.jsonl \
+    --video_root FPSBenchStream/videos --out data/fpsbench_stream/test_mc.json
+```
+
+`python -m video_qa.run_eval_fpsbench_needle` runs the needle-only arm — the same questions
+against the clip alone — under `results/needle_only/`, which is what isolates retrieval from
+the model's ceiling.
+
 ## Efficiency
 
 Streaming throughput, KV-Cache growth and GFLOPs/frame, for the baseline and every pruning
-threshold, on one FPS-Bench-Stream stream.
+threshold, on one FPS-Bench-Stream stream. Needs a GPU.
 
 ```bash
 scripts/efficiency/cost_model.sh                      # llava_ov_7b, 0.1 .. 0.9
@@ -86,33 +143,13 @@ MODEL=llava_ov_0.5b scripts/efficiency/cost_model.sh
 THRESHOLDS="0.5 0.9" N_STREAMS=3 scripts/efficiency/cost_model.sh
 ```
 
-Needs a GPU (`srun -p gpu --gres=gpu:1 bash scripts/efficiency/cost_model.sh`). Arms already
-on disk are skipped, so an interrupted run resumes; `FORCE=1` re-runs them. The table can be
-rebuilt at any time with `scripts/efficiency/collect_cost_model.py`.
+Finished arms are skipped so an interrupted run resumes (`FORCE=1` re-runs them); rebuild
+the table any time with `scripts/efficiency/collect_cost_model.py`.
 
-Four protocol choices decide whether the numbers are comparable:
-
-- `ENCODE_CHUNK_SIZE=1` - one frame per forward pass, which is what streaming means: a
-  live stream has no frame t+1 to batch with frame t. ~2x apart from the batched default.
-- `GPU_PREPROCESS=true` (the default here) - resize/normalize on the GPU rather than in the
-  HF processor, which sits inside the encode timer. Worth less than it sounds on this
-  dataset: measured on an A100 at baseline, 720x540, chunk size 1, span timing, it is
-  11.39 vs 11.40 f/s on the 7B (nothing) and 17.87 vs 15.65 f/s on the 0.5B (+14%). The
-  "nearly 2x" figure in `measure_encoding_fps.py` is 1080p, where the HF processor costs
-  ~37-57 ms/frame; expect the gap back at that resolution, under `per_chunk` timing, or at
-  aggressive keep rates. GPU resampling is not bit-identical to PIL's (mean absolute
-  difference ~0.002), so prefer `GPU_PREPROCESS=false` for throughput quoted beside an
-  accuracy number. The two write separate files (`-gpuprep` tag) and separate tables.
-- `TIMING=span` - three CUDA syncs for the whole run, so CPU preprocessing overlaps GPU
-  compute the way it does live. `per_chunk` adds a sync pair per chunk and reads low at
-  chunk size 1. Both write their own file, so running both cross-checks rather than
-  overwrites.
-- `NUM_FRAMES` must reach steady state - only chunks encoded after the local window
-  filled run at the sustained rate. The window fills after `15000 / (196 x keep_rate)`
-  frames: 77 at baseline, 306 at 25% keep, 1531 at 5%. At 1 fps x 600 frames anything
-  keeping under ~13% never gets there, and the collector flags those rows rather than
-  quoting them beside the others.
-
-Throughput is measured, not derived: pruning drops tokens before the LM prefill (~84% of
-`_encode_video_chunk`), but the vision tower and preprocessing are untouched and cap the
-speed-up. GFLOPs/frame is analytic from `config.json` times the measured keep rate.
+The defaults are what make the numbers comparable — change one and you are measuring
+something else: `ENCODE_CHUNK_SIZE=1` (a live stream has no frame t+1 to batch with),
+`TIMING=span` (syncs per run, not per chunk), `GPU_PREPROCESS=true` (use `false` for
+throughput quoted beside an accuracy number), and a `NUM_FRAMES` past steady state — the
+local window fills after `15000 / (196 x keep_rate)` frames, and the collector flags rows
+that never got there. Throughput is measured, not derived; the vision tower and
+preprocessing are untouched by pruning and cap the speed-up.

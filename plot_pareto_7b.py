@@ -2,12 +2,13 @@
 
 The 7B companion to plot_pareto.py (0.5B, OVO-Bench only). Prune rate on x rather than
 --prune_threshold, because equal steps in the threshold are not equal steps in tokens
-dropped. The axis is linear from 0 to 1 (prune rate as a fraction). `--threshold` plots
+dropped. The axis runs from 0 to 1 (prune rate as a fraction), linear above 0.4 and
+squeezed 4x below it, where only the baselines sit (marked with an axis break). `--threshold` plots
 against the threshold instead, which needs no measured prune rates; each arm gets an
 equal-width slot there (baseline, 0.25, 0.5, ..., 0.9, blind), since the prune-rate axis
 crowds the high thresholds into its right edge.
 
-The blind run (no video at all) is a special case, drawn at x = 1 -- every visual token
+The blind run (no video at all) is off by default (`--blind` adds it). It is drawn at x = 1 -- every visual token
 dropped, or equivalently threshold 1 -- as a dot inside a dotted circle in the benchmark's
 colour. It is the language-prior floor and deliberately not joined to the curve.
 
@@ -29,6 +30,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import transforms
 from matplotlib.legend_handler import HandlerTuple
 
 
@@ -162,11 +164,39 @@ PALETTE = [
 MARKERS = ["o", "P", "^", "s", "X", "v", "D", "*"]
 
 # Blind marker: a small solid dot inside a larger dotted ring.
+# Prune-rate axis: below X_BREAK there is only the baseline and a stray point or two, so
+# that stretch is squeezed to X_SQUEEZE of its linear width and marked with an axis break.
+X_BREAK = 0.4
+X_SQUEEZE = 0.25
+
+
+def squeeze_x(x):
+    x = np.asarray(x, dtype=float)
+    return np.where(x < X_BREAK, x * X_SQUEEZE, X_BREAK * X_SQUEEZE + (x - X_BREAK))
+
+
+def unsqueeze_x(u):
+    u = np.asarray(u, dtype=float)
+    cut = X_BREAK * X_SQUEEZE
+    return np.where(u < cut, u / X_SQUEEZE, X_BREAK + (u - cut))
+
+
+def axis_break(ax, x):
+    """Double-slash break marks on the top and bottom spines at data x."""
+    slash = dict(marker=[(-1, -2), (1, 2)], markersize=11, linestyle="none",
+                 color="k", mec="k", mew=1.2, clip_on=False, zorder=5)
+    base = ax.get_xaxis_transform()  # x in data, y in axes fraction
+    for dx in (-2.5, 2.5):
+        tr = transforms.offset_copy(base, fig=ax.figure, x=dx, units="points")
+        ax.plot([x, x], [0, 1], transform=tr, **slash)
+
+
 DOT_SIZE = 28
 RING_SIZE = 220
 
-# Axis labels and tick labels at 1.5x the default font size.
-AXIS_FONT_SCALE = 1.5
+# Sized for the ICLR PDF: one text size for axis labels, tick labels and legend.
+AXIS_FONT_SIZE = 17
+LEGEND_FONT_SIZE = AXIS_FONT_SIZE
 
 
 def blind_marker(ax, x, y, color, label=None):
@@ -175,41 +205,22 @@ def blind_marker(ax, x, y, color, label=None):
                linestyles=":", linewidths=1.4, zorder=4)
 
 
-def make_room_for_legend(fig, ax, leg, drawn, margin=0.02):
-    """Lower the y-axis floor until the bottom-left legend sits under every curve it spans.
-
-    A curve counts over the legend's x-extent plus its first point past the right edge,
-    so the segment leaving the box is cleared too, not just the markers inside it.
-    """
-    for _ in range(30):
-        fig.canvas.draw()
-        box = leg.get_window_extent().transformed(ax.transData.inverted())
-        ys = []
-        for pts in drawn:
-            for x, y in pts:
-                ys.append(y)
-                if x > box.x1:
-                    break
-        lo, hi = ax.get_ylim()
-        if not ys or box.y1 < min(ys) - margin * (hi - lo):
-            return
-        ax.set_ylim(lo - 0.05 * (hi - lo), hi)
-
-
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default="figures/pareto_7b.png")
     ap.add_argument("--threshold", action="store_true",
                     help="Plot against --prune_threshold (baseline at 0) instead of the "
                          "measured prune rate.")
+    ap.add_argument("--blind", action="store_true",
+                    help="Also draw the blind (no video) control at x = 1.")
     ap.add_argument("--dpi", type=int, default=200)
     args = ap.parse_args()
 
-    # ~1.44x wider than tall: the curves bunch up near prune rate 1, and the extra
-    # width is what separates them there.
-    fig, ax = plt.subplots(figsize=(10.08, 7.0))
+    # ~1.4x wider than tall: the curves bunch up near
+    # prune rate 1, and the extra width is what separates them there. The legend sits
+    # above the axes, so the y-range no longer has to stretch down to make room for it.
+    fig, ax = plt.subplots(figsize=(8.4, 6.0))
     colors = PALETTE
-    drawn = []  # every plotted point set, sorted by x, for placing the legend below them
 
     # Threshold mode: one evenly spaced slot per arm, baseline first and blind last.
     thresholds = sorted({thr for data in BENCHMARKS.values()
@@ -231,57 +242,66 @@ def main():
             else:
                 x = prune / 100.0
             pts.append((x, acc))
-        if not pts and data["blind"] is None:
+        blind = data["blind"] if args.blind else None
+        if not pts and blind is None:
             print(f"skipped {name}: no numbers yet")
             continue
 
         if pts:
             xs, ys = zip(*pts)
-            drawn.append(pts)
             ax.plot(xs, ys, "-", marker=marker, color=color, label=name,
                     markersize=7 if marker != "*" else 10, markeredgecolor="white",
                     markeredgewidth=0.6, linewidth=2.0, zorder=3)
-        if data["blind"] is not None:
+        if blind is not None:
             # Not joined to the curve: blind is a separate control, not a pruning arm.
-            blind_marker(ax, blind_x, data["blind"], color,
+            blind_marker(ax, blind_x, blind, color,
                          label=None if pts else f"{name} (blind)")
-            drawn.append([(blind_x, data["blind"])])
 
     if args.threshold:
         ax.set_xlabel("Prune threshold")
-        ax.set_xlim(-0.4, blind_x + 0.4)
-        ax.set_xticks(range(blind_x + 1))
+        last = blind_x if args.blind else len(thresholds)
+        ax.set_xlim(-0.4, last + 0.4)
+        ax.set_xticks(range(last + 1))
         # The unpruned baseline is threshold 0 -- it keeps every token by definition.
-        ax.set_xticklabels(["0"] + [f"{t:g}" for t in thresholds] + ["blind"])
+        ax.set_xticklabels(["0"] + [f"{t:g}" for t in thresholds]
+                           + (["blind"] if args.blind else []))
     else:
-        ax.set_xlabel("Prune rate (fraction of visual tokens dropped; 1 = blind)")
-        ax.set_xlim(-0.03, 1.05)
-        ax.set_xticks(np.arange(0, 1.01, 0.1))
+        ax.set_xlabel("Prune rate (fraction of visual tokens dropped)"
+                      + ("; 1 = blind" if args.blind else ""))
+        ax.set_xscale("function", functions=(squeeze_x, unsqueeze_x))
+        # Without blind the curves end just short of 1; stop the axis right after them.
+        ax.set_xlim(-0.03, 1.02 if args.blind else 1.005)
+        ax.set_xticks([0.0] + list(np.arange(X_BREAK, 1.01, 0.1)))
+        axis_break(ax, X_BREAK / 2)
 
-    # One legend entry for the blind marker, instead of one per benchmark: the dot and
-    # its dotted ring drawn on top of each other.
-    dot = ax.scatter([], [], s=DOT_SIZE, color="black")
-    ring = ax.scatter([], [], s=RING_SIZE, facecolors="none", edgecolors="black",
-                      linestyles=":", linewidths=1.4)
     handles, labels = ax.get_legend_handles_labels()
-    handles.append((dot, ring))
-    labels.append("blind (no video)")
+    if args.blind:
+        # One legend entry for the blind marker, instead of one per benchmark: the dot
+        # and its dotted ring drawn on top of each other.
+        dot = ax.scatter([], [], s=DOT_SIZE, color="black")
+        ring = ax.scatter([], [], s=RING_SIZE, facecolors="none", edgecolors="black",
+                          linestyles=":", linewidths=1.4)
+        handles.append((dot, ring))
+        labels.append("blind (no video)")
 
     ax.set_ylabel("Accuracy (%)")
-    axis_fs = AXIS_FONT_SCALE * plt.rcParams["font.size"]
-    ax.xaxis.label.set_size(axis_fs)
-    ax.yaxis.label.set_size(axis_fs)
-    ax.tick_params(axis="both", labelsize=axis_fs)
+    ax.xaxis.label.set_size(AXIS_FONT_SIZE)
+    ax.yaxis.label.set_size(AXIS_FONT_SIZE)
+    ax.tick_params(axis="both", labelsize=AXIS_FONT_SIZE)
+    ax.margins(y=0.04)
     # No title: the caption carries "{MODEL} @ {SAMPLE_FPS} fps" in the paper.
     ax.grid(color="#9e9e9e", alpha=0.55, linewidth=0.7, zorder=0)
-    leg = ax.legend(handles, labels, handler_map={tuple: HandlerTuple(ndivide=1, pad=0)},
-                    loc="lower left", ncol=2, fontsize=9, labelspacing=0.9,
-                    framealpha=0.95, edgecolor="lightgrey")
+    ax.legend(handles, labels, handler_map={tuple: HandlerTuple(ndivide=1, pad=0)},
+              loc="lower center", bbox_to_anchor=(0.5, 1.0), ncol=3,
+              fontsize=LEGEND_FONT_SIZE, columnspacing=0.8, handlelength=1.6, handletextpad=0.4,
+              borderaxespad=0.2, borderpad=0, frameon=False)
     fig.tight_layout()
-    make_room_for_legend(fig, ax, leg, drawn)
 
     os.makedirs(os.path.dirname(args.out) or ".", exist_ok=True)
-    fig.savefig(args.out, dpi=args.dpi)  # no bbox_inches="tight": it would crop the figure box
+    # Tight bbox with a hairline pad: the legend lives outside the axes, and any blank
+    # margin left here is whitespace in the paper. The PDF is the vector copy for LaTeX.
+    for out in (args.out, os.path.splitext(args.out)[0] + ".pdf"):
+        fig.savefig(out, dpi=args.dpi, bbox_inches="tight", pad_inches=0.02)
     # The title moved out of the figure, so the run prints what the caption has to say.
     print(f"wrote {args.out} -- caption it {MODEL} @ {SAMPLE_FPS} fps, accuracy vs. token pruning")
 
