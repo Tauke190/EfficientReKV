@@ -246,6 +246,106 @@ class FrameTokenPruner(StreamingTokenPruner):
     granularity = "frame"
 
 
+class _RateTokenPruner:
+    """Shared state and bookkeeping for the content-agnostic, fixed-rate baselines.
+
+    Subclasses implement `_mask(P, device)`, which returns frame t's (P,) keep mask and
+    must use nothing but the frame index and its own carried state. They never look at
+    `feats`, which is what makes them controls for the budget alone.
+    """
+
+    def __init__(self, keep_rate):
+        assert 0 < keep_rate <= 1, f"keep_rate must be in (0, 1], got {keep_rate}"
+        self.keep_rate_target = keep_rate
+        self.reset()
+
+    def reset(self):
+        """Clear all carried state. Must be called between videos."""
+        self.n_kept = 0
+        self.n_seen = 0
+
+    @property
+    def keep_rate(self):
+        return self.n_kept / self.n_seen if self.n_seen else 1.0
+
+    @torch.inference_mode()
+    def __call__(self, feats):
+        assert feats.dim() == 3, f"expected (T, P, D), got {tuple(feats.shape)}"
+        T, P, D = feats.shape
+        kept_rows, counts = [], []
+        for t in range(T):
+            mask = self._mask(P, feats.device)
+            kept_rows.append(feats[t][mask])
+            counts.append(int(mask.sum()))
+        kept = torch.cat(kept_rows, dim=0) if kept_rows else feats.new_zeros((0, D))
+        self.n_kept += int(kept.shape[0])
+        self.n_seen += T * P
+        logger.debug(
+            f"[prune] chunk kept {kept.shape[0]}/{T * P} "
+            f"({100.0 * kept.shape[0] / max(T * P, 1):.1f}%), "
+            f"video-so-far {100.0 * self.keep_rate:.1f}%"
+        )
+        return kept, counts
+
+
+class UniformFramePruner(_RateTokenPruner):
+    """Baseline: uniform frame subsampling at a fixed token rate.
+
+    Keeps whole frames, evenly spaced, so that a fraction `keep_rate` of the frames (and so of
+    the tokens) survives. At keep_rate 0.074 and 1 fps that is about one frame every 13.5 s. An
+    accumulator, not `t % N`, sets the spacing, so a non-integer period gives the exact rate.
+    Frame 0 is always kept. Kept frames depend only on the frame index, so they are the
+    same at any chunking.
+
+    The frames are dropped after the vision tower, like every pruner here, so the encoder
+    still runs on all of them. Accuracy, prefill and KV numbers are comparable with rlt_*,
+    but encoder throughput is lower than it would be for a video that really was subsampled.
+    """
+
+    def reset(self):
+        super().reset()
+        self._acc = 1.0
+
+    def _mask(self, P, device):
+        keep = self._acc >= 1.0
+        if keep:
+            self._acc -= 1.0
+        self._acc += self.keep_rate_target
+        return torch.full((P,), keep, dtype=torch.bool, device=device)
+
+
+class RandomTokenPruner(_RateTokenPruner):
+    """Baseline: random token dropping at a fixed token rate.
+
+    Each frame keeps about `keep_rate * P` positions, drawn uniformly at random without
+    replacement. The fractional part carries over to the next frame, so the count alternates
+    (e.g. 14, 13, 14, … for 6.92% of 196) and the long-run rate is exact rather than
+    quantized to 1/P. A near-fixed count per frame rather than a per-token coin flip hits the
+    rate exactly and spreads the budget evenly over time. It is the control for *which*
+    tokens rlt_ref keeps, with how many held fixed. The generator is re-seeded on `reset()`,
+    so every video gets the same draws on every run and at any chunking.
+    """
+
+    def __init__(self, keep_rate, seed=0):
+        self.seed = seed
+        super().__init__(keep_rate)
+
+    def reset(self):
+        super().reset()
+        self._gen = torch.Generator().manual_seed(self.seed)
+        self._carry = 0.5   # round-half-up on the first frame
+
+    def _mask(self, P, device):
+        self._carry += self.keep_rate_target * P
+        k = min(int(self._carry), P)
+        self._carry -= k
+        # Drawn on CPU so the stream of draws does not depend on the device.
+        idx = torch.randperm(P, generator=self._gen)[:k]
+        mask = torch.zeros(P, dtype=torch.bool)
+        mask[idx] = True   # a boolean mask keeps survivors in raster order
+        return mask.to(device)
+
+
 # ---- method registry ---------------------------------------------------------------
 #
 # Anything registered here plugs in at the *KV-Cache boundary*: it sits between the
@@ -277,6 +377,8 @@ PRUNERS = {
     'rlt_ref': StreamingTokenPruner,       # diff against the last kept token (ours)
     'rlt_prev': ConsecutiveTokenPruner,    # diff against frame t-1 (published RLT)
     'rlt_frame': FrameTokenPruner,         # keep/drop whole frames, vs the last kept frame
+    'uniform_frame': UniformFramePruner,   # baseline: evenly spaced whole frames at a fixed rate
+    'random_token': RandomTokenPruner,     # baseline: random tokens per frame at a fixed rate
 }
 
 

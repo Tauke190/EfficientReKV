@@ -134,7 +134,8 @@ class VideoLlava_ReKV(VideoLlavaForConditionalGeneration, Abstract_ReKV):
 def load_model(model_path='model_zoo/Video-LLaVA-7B-hf', n_init=None, n_local=3084, topk=8, chunk_size=1,
                max_cached_block=128,
                prune_method=None, prune_threshold=None, prune_metric='cosine',
-               prune_refresh_every=0, prune_log_percentiles=False):
+               prune_refresh_every=0, prune_log_percentiles=False,
+               prune_keep_rate=None, prune_seed=0):
     """Load Video-LLaVA with ReKV, and optionally stage-2 (memory-side) token pruning.
 
     Stage 2 only. Stage 1 (model/vision_reduction.py) is a SigLIP implementation and does
@@ -181,6 +182,11 @@ def load_model(model_path='model_zoo/Video-LLaVA-7B-hf', n_init=None, n_local=30
             kwargs = dict(threshold=prune_threshold, metric=prune_metric,
                           refresh_every=prune_refresh_every,
                           log_percentiles=prune_log_percentiles)
+        elif prune_method in ('uniform_frame', 'random_token'):
+            assert prune_keep_rate is not None, f"{prune_method!r} pruning requires --prune_keep_rate"
+            kwargs = dict(keep_rate=prune_keep_rate)
+            if prune_method == 'random_token':
+                kwargs['seed'] = prune_seed
         else:
             kwargs = {}
         token_pruner = build_pruner(prune_method, **kwargs)

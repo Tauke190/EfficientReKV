@@ -164,7 +164,8 @@ class FlashVStream_ReKV(VStreamLlamaForCausalLM, Abstract_ReKV):
 def load_model(model_path='model_zoo/Flash-VStream-7b',
                n_init=None, n_local=3648, topk=16, chunk_size=1,
                prune_method=None, prune_threshold=None, prune_metric='cosine',
-               prune_refresh_every=0, prune_log_percentiles=False):
+               prune_refresh_every=0, prune_log_percentiles=False,
+               prune_keep_rate=None, prune_seed=0):
     """Load Flash-VStream with ReKV, and optionally stage-2 (memory-side) token pruning.
 
     Stage 2 only. Stage 1 (model/vision_reduction.py) is a SigLIP implementation and this
@@ -206,6 +207,11 @@ def load_model(model_path='model_zoo/Flash-VStream-7b',
             kwargs = dict(threshold=prune_threshold, metric=prune_metric,
                           refresh_every=prune_refresh_every,
                           log_percentiles=prune_log_percentiles)
+        elif prune_method in ('uniform_frame', 'random_token'):
+            assert prune_keep_rate is not None, f"{prune_method!r} pruning requires --prune_keep_rate"
+            kwargs = dict(keep_rate=prune_keep_rate)
+            if prune_method == 'random_token':
+                kwargs['seed'] = prune_seed
         else:
             kwargs = {}
         token_pruner = build_pruner(prune_method, **kwargs)

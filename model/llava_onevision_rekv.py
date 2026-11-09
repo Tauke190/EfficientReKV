@@ -188,6 +188,7 @@ def load_model(model_path='model_zoo/LLaVA/llava-onevision-qwen2-7b-ov-hf',
                n_init=None, n_local=None, topk=64, chunk_size=1,
                prune_method=None, prune_threshold=None, prune_metric='cosine',
                prune_refresh_every=0, prune_log_percentiles=False,
+               prune_keep_rate=None, prune_seed=0,
                vision_method=None, vision_threshold=None, vision_mask_space='embed',
                vision_metric='cosine', vision_refresh_every=0):
     """Load LLaVA-OneVision with ReKV, and optionally either or both reduction stages.
@@ -228,6 +229,11 @@ def load_model(model_path='model_zoo/LLaVA/llava-onevision-qwen2-7b-ov-hf',
             kwargs = dict(threshold=prune_threshold, metric=prune_metric,
                           refresh_every=prune_refresh_every,
                           log_percentiles=prune_log_percentiles)
+        elif prune_method in ('uniform_frame', 'random_token'):
+            assert prune_keep_rate is not None, f"{prune_method!r} pruning requires --prune_keep_rate"
+            kwargs = dict(keep_rate=prune_keep_rate)
+            if prune_method == 'random_token':
+                kwargs['seed'] = prune_seed
         else:
             kwargs = {}
         token_pruner = build_pruner(prune_method, **kwargs)

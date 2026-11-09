@@ -129,6 +129,10 @@ def reduction_tag(args):
         tag += f"-{method}"
         if args.prune_threshold is not None:
             tag += f"{args.prune_threshold:g}{args.prune_metric}"
+        if getattr(args, 'prune_keep_rate', None) is not None:
+            tag += f"{args.prune_keep_rate:g}"
+            if method == 'random_token':
+                tag += f"-s{args.prune_seed}"
         if args.prune_refresh_every:
             tag += f"-r{args.prune_refresh_every}"
         if args.prune_cache != 'adaptive':
@@ -193,6 +197,9 @@ def reduction_args(args):
             cmd += ["--prune_threshold", str(args.prune_threshold),
                     "--prune_metric", args.prune_metric,
                     "--prune_refresh_every", str(args.prune_refresh_every)]
+        if getattr(args, 'prune_keep_rate', None) is not None:
+            cmd += ["--prune_keep_rate", str(args.prune_keep_rate),
+                    "--prune_seed", str(args.prune_seed)]
     return cmd
 
 

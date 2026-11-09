@@ -251,7 +251,7 @@ def main():
             xs, ys = zip(*pts)
             ax.plot(xs, ys, "-", marker=marker, color=color, label=name,
                     markersize=7 if marker != "*" else 10, markeredgecolor="white",
-                    markeredgewidth=0.6, linewidth=2.0, zorder=3)
+                    markeredgewidth=0.6, linewidth=6.0, zorder=3)
         if blind is not None:
             # Not joined to the curve: blind is a separate control, not a pruning arm.
             blind_marker(ax, blind_x, blind, color,
@@ -290,7 +290,7 @@ def main():
     ax.tick_params(axis="both", labelsize=AXIS_FONT_SIZE)
     ax.margins(y=0.04)
     # No title: the caption carries "{MODEL} @ {SAMPLE_FPS} fps" in the paper.
-    ax.grid(color="#9e9e9e", alpha=0.55, linewidth=0.7, zorder=0)
+    ax.grid(color="black", alpha=1.0, linewidth=0.7, zorder=0)
     ax.legend(handles, labels, handler_map={tuple: HandlerTuple(ndivide=1, pad=0)},
               loc="lower center", bbox_to_anchor=(0.5, 1.0), ncol=3,
               fontsize=LEGEND_FONT_SIZE, columnspacing=0.8, handlelength=1.6, handletextpad=0.4,

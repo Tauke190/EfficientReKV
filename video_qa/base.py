@@ -555,6 +555,8 @@ def pruning_load_kwargs(args):
         prune_metric=args.prune_metric,
         prune_refresh_every=args.prune_refresh_every,
         prune_log_percentiles=getattr(args, 'prune_log_percentiles', False),
+        prune_keep_rate=getattr(args, 'prune_keep_rate', None),
+        prune_seed=getattr(args, 'prune_seed', 0),
     )
 
 

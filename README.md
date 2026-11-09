@@ -55,6 +55,13 @@ Notes:
 - **`--prune_method rlt_frame`**: `rlt_ref` with a per-frame decision. A frame is kept whole
   when more than half its tokens are over `--prune_threshold` against the last kept frame,
   and dropped whole otherwise. The ablation for deciding per token.
+- **`--prune_method uniform_frame|random_token --prune_keep_rate R`**: content-agnostic
+  baselines at a fixed token rate. `uniform_frame` keeps evenly spaced whole frames
+  (R = 0.07 at 1 fps ≈ 1 frame every 14 s). `random_token` keeps a random R of each frame's
+  tokens (`--prune_seed`, default 0). Set R to the matched rlt_ref arm's token-weighted
+  `token_keep_rate`; `sbatch scripts/eval/matched_baselines.slurm` does this for
+  StreamingBench. Tags: `-uniform_frame0.235`, `-random_token0.235-s0`. Like every
+  pruner, both drop tokens after the vision tower, so the encoder still sees every frame.
 - **`--prune_cache adaptive|pad`**: how pruned frames enter the KV-Cache. `adaptive` (default,
   CAC) packs the kept tokens into full blocks. `pad` is the no-CAC ablation: each frame is padded
   back to one full block by repeating its last kept token, so the cache layout is exactly

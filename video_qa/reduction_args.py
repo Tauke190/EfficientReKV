@@ -49,8 +49,8 @@ def add_reduction_args(parser):
     parser.add_argument("--prune_method", type=str, default='none',
                         help="Reduction method applied at the KV-Cache boundary; must be "
                              "registered in model/token_pruning.py (currently: rlt_ref, rlt_prev, "
-                             "rlt_frame). The "
-                             "--prune_* flags below are the hyperparameters of both.")
+                             "rlt_frame, and the fixed-rate baselines uniform_frame and "
+                             "random_token).")
     parser.add_argument("--prune_threshold", type=float, default=None,
                         help="Drop a visual token when its distance to the feature it "
                              "would reuse is below this. Calibrate with "
@@ -61,6 +61,12 @@ def add_reduction_args(parser):
                              "model/token_pruning.py).")
     parser.add_argument("--prune_refresh_every", type=int, default=0,
                         help="Force-keep every Nth frame to bound staleness. 0 = off.")
+    parser.add_argument("--prune_keep_rate", type=float, default=None,
+                        help="Target fraction of tokens kept, for uniform_frame and "
+                             "random_token only. Set it to the token_keep_rate of the rlt_ref "
+                             "run you are comparing against.")
+    parser.add_argument("--prune_seed", type=int, default=0,
+                        help="RNG seed for random_token.")
     parser.add_argument("--prune_cache", type=str, default='adaptive',
                         choices=['adaptive', 'pad'],
                         help="How pruned frames enter the KV-Cache. 'adaptive' (CAC) packs "
