@@ -57,6 +57,13 @@ class Abstract_ReKV:
         self._n_tokens_fed = 0         # video tokens handed to the LM so far
         self._last_token = None        # (1, D) last token fed, pads frames with no survivors ("pad")
         self.last_retrieved_blocks = None  # blocks the last question retrieved (per layer)
+        # Freshness audit (see `freshness_snapshot`). `frame_kept_counts` is what the
+        # pruner kept per frame, before "pad" mode or the question-time flush pad it --
+        # `frame_token_counts` cannot answer "did the newest frame keep anything?" once
+        # padding has been charged to it.
+        self.frame_kept_counts = []
+        self.last_freshness = None     # snapshot taken by the last flush_stream()
+        self._ingested_since_flush = False
 
     def clear_cache(self):
         self.kv_cache = None
@@ -123,14 +130,17 @@ class Abstract_ReKV:
         if self.token_pruner is not None:
             feats = video_features.view(n_frames, self.n_frame_tokens, D)
             kept, counts = self.token_pruner(feats)     # (N, D), list[int]
+            self.frame_kept_counts.extend(int(c) for c in counts)
             if self.prune_cache == "pad":
                 kept = self._pad_frames(kept, counts)
                 counts = [self.n_frame_tokens] * n_frames
             video_features = kept.unsqueeze(0)          # (1, N, D)
         else:
             counts = [self.n_frame_tokens] * n_frames
+            self.frame_kept_counts.extend(counts)
 
         self.frame_token_counts.extend(counts)
+        self._ingested_since_flush = True
 
         if self._pending_embeds is not None:
             video_features = torch.cat([self._pending_embeds, video_features], dim=1)
@@ -170,8 +180,89 @@ class Abstract_ReKV:
 
         Not called per frame on purpose: that would pad every frame up to a full block and
         undo the pruning entirely.
+
+        Also takes the freshness snapshot for this question, *before* flushing, since the
+        pending tail is exactly what the snapshot is about. Only when frames arrived since
+        the previous flush: a solver that asks several questions at one timestamp
+        (FPS-Bench-Stream's K binaries) would otherwise overwrite the real snapshot with one
+        that sees nothing pending.
         """
+        if self._ingested_since_flush:
+            self.last_freshness = self.freshness_snapshot()
+            self._ingested_since_flush = False
         self._flush_pending()
+
+    # Recent-window lengths, in frames, for `freshness_snapshot`. The model does not know
+    # the sample rate, so the solver converts seconds to frames and sets this
+    # (BaseVQA.__init__); the default is for a caller that never does.
+    freshness_windows = {'1f': 1, '5f': 5, '10f': 10}
+
+    def freshness_snapshot(self):
+        """How fresh memory is at the moment a question arrives, before the flush.
+
+        Answers the reviewer's "CAC discards the latest frames for real-time queries" on
+        two separate counts, which is why the fields split in two:
+
+        Pending (CAC's held-back tail, what the flush fixes):
+          pending_tokens       tokens waiting for a full block when the question came
+          block_age_frames     frames between the query frame and the newest frame whose
+                               memory was already committed -- how stale the cache would
+                               be if the question did not flush. Equals the number of
+                               trailing frames with a token still pending.
+          flush_pad_tokens     padding the flush adds to complete that block
+
+        Retained (the pruner's choice, which no flush can undo):
+          kept_age_frames      frames between the query frame and the newest frame that
+                               kept >= 1 token of its own; 0 = the query frame itself
+          recent_<w>_frames_with_tokens / _keep_rate
+                               over the last w frames: share of frames that kept anything,
+                               and tokens kept / tokens seen
+          local_span_frames    trailing frames whose tokens fit in the n_local window,
+                               i.e. are attended directly at true positions, never via
+                               retrieval
+
+        Ages are in frames; BaseVQA.reduction_stats converts them to seconds.
+        """
+        kept = self.frame_kept_counts
+        n = len(kept)
+        if n == 0:
+            return {}
+        query = n - 1
+        counts = np.asarray(self.frame_token_counts, dtype=np.int64)
+        ends = np.cumsum(counts)
+        committed = self._n_tokens_fed
+        pending = 0 if self._pending_embeds is None else int(self._pending_embeds.shape[1])
+
+        # A frame is committed once all its tokens are fed. A zero-token frame is carried
+        # by the token before it, so `ends <= committed` covers that case too.
+        done = np.nonzero(ends <= committed)[0]
+        last_committed = int(done[-1]) if len(done) else -1
+        newest_kept = next((f for f in range(query, -1, -1) if kept[f] > 0), -1)
+
+        snap = {
+            'n_frames': n,
+            'pending_tokens': pending,
+            'block_age_frames': int(query - last_committed),
+            'flush_pad_tokens': (self.block_size - pending) if pending else 0,
+            'kept_age_frames': int(query - newest_kept),
+        }
+        P = self.n_frame_tokens
+        for name, w in self.freshness_windows.items():
+            tail = kept[-w:]
+            snap[f'recent_{name}_frames_with_tokens'] = round(
+                sum(1 for c in tail if c > 0) / len(tail), 4)
+            snap[f'recent_{name}_keep_rate'] = round(sum(tail) / (len(tail) * P), 4)
+
+        # Trailing frames inside the local window, counting the pending tail as it will be
+        # once flushed (the question attends after the flush).
+        budget, span = self.n_local, 0
+        for c in reversed(self.frame_token_counts):
+            if c > budget:
+                break
+            budget -= c
+            span += 1
+        snap['local_span_frames'] = span
+        return snap
 
     def _flush_pending(self):
         """Feed the final partial block, padded up to block_size.

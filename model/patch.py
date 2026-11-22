@@ -149,7 +149,9 @@ def patch_hf(
         raise ValueError(f"Only supports llama, mistral and qwen2 models, not {model.__class__.__name__}.")
 
     hf_rope = model.model.layers[0].self_attn.rotary_emb 
-    if isinstance(hf_rope, Qwen2RotaryEmbedding):
+    # Older Qwen2RotaryEmbedding stores base/dim; transformers 4.45.2 builds it from the
+    # config instead, so those fall through to the config branch (same values).
+    if isinstance(hf_rope, Qwen2RotaryEmbedding) and hasattr(hf_rope, 'base'):
         base = hf_rope.base
         distance_scale = 1.0
         dim = hf_rope.dim

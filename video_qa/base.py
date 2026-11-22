@@ -62,7 +62,11 @@ MODELS = {
         'load_func': llava_onevision_rekv.load_model,
         'model_class': LlavaOnevisionForConditionalGeneration,
         'processor_class': LlavaOnevisionProcessor,
-        'model_path': 'model_zoo/llava-onevision-qwen2-7b-ov-hf',
+        # The workstation keeps 7B on /mnt/SSD2 (its root disk is full); the cluster has it
+        # under model_zoo/. Prefer the repo copy when present so cluster runs are unchanged.
+        'model_path': ('model_zoo/llava-onevision-qwen2-7b-ov-hf'
+                       if os.path.isdir('model_zoo/llava-onevision-qwen2-7b-ov-hf')
+                       else '/mnt/SSD2/av354855/model_zoo/llava-onevision-qwen2-7b-ov-hf'),
     },
     'llava_ov_72b': {
         'load_func': llava_onevision_rekv.load_model,
@@ -264,6 +268,12 @@ class BaseVQA:
 
         self.qa_model = qa_model
         self.qa_processor = qa_processor
+        # Freshness audit windows (model.freshness_snapshot), in seconds of stream time,
+        # converted to frames at this run's rate. Instance attribute, so a model without
+        # the audit (or a stub) is left alone.
+        if hasattr(qa_model, 'freshness_snapshot'):
+            qa_model.freshness_windows = {
+                f'{s}s': max(1, int(round(s * sample_fps))) for s in (1, 5, 10)}
 
         # Retrieval Hyperparams
         assert chunk_size <= retrieve_size, f'chunk_size: {chunk_size}, retrieve_size: {retrieve_size}'
@@ -412,6 +422,16 @@ class BaseVQA:
             stats['num_blocks'] = getattr(model, 'num_blocks', None)
             stats['n_local'] = getattr(model, 'n_local', None)
             stats['kv_cache_bytes'] = model.calc_memory_usage()
+
+        # Freshness audit, from the snapshot the last question's flush took. Recorded for
+        # baselines too: "accuracy vs age" needs the unpruned run on the same axis, where
+        # kept_age is always 0 and nothing is ever pending.
+        fresh = getattr(model, 'last_freshness', None)
+        if fresh:
+            for k, v in fresh.items():
+                stats[f'fresh_{k}'] = v
+            for k in ('block_age', 'kept_age'):
+                stats[f'fresh_{k}_s'] = round(fresh[f'{k}_frames'] / self.sample_fps, 3)
         return stats
 
     def video_open_qa(self, question, max_new_tokens=1024):
@@ -521,7 +541,7 @@ def log_host_memory(chunk_idx, done, video_id):
     except OSError:
         pass
     pinned_gb = None
-    if torch.cuda.is_available():
+    if torch.cuda.is_available() and hasattr(torch.cuda, 'host_memory_stats'):  # torch >= 2.7
         stats = torch.cuda.host_memory_stats()
         if 'reserved_bytes.current' in stats:
             pinned_gb = stats['reserved_bytes.current'] / 1024 ** 3

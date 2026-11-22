@@ -50,7 +50,9 @@ import pandas as pd
 # parse a flag without importing a backend. Mirrors MODELS in video_qa/base.py.
 MODEL_PATHS = {
     'llava_ov_0.5b': 'model_zoo/llava-onevision-qwen2-0.5b-ov-hf',
-    'llava_ov_7b': 'model_zoo/llava-onevision-qwen2-7b-ov-hf',
+    'llava_ov_7b': ('model_zoo/llava-onevision-qwen2-7b-ov-hf'
+                    if os.path.isdir('model_zoo/llava-onevision-qwen2-7b-ov-hf')
+                    else '/mnt/SSD2/av354855/model_zoo/llava-onevision-qwen2-7b-ov-hf'),
     'llava_ov_72b': 'model_zoo/llava-onevision-qwen2-72b-ov-hf',
     'video_llava_7b': 'model_zoo/Video-LLaVA-7B-hf',
     'longva_7b': 'model_zoo/LongVA-7B',

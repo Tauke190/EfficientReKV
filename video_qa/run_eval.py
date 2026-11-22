@@ -137,6 +137,10 @@ def reduction_tag(args):
             tag += f"-r{args.prune_refresh_every}"
         if args.prune_cache != 'adaptive':
             tag += f"-{args.prune_cache}"
+    # Free-form suffix, so a re-run (e.g. for new logging columns) lands beside the run it
+    # repeats instead of overwriting it.
+    if getattr(args, 'save_tag', None):
+        tag += f"-{args.save_tag}"
     return tag
 
 
@@ -442,7 +446,7 @@ def eval_ovobench(args, mode):
     blind_tag = "-blind" if args.blind else ""
     save_dir = f"results/{args.model}/ovobench_{mode}/{args.retrieve_size}-{args.sample_fps}{reduction_tag(args)}{blind_tag}"
     solver = "blind_vqa" if args.blind else "rekv_ovobench_vqa"
-    anno_path = f"data/ovo_bench/{mode}.json"
+    anno_path = args.anno_path or f"data/ovo_bench/{mode}.json"
     if not args.only_eval:
         # QA
         processes = []
@@ -1020,8 +1024,11 @@ if __name__ == "__main__":
                              "does. That is a harder, different task -- the questions are "
                              "written as a conversation -- so its numbers are not "
                              "comparable to published Sequential-QA scores.")
+    parser.add_argument("--save_tag", type=str, default=None,
+                        help="Suffix appended to the results directory, so a re-run does "
+                             "not overwrite the run it repeats, e.g. --save_tag fresh.")
     parser.add_argument("--anno_path", type=str, default=None,
-                        help="fpsbench_stream: annotation file to "
+                        help="fpsbench_stream / ovobench_*: annotation file to "
                              "run against, overriding the dataset default. For a subset "
                              "built with convert_fpsbench_stream.py --limit/--position_bin, "
                              "or for the keyed FPSBench file that local scoring needs.")
