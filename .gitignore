@@ -22,6 +22,8 @@ ENV/
 # =========================
 # Machine Learning Datasets
 # =========================
+# data/ is machine-local (a symlink on the workstation, a real folder on HPC).
+/data
 /data/*
 !/data/fpsbench_stream/
 /data/fpsbench_stream/*
