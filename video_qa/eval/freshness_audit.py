@@ -19,6 +19,9 @@ Usage:
     --by task          also break accuracy-by-age down per column value (e.g. task)
     --bins 0,1,3,10    kept-age bin edges in seconds (last bin is open-ended)
     --out audit.csv    also write the accuracy-by-age table, for the figure later
+    --baseline CSV     unpruned run on the same questions (matched by question_id): adds
+                       its accuracy on each kept-age bin, so a drop in the stale bins can
+                       be told apart from those questions simply being harder
 
 Runs from before the audit was added have no `fresh_*` columns; they are reported as such
 and skipped, so re-run them to get the numbers.
@@ -52,7 +55,7 @@ def age_bins(df, edges):
     return cut
 
 
-def audit(path, edges, by):
+def audit(path, edges, by, base=None):
     df = pd.read_csv(path)
     name = run_name(path)
     print(f'\n=== {name}  ({len(df)} questions)')
@@ -89,13 +92,31 @@ def audit(path, edges, by):
         return None
     df = df.assign(age_bin=age_bins(df, edges))
     groups = ['age_bin'] + ([by] if by and by in df.columns else [])
-    tab = (df.groupby(groups, observed=True)['qa_acc']
-             .agg(n='size', acc='mean').reset_index())
-    print('  [4] accuracy by kept age')
-    print(f'      overall acc {df["qa_acc"].mean():.2f}')
+    paired = False
+    if base is not None and 'question_id' in df.columns:
+        df = df.assign(question_id=df['question_id'].astype(str)).merge(
+            base, on='question_id', how='left')
+        paired = df['base_acc'].notna().any()
+        n_miss = int(df['base_acc'].isna().sum())
+        if n_miss:
+            print(f'  (baseline missing for {n_miss} questions; they count only in acc)')
+    agg = {'n': ('qa_acc', 'size'), 'acc': ('qa_acc', 'mean')}
+    if paired:
+        agg['base_acc'] = ('base_acc', 'mean')
+    tab = df.groupby(groups, observed=True).agg(**agg).reset_index()
+    if paired:
+        tab['delta'] = tab['acc'] - tab['base_acc']
+    print('  [4] accuracy by kept age' + ('  (base = unpruned, same questions)' if paired else ''))
+    line = f'      overall acc {df["qa_acc"].mean():.2f}'
+    if paired:
+        line += f'   base {df["base_acc"].mean():.2f}'
+    print(line)
     for _, r in tab.iterrows():
         key = '  '.join(str(r[g]) for g in groups)
-        print(f'      {key:<32} n={int(r["n"]):5d}  acc={r["acc"]:6.2f}')
+        line = f'      {key:<32} n={int(r["n"]):5d}  acc={r["acc"]:6.2f}'
+        if paired:
+            line += f'  base={r["base_acc"]:6.2f}  delta={r["delta"]:+6.2f}'
+        print(line)
     tab.insert(0, 'run', name)
     return tab
 
@@ -107,10 +128,18 @@ def main():
                     help='kept-age bin edges in seconds, ascending; last bin is open')
     ap.add_argument('--by', default=None, help='extra column to split accuracy by, e.g. task')
     ap.add_argument('--out', default=None, help='write the accuracy-by-age table here')
+    ap.add_argument('--baseline', default=None,
+                    help='unpruned results.csv on the same questions, matched by question_id')
     args = ap.parse_args()
 
+    base = None
+    if args.baseline:
+        b = pd.read_csv(args.baseline)
+        base = (b.assign(question_id=b['question_id'].astype(str))
+                 .groupby('question_id', as_index=False)['qa_acc'].mean()
+                 .rename(columns={'qa_acc': 'base_acc'}))
     edges = [float(x) for x in args.bins.split(',')]
-    tabs = [t for t in (audit(p, edges, args.by) for p in args.csvs) if t is not None]
+    tabs = [t for t in (audit(p, edges, args.by, base) for p in args.csvs) if t is not None]
     if args.out and tabs:
         pd.concat(tabs, ignore_index=True).to_csv(args.out, index=False)
         print(f'\nwrote {args.out}')
