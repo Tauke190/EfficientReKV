@@ -55,8 +55,32 @@ def age_bins(df, edges):
     return cut
 
 
-def audit(path, edges, by, base=None):
+def load_results(path):
+    """results.csv, with `qa_acc` filled from the judge cache for open-ended runs.
+
+    Multiple-choice solvers write qa_acc (0/100) themselves. Open-ended ones (StreamBench)
+    do not: the LLM judge's verdicts live in tmp_*.jsonl next to results.csv, keyed per
+    row. Reuse eval_streambench's own join so the two can never disagree; unscored rows
+    get NaN and drop out of the means.
+    """
     df = pd.read_csv(path)
+    if 'qa_acc' in df.columns:
+        return df
+    save_dir = os.path.dirname(path) or '.'
+    if not any(f.startswith('tmp') and f.endswith('.jsonl') for f in os.listdir(save_dir)):
+        return df
+    import eval_streambench as esb   # sibling module; this file runs from video_qa/eval/
+    keys = esb.judge_keys(df)
+    verdicts = esb.load_verdicts(esb.find_cache_dir(save_dir), keys)
+    df['qa_acc'] = [(100.0 if verdicts[k]['pred'] == 'yes' else 0.0) if k in verdicts
+                    else np.nan for k in keys]
+    print(f'  ({os.path.basename(save_dir)}: qa_acc from judge cache, '
+          f'{len(verdicts)}/{len(keys)} rows scored)')
+    return df
+
+
+def audit(path, edges, by, base=None):
+    df = load_results(path)
     name = run_name(path)
     print(f'\n=== {name}  ({len(df)} questions)')
     if 'fresh_pending_tokens' not in df.columns:
@@ -134,10 +158,14 @@ def main():
 
     base = None
     if args.baseline:
-        b = pd.read_csv(args.baseline)
-        base = (b.assign(question_id=b['question_id'].astype(str))
-                 .groupby('question_id', as_index=False)['qa_acc'].mean()
-                 .rename(columns={'qa_acc': 'base_acc'}))
+        b = load_results(args.baseline)
+        if 'qa_acc' not in b.columns:
+            print(f'WARNING: {args.baseline} has no qa_acc and no judge cache; '
+                  f'auditing without the paired control')
+        else:
+            base = (b.assign(question_id=b['question_id'].astype(str))
+                     .groupby('question_id', as_index=False)['qa_acc'].mean()
+                     .rename(columns={'qa_acc': 'base_acc'}))
     edges = [float(x) for x in args.bins.split(',')]
     tabs = [t for t in (audit(p, edges, args.by, base) for p in args.csvs) if t is not None]
     if args.out and tabs:

@@ -1,0 +1,67 @@
+{
+  "per_class": {
+    "SF": {
+      "accuracy": 61.26,
+      "score": 3.199,
+      "n": 302,
+      "name": "Simple Factual"
+    },
+    "OS": {
+      "accuracy": 38.13,
+      "score": 2.241,
+      "n": 299,
+      "name": "Object Search"
+    },
+    "SM": {
+      "accuracy": 54.28,
+      "score": 2.826,
+      "n": 339,
+      "name": "Short-term Memory Search"
+    },
+    "LM": {
+      "accuracy": 54.46,
+      "score": 2.848,
+      "n": 303,
+      "name": "Long-term Memory Search"
+    },
+    "CI": {
+      "accuracy": 64.65,
+      "score": 3.384,
+      "n": 297,
+      "name": "Conversational Interaction"
+    },
+    "KG": {
+      "accuracy": 77.18,
+      "score": 3.785,
+      "n": 298,
+      "name": "Knowledge-based QA (answerable blind)"
+    }
+  },
+  "per_source": {
+    "Ego": {
+      "accuracy": 63.27,
+      "score": 3.304,
+      "n": 599
+    },
+    "Movie": {
+      "accuracy": 52.45,
+      "score": 2.775,
+      "n": 204
+    },
+    "WebVideo": {
+      "accuracy": 56.43,
+      "score": 2.942,
+      "n": 1035
+    }
+  },
+  "micro_average": 58.22,
+  "macro_average": 58.33,
+  "macro_average_no_kg": 54.56,
+  "mean_score": 3.041,
+  "n_questions": 1838,
+  "n_scored": 1838,
+  "n_unscored": 0,
+  "judge_cache": "tmp_local_streambench.jsonl",
+  "judge": "streambench:meta-llama/Meta-Llama-3-8B-Instruct",
+  "blind": false
+}

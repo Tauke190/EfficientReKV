@@ -41,7 +41,7 @@ export PYTHONPATH="$(pwd)${PYTHONPATH:+:${PYTHONPATH}}"
 
 num_chunks="${NUM_CHUNKS:-${SLURM_GPUS_ON_NODE:-2}}"   # one process per GPU
 models="${MODELS:-llava_ov_7b}"
-datasets="${DATASETS:-streamingbench_real}"   # also: ovobench_realtime
+datasets="${DATASETS:-streambench}"   # also: streamingbench_real ovobench_realtime (re-download data/ first)
 arms="${ARMS:-0.5 0.8}"                       # RLT thresholds; add "baseline" if needed
 fps="${FPS:-1}"
 fps_dir=$(python -c "print(float('${fps}'))")   # run_eval names dirs with the float, e.g. 1.0
