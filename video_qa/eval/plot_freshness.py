@@ -208,14 +208,12 @@ def fig_main(data, out_dir, summary):
             n, acc, base = len(sub), sub['qa_acc'].mean(), sub['base_acc'].mean()
             summary.append(dict(tau=tau, binned_by='query_frame', bin=gname, n=n,
                                 acc=acc, base_acc=base))
-            if n >= MIN_N:
-                ax.bar(x - w / 2, base, w * 0.92, color=BASE_C)
-                ax.bar(x + w / 2, acc, w * 0.92, color=SERIES[i])
-                ax.text(x + w / 2, acc + 1.5, f'{acc - base:+.1f}', ha='center',
-                        fontsize=7.5, color=INK)
-            else:
-                ax.bar(x, 8, w * 1.84, color='none', edgecolor=GRID, lw=0.8, ls='--')
-                ax.text(x, 10, 'too few', ha='center', fontsize=7, color=INK2)
+            # Small groups are drawn faded: shown, but not to be read as a result.
+            alpha = 1.0 if n >= MIN_N else 0.35
+            ax.bar(x - w / 2, base, w * 0.92, color=BASE_C, alpha=alpha)
+            ax.bar(x + w / 2, acc, w * 0.92, color=SERIES[i], alpha=alpha)
+            ax.text(x + w / 2, acc + 1.5, f'{acc - base:+.1f}', ha='center',
+                    fontsize=7.5, color=INK if n >= MIN_N else INK2)
             ticks.append(x)
             labels.append(f'{gname}\nn={n}')
             x += 1
@@ -226,7 +224,7 @@ def fig_main(data, out_dir, summary):
         mid = (ticks[2 * i] + ticks[2 * i + 1]) / 2
         ax.text(mid, -0.30, f'τ = {tau}', transform=ax.get_xaxis_transform(),
                 ha='center', fontsize=8.5, color=INK)
-    ax.set_ylim(0, 80)
+    ax.set_ylim(0, 90)
     ax.set_ylabel('accuracy (%)')
     ax.grid(axis='x', visible=False)
     from matplotlib.patches import Patch
