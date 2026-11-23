@@ -236,6 +236,31 @@ def fig_main(data, out_dir, summary):
     save(fig, out_dir, 'fig_freshness_main')
 
 
+def fig_lag_cdf(data, out_dir):
+    """Single-column figure (CVPR column = 3.25 in): CDF of the memory lag a query would
+    see without the query-time flush, i.e. block age. 12 pt text, medians marked."""
+    with plt.rc_context({'font.size': 12, 'axes.labelsize': 12, 'xtick.labelsize': 11,
+                         'ytick.labelsize': 11, 'legend.fontsize': 11}):
+        fig, ax = plt.subplots(figsize=(3.3, 2.6))
+        for i, (tau, df) in enumerate(data.items()):
+            age = df['fresh_block_age_s']
+            ecdf(ax, age, SERIES[i], f'τ = {tau}')
+            med = age.median()
+            ax.plot([med], [0.5], 'o', ms=6, color=SERIES[i], mec='white', mew=1.2,
+                    zorder=5)
+            ax.annotate(f'{med:.0f} s', (med, 0.5), xytext=(7, -17),
+                        textcoords='offset points', fontsize=11, color=INK)
+        ax.set_xlim(0, 90)
+        ax.set_xticks([0, 30, 60, 90])
+        ax.set_ylim(0, 1.02)
+        ax.set_yticks([0, 0.5, 1])
+        ax.set_yticklabels(['0', '50%', '100%'])
+        ax.set_xlabel('Memory lag without flush (s)')
+        ax.set_ylabel('Cumulative queries')
+        ax.legend(loc='lower right', handlelength=1.2)
+        save(fig, out_dir, 'fig_lag_cdf')
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split('\n')[0])
     ap.add_argument('--run', action='append', required=True,
@@ -248,6 +273,7 @@ def main():
     data = load(runs, args.baseline)
     summary = []
     fig_main(data, args.out_dir, summary)
+    fig_lag_cdf(data, args.out_dir)
     fig_cdf(data, args.out_dir)
     fig_acc(data, args.out_dir, summary)
     fig_pending(data, args.out_dir, summary)
