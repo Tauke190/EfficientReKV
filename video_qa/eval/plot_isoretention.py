@@ -1,4 +1,4 @@
-"""Iso-retention figure: accuracy vs token keep rate, token-level vs frame-level pruning.
+"""Iso-retention figure: accuracy vs token keep rate for the three RLT variants.
 
 Single CVPR column (3.3 in), 12 pt text. Keep rate is the pooled tokens_kept/tokens_seen
 of each run; accuracy is the StreamBench judge micro-average from streambench_scores.json.
@@ -14,12 +14,16 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import pandas as pd
 
-BLUE, ORANGE, BASE_C = '#2a78d6', '#eb6834', '#9a9893'
+BLUE, ORANGE, GREEN, BASE_C = '#2a78d6', '#eb6834', '#1baf7a', '#9a9893'
 INK, INK2, GRID = '#0b0b0b', '#52514e', '#e4e3df'
 
 METHODS = [  # (label, colour, run suffixes from low to high keep rate)
-    ('Token (ours)', BLUE, ['rlt_ref0.7cosine', 'rlt_ref0.6cosine', 'rlt_ref0.5cosine']),
-    ('Frame', ORANGE, ['rlt_frame0.52cosine', 'rlt_frame0.49cosine', 'rlt_frame0.44cosine']),
+    ('Ours: vs. last kept token', BLUE,
+     ['rlt_ref0.7cosine', 'rlt_ref0.6cosine', 'rlt_ref0.5cosine']),
+    ('Token vs. previous frame', GREEN,
+     ['rlt_prev0.66cosine', 'rlt_prev0.57cosine', 'rlt_prev0.47cosine']),
+    ('Whole-frame selection', ORANGE,
+     ['rlt_frame0.52cosine', 'rlt_frame0.49cosine', 'rlt_frame0.44cosine']),
 ]
 
 
@@ -56,27 +60,17 @@ def main():
 
     for lab, col, _ in METHODS:
         x, y = zip(*pts[lab])
-        ax.plot(x, y, '-o', color=col, lw=2, ms=7, mec='white', mew=1.3, zorder=3)
-    # direct labels at the low-budget end, where the lines are furthest apart
-    (xt, yt), (xf, yf) = pts['Token (ours)'][0], pts['Frame'][0]
-    ax.text(6.3, 63.6, 'Token (ours)', color=BLUE, fontsize=11, va='bottom')
-    ax.text(xf * 1.08, yf - 0.3, 'Frame', color=ORANGE, fontsize=11, va='center')
-
-    # gap brackets at the two budgets where the methods split
-    for i, (shift, side) in enumerate([(0.86, 'right'), (1.12, 'left')]):
-        (x1, y1), (x2, y2) = pts['Token (ours)'][i], pts['Frame'][i]
-        xm = (x1 + x2) / 2 * shift
-        ax.annotate('', (xm, y1), (xm, y2),
-                    arrowprops=dict(arrowstyle='<->', color=INK, lw=1, shrinkA=0, shrinkB=0))
-        ax.text(xm * (0.97 if side == 'right' else 1.03), (y1 + y2) / 2, f'+{y1 - y2:.1f}',
-                ha=side, va='center', fontsize=11, color=INK)
+        ax.plot(x, y, '-o', color=col, lw=2, ms=7, mec='white', mew=1.3,
+                zorder=5 if col == BLUE else 3, label=lab)
+    ax.legend(loc='lower left', bbox_to_anchor=(-0.02, 1.0), frameon=False, fontsize=11,
+              handlelength=1.4, borderaxespad=0, labelspacing=0.25)
 
     ax.set_xscale('log')
     ax.set_xlim(6, 33)
     ax.set_xticks([8, 16, 28])
     ax.set_xticklabels(['8', '16', '28'])
     ax.minorticks_off()
-    ax.set_ylim(53, 68)
+    ax.set_ylim(53.5, 67)
     ax.set_yticks([55, 60, 65])
     ax.set_xlabel('Tokens kept (%)')
     ax.set_ylabel('Accuracy (%)')
