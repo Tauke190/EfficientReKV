@@ -18,11 +18,11 @@ BLUE, ORANGE, GREEN, BASE_C = '#2a78d6', '#eb6834', '#1baf7a', '#9a9893'
 INK, INK2, GRID = '#0b0b0b', '#52514e', '#e4e3df'
 
 METHODS = [  # (label, colour, run suffixes from low to high keep rate)
-    ('Ours: vs. last kept token', BLUE,
+    ('Ours', BLUE,
      ['rlt_ref0.7cosine', 'rlt_ref0.6cosine', 'rlt_ref0.5cosine']),
-    ('Token vs. previous frame', GREEN,
+    ('Prev', GREEN,
      ['rlt_prev0.66cosine', 'rlt_prev0.57cosine', 'rlt_prev0.47cosine']),
-    ('Whole-frame selection', ORANGE,
+    ('Frame', ORANGE,
      ['rlt_frame0.52cosine', 'rlt_frame0.49cosine', 'rlt_frame0.44cosine']),
 ]
 
@@ -62,8 +62,8 @@ def main():
         x, y = zip(*pts[lab])
         ax.plot(x, y, '-o', color=col, lw=2, ms=7, mec='white', mew=1.3,
                 zorder=5 if col == BLUE else 3, label=lab)
-    ax.legend(loc='lower left', bbox_to_anchor=(-0.02, 1.0), frameon=False, fontsize=11,
-              handlelength=1.4, borderaxespad=0, labelspacing=0.25)
+    ax.legend(loc='lower right', frameon=False, fontsize=11, handlelength=1.4,
+              borderaxespad=0.3, labelspacing=0.25)
 
     ax.set_xscale('log')
     ax.set_xlim(6, 33)
