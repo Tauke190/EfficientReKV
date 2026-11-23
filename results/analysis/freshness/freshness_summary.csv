@@ -1,4 +1,8 @@
 tau,binned_by,bin,n,acc,base_acc,tail_frames,tail_tokens_seen,retained_pending,discarded
+0.5,query_frame,visible,1829,64.95352651722253,65.82832148715146,,,,
+0.5,query_frame,dropped,9,77.77777777777777,66.66666666666667,,,,
+0.8,query_frame,visible,1737,58.606793321819225,66.090961427749,,,,
+0.8,query_frame,dropped,101,51.48514851485149,61.386138613861384,,,,
 0.5,fresh_block_age_s,0–2 s,508,60.43307086614173,62.40157480314961,,,,
 0.5,fresh_block_age_s,2–5 s,1014,67.45562130177515,68.34319526627219,,,,
 0.5,fresh_block_age_s,>5 s,316,64.55696202531645,63.29113924050633,,,,

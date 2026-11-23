@@ -189,6 +189,55 @@ def fig_pending(data, out_dir, summary):
     save(fig, out_dir, 'fig_pending_vs_discarded')
 
 
+def fig_main(data, out_dir, summary):
+    """Main-text figure: accuracy split by whether the query frame kept any token.
+
+    Small groups (n < MIN_N) are drawn as an empty outline with only their n, so a
+    handful of questions cannot read as a result.
+    """
+    MIN_N = 30
+    taus = list(data)
+    groups = [('visible', True), ('dropped', False)]
+    fig, ax = plt.subplots(figsize=(4.2, 2.6))
+    w, x = 0.36, 0
+    ticks, labels = [], []
+    for i, tau in enumerate(taus):
+        df = data[tau].dropna(subset=['qa_acc'])
+        for gname, flag in groups:
+            sub = df[(df['fresh_kept_age_frames'] == 0) == flag]
+            n, acc, base = len(sub), sub['qa_acc'].mean(), sub['base_acc'].mean()
+            summary.append(dict(tau=tau, binned_by='query_frame', bin=gname, n=n,
+                                acc=acc, base_acc=base))
+            if n >= MIN_N:
+                ax.bar(x - w / 2, base, w * 0.92, color=BASE_C)
+                ax.bar(x + w / 2, acc, w * 0.92, color=SERIES[i])
+                ax.text(x + w / 2, acc + 1.5, f'{acc - base:+.1f}', ha='center',
+                        fontsize=7.5, color=INK)
+            else:
+                ax.bar(x, 8, w * 1.84, color='none', edgecolor=GRID, lw=0.8, ls='--')
+                ax.text(x, 10, 'too few', ha='center', fontsize=7, color=INK2)
+            ticks.append(x)
+            labels.append(f'{gname}\nn={n}')
+            x += 1
+        x += 0.5
+    ax.set_xticks(ticks)
+    ax.set_xticklabels(labels, fontsize=7.5)
+    for i, tau in enumerate(taus):
+        mid = (ticks[2 * i] + ticks[2 * i + 1]) / 2
+        ax.text(mid, -0.30, f'τ = {tau}', transform=ax.get_xaxis_transform(),
+                ha='center', fontsize=8.5, color=INK)
+    ax.set_ylim(0, 80)
+    ax.set_ylabel('accuracy (%)')
+    ax.grid(axis='x', visible=False)
+    from matplotlib.patches import Patch
+    ax.legend(handles=[Patch(color=BASE_C, label='unpruned'),
+                       *[Patch(color=SERIES[i], label=f'pruned, τ = {t}')
+                         for i, t in enumerate(taus)]],
+              loc='lower center', bbox_to_anchor=(0.5, 1.0), ncol=len(taus) + 1,
+              fontsize=7)
+    save(fig, out_dir, 'fig_freshness_main')
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split('\n')[0])
     ap.add_argument('--run', action='append', required=True,
@@ -200,6 +249,7 @@ def main():
     runs = [tuple(r.split('=', 1)) for r in args.run]
     data = load(runs, args.baseline)
     summary = []
+    fig_main(data, args.out_dir, summary)
     fig_cdf(data, args.out_dir)
     fig_acc(data, args.out_dir, summary)
     fig_pending(data, args.out_dir, summary)
