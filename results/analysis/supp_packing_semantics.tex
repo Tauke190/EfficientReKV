@@ -1,0 +1,129 @@
+% Supplementary: exact semantics of TTS + CAC on ReKV (LLaVA-OneVision-7B).
+% Requires \usepackage{booktabs} (included in the CVPR template).
+
+\section{Implementation and Semantics of Cross-Frame Token Packing}
+\label{sec:supp_semantics}
+
+This section specifies exactly what the language model (LM) receives and attends to
+when TTS prunes tokens and CAC packs the survivors into blocks. Unless noted, every
+statement applies equally to the unpruned ReKV baseline, with all $P$ tokens of a frame
+retained. Hyperparameters are listed in \cref{tab:supp_hparams}.
+
+\paragraph{Frame sampling and timestamps.}
+Frames are sampled at $f{=}1$\,fps; frame $t$ is the source frame shown at time $t/f$.
+Frames are processed strictly one at a time in arrival order, and no stage reads a
+future frame. No explicit timestamp, frame index or separator token is given to the LM:
+time is encoded only by the order of tokens in the stream. A question with timestamp
+$q$ is answered after frames $0,\dots,\lfloor qf\rfloor$ have been ingested.
+
+\paragraph{Visual tokens and processing order.}
+Each frame passes through SigLIP, the multimodal projector, and LLaVA-OneVision's
+bilinear $2{\times}$ pooling ($27{\times}27\!\to\!14{\times}14$), giving
+$\mathbf{F}_t\in\mathbb{R}^{P\times D}$ with $P{=}196$ tokens in row-major spatial
+order. TTS operates \emph{after} pooling, on these LM-space features; the vision tower
+and pooling are unchanged.
+
+\paragraph{Token selection (TTS).}
+For each spatial position $p$, TTS keeps a reference $\mathbf{r}_p$, the feature last
+\emph{retained} at $p$. Token $(t,p)$ is retained iff
+$1-\cos(\mathbf{F}_t[p],\mathbf{r}_p)>\tau$, in which case $\mathbf{r}_p\leftarrow
+\mathbf{F}_t[p]$; otherwise it is dropped and $\mathbf{r}_p$ is unchanged. Distances are
+computed in fp32. The first frame of each video is retained in full and initializes
+$\mathbf{r}$; references are reset between videos. Because each decision depends only
+on $\mathbf{F}_t$ and $\mathbf{r}$, the selection is causal and independent of how
+frames are batched. A dropped token leaves no slot in the sequence: it receives no
+attention, and its content survives only in the earlier retained token within cosine
+distance $\tau$ at the same position. A frame may retain $0$ to $P$ tokens.
+
+\paragraph{Packing order.}
+Retained tokens are appended in $(t,p)$ order: by frame, then by spatial position
+within the frame. Tokens from consecutive frames are contiguous, with no padding,
+separator or newline token between frames. This is the change in semantics relative to
+the unpruned model, where each frame occupies exactly $P$ consecutive positions.
+
+\paragraph{Block formation (CAC).}
+The stream of retained tokens is cut into blocks of exactly $B{=}P{=}196$ tokens by
+count, regardless of frame boundaries. A block therefore spans a content-dependent
+number of frames (many in a static scene, one in a busy one), and a frame spans at most
+two blocks. Until $B$ tokens accumulate, retained tokens are buffered as embeddings,
+not yet passed through the LM, so they are not yet in the KV cache. Each completed
+block is prefilled through the LM and committed to the cache.
+
+\paragraph{Query-time commit.}
+When a question arrives, any buffered tokens ($n<B$) are padded to a full block by
+repeating the last retained token $B-n$ times. The block is prefilled and committed
+before the question is processed, so every frame ingested so far is in memory. The
+padded block is permanent: later frames start a new block, and the padding counts
+toward the cache size and retrieval cost. On StreamBench this adds on average 96
+($\tau{=}0.5$) to 99 ($\tau{=}0.8$) padding tokens per question. At the end of a video
+the same padding is applied once to the final partial block.
+
+\paragraph{Warm-up and attention sink.}
+Each video starts from an empty cache. The system prompt (13 tokens) is prefilled first
+and kept permanently as an attention sink of $n_{\text{init}}$ tokens. While fewer than
+$n_{\text{local}}{=}15{,}000$ video tokens have been committed, all of them stay on the
+GPU and every block is attended directly. After that, blocks leaving the local window
+are offloaded to CPU memory. Pruning only changes \emph{when} this happens: the window
+holds $n_{\text{local}}/P\approx 76$ frames unpruned and about
+$n_{\text{local}}/(\rho P)$ frames at token keep rate $\rho$.
+
+\paragraph{Position IDs.}
+Keys are stored without rotary embedding (RoPE); RoPE is applied at attention time with
+positions equal to the index in the attended sequence. During encoding, each new block
+attends to the preceding $n_{\text{local}}$ committed tokens at consecutive positions.
+Positional distance therefore counts \emph{retained tokens}, not elapsed time: a static
+interval that retains few tokens occupies few positions. Following InfLLM/ReKV, once the
+sequence exceeds $n_{\text{local}}$ the sink tokens are attended with a single fixed
+relative position.
+
+\paragraph{Retrieval.}
+Each committed block is represented by the mean of its $B$ keys (padding included);
+each layer stores these representatives independently. For a question, the LM first
+runs the question tokens alone; in each layer the mean question query is compared with
+all block representatives by cosine similarity, and the top $k{=}64$ blocks are
+selected per layer. If no blocks have been offloaded yet, the representatives are
+computed from the blocks inside the local window and scored by dot product, and all
+blocks are used when there are at most $k$. The selected blocks are loaded, sorted by block index (i.e.\ temporal
+order) and concatenated after the sink tokens. The prompt and the answer then attend
+to [sink; $k$ retrieved blocks; prompt] at consecutive positions, so retrieved blocks
+are positionally adjacent regardless of the time between them, exactly as in ReKV. The
+retrieved context is always $kB{=}12{,}544$ tokens, but with pruning it covers a
+longer, content-dependent stretch of video. The most recent block is eligible for
+retrieval like any other, but it is not always selected. Answers are decoded greedily
+(at most 256 tokens on StreamBench).
+
+\paragraph{Costs.}
+LM prefill during ingestion, KV-cache memory, and the number of retrievable blocks all
+scale with the number of committed tokens: retained tokens plus padding, i.e.\ about
+$\rho$ of the unpruned count plus about one padding half-block per question. TTS adds
+one $D$-dimensional cosine distance per token, negligible beside the LM prefill. The
+query-time commit adds at most one block of prefill per question. Retrieval and
+answering cost per question are the same as in ReKV, since the retrieved context is a
+fixed $kB$ tokens.
+
+\begin{table}[t]
+  \centering
+  \small
+  \begin{tabular}{@{}lr@{}}
+    \toprule
+    Setting & Value \\
+    \midrule
+    Backbone & LLaVA-OneVision-Qwen2-7B (fp16) \\
+    Sampling rate $f$ & 1\,fps \\
+    Tokens per frame $P$ (after $2{\times}$ pooling) & 196 \\
+    Block size $B$ & 196 \\
+    Local window $n_{\text{local}}$ & 15{,}000 tokens \\
+    Attention sink $n_{\text{init}}$ & 13 tokens (system prompt) \\
+    Retrieved blocks per layer $k$ & 64 \\
+    Block representative & mean key \\
+    Retrieval score & cosine (mean question query) \\
+    GPU block cache & 128 blocks \\
+    TTS distance & $1-\cos$, fp32, vs.\ last retained \\
+    Thresholds $\tau$ & 0.50, 0.70 \\
+    Decoding & greedy, $\le$256 tokens \\
+    \bottomrule
+  \end{tabular}
+  \caption{Hyperparameters for TTS+CAC on ReKV. All except $\tau$ are identical for the
+  unpruned baseline.}
+  \label{tab:supp_hparams}
+\end{table}
